@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<link rel="stylesheet" href="style.css">
+<script src="script.js"></script>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CV Builder Pro — Multi‑Templates</title>
+  <!-- Polices & icônes -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <!-- Librairies -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+  <!-- Style CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <a class="logo" href="#">
+    <div class="logo-icon"><i class="fas fa-file-alt"></i></div>
+    <span class="logo-text">CV Builder</span>
+    <span class="logo-badge">Pro</span>
+  </a>
+
+  <!-- Sélecteur de couleur d'accent -->
+  <div class="header-center">
+    <span class="color-picker-label">Accent :</span>
+    <div class="color-dot active" style="background:#6366f1" data-color="#6366f1" title="Indigo"></div>
+    <div class="color-dot" style="background:#0ea5e9" data-color="#0ea5e9" title="Ciel"></div>
+    <div class="color-dot" style="background:#10b981" data-color="#10b981" title="Émeraude"></div>
+    <div class="color-dot" style="background:#f59e0b" data-color="#f59e0b" title="Ambre"></div>
+    <div class="color-dot" style="background:#ef4444" data-color="#ef4444" title="Rouge"></div>
+    <div class="color-dot" style="background:#ec4899" data-color="#ec4899" title="Rose"></div>
+    <div class="color-dot" style="background:#14b8a6" data-color="#14b8a6" title="Teal"></div>
+  </div>
+
+  <!-- Sélecteur de fond du CV -->
+  <div class="bg-selector">
+    <span class="color-picker-label">Fond :</span>
+    <div class="bg-btn active" data-bg="#ffffff">Blanc</div>
+    <div class="bg-btn" data-bg="#f8f9fa">Gris clair</div>
+    <div class="bg-btn" data-bg="#fef9e7">Beige</div>
+    <div class="bg-btn" data-bg="#e6f3ff">Bleuté</div>
+  </div>
+
+  <!-- Actions -->
+  <div class="header-right">
+    <button class="btn-icon" id="themeToggle" title="Changer de thème"><i class="fas fa-moon"></i></button>
+    <button class="btn-icon" id="resetBtn" title="Réinitialiser"><i class="fas fa-undo-alt"></i></button>
+    <button class="btn-dl" id="downloadPDF">
+      <i class="fas fa-download"></i>
+      <span>Télécharger PDF</span>
+    </button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main-wrapper">
+
+  <!-- FORM PANEL -->
+  <div class="form-panel" data-anim>
+    <div class="form-card">
+      <div class="form-card-header">
+        <p class="form-card-badge"><i class="fas fa-pen-nib"></i> Éditeur de contenu</p>
+        <nav class="tabs">
+          <button class="tab-btn active" data-tab="identite"><i class="fas fa-user"></i>Identité</button>
+          <button class="tab-btn" data-tab="experiences"><i class="fas fa-briefcase"></i>Expériences</button>
+          <button class="tab-btn" data-tab="formation"><i class="fas fa-graduation-cap"></i>Formation</button>
+          <button class="tab-btn" data-tab="skills"><i class="fas fa-layer-group"></i>Compétences & Langues</button>
+        </nav>
+      </div>
+      <div class="form-body">
+
+        <!-- TAB Identité -->
+        <div class="tab-panel active" id="tab-identite">
+          <div class="field-g">
+            <label class="field-lbl">Photo de profil</label>
+            <input type="file" id="photoUpload" accept="image/*" class="fi" style="padding:6px">
+            <div class="photo-preview-container">
+              <img id="photoPreview" src="#" alt="Aperçu" style="display:none; max-width:80px; border-radius:50%; margin-top:8px;">
+            </div>
+          </div>
+          <div class="field-g">
+            <label class="field-lbl">Nom complet</label>
+            <input class="fi" type="text" id="nom" placeholder="Jean Dupont">
+          </div>
+          <div class="field-g">
+            <label class="field-lbl">Titre professionnel</label>
+            <input class="fi" type="text" id="titre" placeholder="Développeur Full-Stack">
+          </div>
+          <div class="field-row field-g">
+            <div>
+              <label class="field-lbl">Email</label>
+              <input class="fi" type="email" id="email" placeholder="jean@exemple.com">
+            </div>
+            <div>
+              <label class="field-lbl">Téléphone</label>
+              <input class="fi" type="tel" id="telephone" placeholder="+33 6 12 34 56 78">
+            </div>
+          </div>
+          <div class="field-g">
+            <label class="field-lbl">Localisation</label>
+            <input class="fi" type="text" id="adresse" placeholder="Paris, France">
+          </div>
+          <div class="field-row field-g">
+            <div>
+              <label class="field-lbl">LinkedIn</label>
+              <input class="fi" type="text" id="linkedin" placeholder="linkedin.com/in/jean">
+            </div>
+            <div>
+              <label class="field-lbl">GitHub / Portfolio</label>
+              <input class="fi" type="text" id="github" placeholder="github.com/jean">
+            </div>
+          </div>
+          <div class="field-g">
+            <label class="field-lbl">Résumé / Accroche</label>
+            <textarea class="ft" id="resume" rows="3" placeholder="Quelques lignes sur votre profil..."></textarea>
+          </div>
+        </div>
+
+        <!-- TAB Expériences (dynamique) -->
+        <div class="tab-panel" id="tab-experiences">
+          <div class="sdivider"><span>Liste des expériences</span></div>
+          <div id="experiences-container"></div>
+          <button class="btn-add" id="addExperienceBtn"><i class="fas fa-plus-circle"></i> Ajouter une expérience</button>
+        </div>
+
+        <!-- TAB Formation (dynamique) -->
+        <div class="tab-panel" id="tab-formation">
+          <div class="sdivider"><span>Liste des formations</span></div>
+          <div id="formations-container"></div>
+          <button class="btn-add" id="addFormationBtn"><i class="fas fa-plus-circle"></i> Ajouter une formation</button>
+        </div>
+
+        <!-- TAB Compétences & Langues -->
+        <div class="tab-panel" id="tab-skills">
+          <div class="field-g">
+            <label class="field-lbl">Compétences techniques <span style="color:var(--text-muted);font-weight:400;">(séparées par virgule)</span></label>
+            <textarea class="ft" id="competences" rows="3" placeholder="JavaScript, TypeScript, React, Node.js..."></textarea>
+          </div>
+          <div class="sdivider"><span>Langues (ajoutez plusieurs)</span></div>
+          <div id="langues-container"></div>
+          <button class="btn-add" id="addLangueBtn"><i class="fas fa-plus-circle"></i> Ajouter une langue</button>
+          <div class="field-g" style="margin-top:15px;">
+            <label class="field-lbl">Centres d'intérêt</label>
+            <input class="fi" type="text" id="interets" placeholder="Open source, Voyage, Musique">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREVIEW PANEL -->
+  <div class="preview-panel" data-anim>
+    <!-- TEMPLATE SELECTOR -->
+    <div class="template-selector-wrap">
+      <p class="tpl-selector-title"><i class="fas fa-palette"></i>Choisir un template</p>
+      <div class="tpl-grid">
+        <div class="tpl-card active" data-tpl="elite"><div class="tpl-thumb"><div class="t1-thumb" style="flex:1"><div class="t1-sidebar"><div class="t1-av"></div><div class="t1-ln ac"></div><div class="t1-ln" style="width:45%"></div><div style="height:3px"></div><div class="t1-ln" style="width:80%"></div><div class="t1-ln" style="width:65%"></div><div class="t1-ln" style="width:75%"></div><div style="height:3px"></div><div class="t1-ln" style="width:70%"></div><div class="t1-ln" style="width:55%"></div></div><div class="t1-main"><div class="t1-hl"></div><div class="t1-ml"></div><div class="t1-ml short"></div><div class="t1-ml"></div><div style="height:4px"></div><div class="t1-hl" style="width:50%"></div><div class="t1-ml"></div><div class="t1-ml short"></div></div></div></div><div class="tpl-label">Élite</div></div>
+        <div class="tpl-card" data-tpl="minimal"><div class="tpl-thumb"><div class="t2-thumb" style="flex:1;height:100%"><div class="t2-top"><div class="t2-tname"></div><div class="t2-ttag"></div></div><div class="t2-bl acc"></div><div class="t2-bl" style="width:90%"></div><div class="t2-bl" style="width:70%"></div><div style="height:3px"></div><div class="t2-bl acc"></div><div class="t2-bl" style="width:85%"></div><div class="t2-bl" style="width:60%"></div><div style="height:3px"></div><div class="t2-bl acc"></div><div class="t2-bl" style="width:95%"></div></div></div><div class="tpl-label">Minimal</div></div>
+        <div class="tpl-card" data-tpl="modern"><div class="tpl-thumb"><div class="t3-thumb" style="flex:1"><div class="t3-hdr"><div class="t3-hav"></div><div class="t3-htext"><div class="t3-hn"></div><div class="t3-ht"></div></div></div><div class="t3-body"><div class="t3-col"><div class="t3-bl acc"></div><div class="t3-bl"></div><div class="t3-bl" style="width:70%"></div><div class="t3-bl"></div><div style="height:2px"></div><div class="t3-bl acc"></div><div class="t3-bl"></div></div><div class="t3-col"><div class="t3-bl acc"></div><div class="t3-bl"></div><div class="t3-bl" style="width:80%"></div><div style="height:2px"></div><div class="t3-bl acc"></div><div class="t3-bl"></div><div class="t3-bl" style="width:65%"></div></div></div></div></div><div class="tpl-label">Moderne</div></div>
+        <div class="tpl-card" data-tpl="executive"><div class="tpl-thumb"><div class="t4-thumb" style="flex:1;height:100%"><div class="t4-topbar"></div><div class="t4-row"><div class="t4-nm"></div><div class="t4-sep"></div><div class="t4-info"></div><div class="t4-info" style="width:14px"></div></div><div class="t4-line"></div><div class="t4-bl acc"></div><div style="height:2px"></div><div class="t4-bl" style="width:90%"></div><div class="t4-bl" style="width:75%"></div><div class="t4-bl"></div><div style="height:3px"></div><div class="t4-bl acc"></div><div style="height:2px"></div><div class="t4-bl" style="width:85%"></div><div class="t4-bl" style="width:70%"></div></div></div><div class="tpl-label">Executive</div></div>
+        <div class="tpl-card" data-tpl="neo"><div class="tpl-thumb"><div class="t5-thumb" style="flex:1"><div class="t5-hdr"><div class="t5-nav"></div><div class="t5-hn"></div><div class="t5-ht"></div></div><div class="t5-body"><div class="t5-bl acc"></div><div style="display:flex;gap:2px;margin:2px 0"><div class="t5-badge"></div><div class="t5-badge"></div><div class="t5-badge"></div></div><div class="t5-bl" style="width:85%"></div><div class="t5-bl" style="width:70%"></div><div style="height:3px"></div><div class="t5-bl acc"></div><div class="t5-bl" style="width:90%"></div><div class="t5-bl" style="width:75%"></div></div></div></div><div class="tpl-label">Neo Dark</div></div>
+      </div>
+    </div>
+
+    <!-- CV PAPER -->
+    <div class="cv-paper-wrapper">
+      <div class="preview-topbar">
+        <div class="live-badge"><div class="live-dot"></div>Aperçu en direct</div>
+        <div class="preview-hint"><i class="fas fa-arrows-alt" style="margin-right:4px"></i>Modifiez les champs à gauche</div>
+      </div>
+      <div class="cv-transition-wrap" id="cvTransitionWrap">
+        <div id="cvPreview"></div>
+      </div>
+    </div>
+    <p style="text-align:center;font-size:0.7rem;color:var(--text-muted);padding:4px 0">
+      <i class="fas fa-lock" style="margin-right:4px"></i>Vos données restent locales — aucun envoi vers un serveur
+    </p>
+  </div>
+</div>
+
+<!-- LOADING & TOAST -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p class="loading-text">Génération du PDF en cours…</p>
+</div>
+<div class="toast" id="toast">
+  <div class="toast-ic ok" id="toastIc"><i class="fas fa-check"></i></div>
+  <span id="toastMsg">PDF téléchargé !</span>
+</div>
+
+<!-- SCRIPT -->
+<script src="script.js"></script>
+</body>
+</html>
