@@ -3,15 +3,18 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TROPTOP CV Builder — Multi‑Templates</title>
+  <title>CV Builder Pro — Multi‑Templates</title>
   <!-- Polices & icônes -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <!-- Librairies -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <style>
     /* ========== STYLES ========== */
     :root {
@@ -166,7 +169,8 @@
       gap: 10px;
     }
     .btn-dl,
-    .btn-icon {
+    .btn-icon,
+    .btn-login {
       display: inline-flex;
       align-items: center;
       gap: 7px;
@@ -182,14 +186,14 @@
       transition: all 0.28s ease;
       white-space: nowrap;
     }
-    .btn-icon {
+    .btn-icon, .btn-login {
       padding: 9px 12px;
       background: var(--bg-card2);
       color: var(--text-primary);
       box-shadow: none;
       border: 1px solid var(--border);
     }
-    .btn-icon:hover {
+    .btn-icon:hover, .btn-login:hover {
       background: var(--bg-card);
     }
     .btn-dl::after {
@@ -690,6 +694,58 @@
       opacity: 1;
       transform: translateY(0);
     }
+    /* MODALE DE CONNEXION */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(5px);
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: var(--shadow-card);
+    }
+    .modal h2 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: var(--accent-light);
+    }
+    .modal input {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    .modal .btn {
+      width: 100%;
+      margin-top: 5px;
+    }
+    .modal-toggle {
+      margin-top: 15px;
+      text-align: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    .modal-toggle:hover {
+      color: var(--accent-light);
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-primary);
+      font-size: 0.85rem;
+    }
     /* RESPONSIVE */
     @media (max-width: 1100px) {
       .main-wrapper { grid-template-columns: 1fr; }
@@ -776,12 +832,25 @@
   <div class="header-right">
     <button class="btn-icon" id="themeToggle" title="Changer de thème"><i class="fas fa-moon"></i></button>
     <button class="btn-icon" id="resetBtn" title="Réinitialiser"><i class="fas fa-undo-alt"></i></button>
+    <button class="btn-login" id="loginBtn"><i class="fas fa-user"></i> <span>Connexion</span></button>
     <button class="btn-dl" id="downloadPDF">
       <i class="fas fa-download"></i>
       <span>Télécharger PDF</span>
     </button>
   </div>
 </header>
+
+<!-- MODALE DE CONNEXION -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <h2 id="authTitle">Connexion</h2>
+    <input type="email" id="authEmail" class="fi" placeholder="Email" autocomplete="email">
+    <input type="password" id="authPassword" class="fi" placeholder="Mot de passe" autocomplete="current-password">
+    <button class="btn-dl" id="authAction">Se connecter</button>
+    <div class="modal-toggle" id="authToggle">Pas encore de compte ? S'inscrire</div>
+    <div style="margin-top:10px; text-align:center; color:var(--text-secondary); font-size:0.8rem;" id="authMessage"></div>
+  </div>
+</div>
 
 <!-- MAIN -->
 <div class="main-wrapper">
@@ -904,7 +973,7 @@
       </div>
     </div>
     <p style="text-align:center;font-size:0.7rem;color:var(--text-muted);padding:4px 0">
-      <i class="fas fa-lock" style="margin-right:4px"></i>Vos données restent locales — aucun envoi vers un serveur
+      <i class="fas fa-lock" style="margin-right:4px"></i>Vos données sont sauvegardées localement ou dans le cloud si connecté.
     </p>
   </div>
 </div>
@@ -920,22 +989,29 @@
 </div>
 
 <script>
+  /* ========== FIREBASE CONFIG ========== */
+  // Remplacez ces valeurs par celles de votre projet Firebase
+  const firebaseConfig = {
+    apiKey: "VOTRE_API_KEY",
+    authDomain: "VOTRE_AUTH_DOMAIN",
+    projectId: "VOTRE_PROJECT_ID",
+    storageBucket: "VOTRE_STORAGE_BUCKET",
+    messagingSenderId: "VOTRE_MESSAGING_SENDER_ID",
+    appId: "VOTRE_APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
   /* ========== SCRIPT ========== */
   (function() {
-    // Configuration EmailJS
-    const EMAILJS_PUBLIC_KEY = 'ut02gBJ5Z4xwt5Mfh';
-    const EMAILJS_SERVICE_ID = 'service_tloce4e';
-    const EMAILJS_TEMPLATE_USER_ID = 'template_2c38mrs';
-    const EMAILJS_TEMPLATE_ADMIN_ID = 'template_mm9vsyr';
-    const ADMIN_EMAIL = 'troptoptech@gmail.com';
-    emailjs.init(EMAILJS_PUBLIC_KEY);
-
     // État global
     let currentTemplate = 'elite';
     let currentAccent = '#6366f1';
     let photoDataURL = null;
     let expCounter = 0, formCounter = 0, langueCounter = 0;
     let renderTimeout = null;
+    let currentUser = null;
 
     // Éléments DOM
     const cvPreview = document.getElementById('cvPreview');
@@ -947,6 +1023,16 @@
     const toastIc = document.getElementById('toastIc');
     const toastMsg = document.getElementById('toastMsg');
     const loadingOverlay = document.getElementById('loadingOverlay');
+    const loginBtn = document.getElementById('loginBtn');
+    const authModal = document.getElementById('authModal');
+    const authTitle = document.getElementById('authTitle');
+    const authEmail = document.getElementById('authEmail');
+    const authPassword = document.getElementById('authPassword');
+    const authAction = document.getElementById('authAction');
+    const authToggle = document.getElementById('authToggle');
+    const authMessage = document.getElementById('authMessage');
+
+    let isLoginMode = true;
 
     // Listes déroulantes pour langues
     const langueOptions = [
@@ -981,7 +1067,6 @@
     function getData() {
       const v = id => (document.getElementById(id) || {}).value || '';
 
-      // Expériences
       const expElements = document.querySelectorAll('#experiences-container .exp-block');
       const exps = [];
       expElements.forEach(block => {
@@ -996,7 +1081,6 @@
         }
       });
 
-      // Formations
       const formElements = document.querySelectorAll('#formations-container .exp-block');
       const forms = [];
       formElements.forEach(block => {
@@ -1010,7 +1094,6 @@
         }
       });
 
-      // Langues
       const langueElements = document.querySelectorAll('#langues-container .langue-block');
       const langues = [];
       langueElements.forEach(block => {
@@ -1513,11 +1596,11 @@
         block.remove();
         updatePreview();
         saveToLocalStorage();
-        initSortable();
+        if (currentUser) saveToCloud();
       }
     };
 
-    // Sauvegarde localStorage
+    // Sauvegarde locale (localStorage)
     function saveToLocalStorage() {
       const data = {
         inputs: {},
@@ -1660,14 +1743,231 @@
       }
     }
 
+    // Sauvegarde cloud Firestore
+    async function saveToCloud() {
+      if (!currentUser) return;
+      const data = {
+        inputs: {},
+        exps: [],
+        forms: [],
+        langues: [],
+        photo: photoDataURL,
+        template: currentTemplate,
+        accent: currentAccent,
+        theme: document.body.classList.contains('light-theme') ? 'light' : 'dark'
+      };
+      // Même logique que saveToLocalStorage
+      ['nom','titre','email','telephone','adresse','linkedin','github','resume','competences','interets'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) data.inputs[id] = el.value;
+      });
+      document.querySelectorAll('#experiences-container .exp-block').forEach(block => {
+        const idx = block.dataset.index;
+        if (idx) {
+          data.exps.push({
+            poste: document.getElementById(`exp_${idx}_poste`)?.value || '',
+            entreprise: document.getElementById(`exp_${idx}_entreprise`)?.value || '',
+            date: document.getElementById(`exp_${idx}_date`)?.value || '',
+            desc: document.getElementById(`exp_${idx}_desc`)?.value || ''
+          });
+        }
+      });
+      document.querySelectorAll('#formations-container .exp-block').forEach(block => {
+        const idx = block.dataset.index;
+        if (idx) {
+          data.forms.push({
+            diplome: document.getElementById(`form_${idx}_diplome`)?.value || '',
+            ecole: document.getElementById(`form_${idx}_ecole`)?.value || '',
+            annee: document.getElementById(`form_${idx}_annee`)?.value || ''
+          });
+        }
+      });
+      document.querySelectorAll('#langues-container .langue-block').forEach(block => {
+        const idx = block.dataset.index;
+        if (idx) {
+          const langueSelect = document.getElementById(`langue_${idx}_langue`);
+          const niveauSelect = document.getElementById(`langue_${idx}_niveau`);
+          const autreInput = document.getElementById(`langue_${idx}_autre`);
+          let langue = langueSelect?.value || '';
+          if (langue === 'Autre' && autreInput) {
+            langue = autreInput.value.trim() || 'Autre';
+          }
+          const niveau = niveauSelect?.value || '';
+          if (langue && niveau) {
+            data.langues.push({ langue, niveau });
+          }
+        }
+      });
+      try {
+        await db.collection('cvs').doc(currentUser.uid).set(data);
+        console.log('Sauvegarde cloud réussie');
+      } catch (error) {
+        console.error('Erreur sauvegarde cloud', error);
+      }
+    }
+
+    async function loadFromCloud() {
+      if (!currentUser) return;
+      try {
+        const doc = await db.collection('cvs').doc(currentUser.uid).get();
+        if (doc.exists) {
+          const data = doc.data();
+          if (data.inputs) {
+            Object.entries(data.inputs).forEach(([id, val]) => {
+              const el = document.getElementById(id);
+              if (el) el.value = val;
+            });
+          }
+          if (data.photo) {
+            photoDataURL = data.photo;
+            document.getElementById('photoPreview').src = photoDataURL;
+            document.getElementById('photoPreview').style.display = 'block';
+          }
+          if (data.template) {
+            currentTemplate = data.template;
+            document.querySelectorAll('.tpl-card').forEach(c => {
+              c.classList.toggle('active', c.dataset.tpl === currentTemplate);
+            });
+          }
+          if (data.accent) {
+            currentAccent = data.accent;
+            document.querySelectorAll('.color-dot').forEach(d => {
+              d.classList.toggle('active', d.dataset.color === currentAccent);
+            });
+          }
+          if (data.theme === 'light') {
+            document.body.classList.add('light-theme');
+            document.getElementById('themeToggle').innerHTML = '<i class="fas fa-sun"></i>';
+          }
+          experiencesContainer.innerHTML = '';
+          if (data.exps && data.exps.length) {
+            data.exps.forEach((exp, i) => {
+              expCounter++;
+              const block = createExpBlock(expCounter);
+              experiencesContainer.appendChild(block);
+              document.getElementById(`exp_${expCounter}_poste`).value = exp.poste || '';
+              document.getElementById(`exp_${expCounter}_entreprise`).value = exp.entreprise || '';
+              document.getElementById(`exp_${expCounter}_date`).value = exp.date || '';
+              document.getElementById(`exp_${expCounter}_desc`).value = exp.desc || '';
+            });
+          } else {
+            expCounter++;
+            experiencesContainer.appendChild(createExpBlock(expCounter));
+          }
+          formationsContainer.innerHTML = '';
+          if (data.forms && data.forms.length) {
+            data.forms.forEach((form, i) => {
+              formCounter++;
+              const block = createFormBlock(formCounter);
+              formationsContainer.appendChild(block);
+              document.getElementById(`form_${formCounter}_diplome`).value = form.diplome || '';
+              document.getElementById(`form_${formCounter}_ecole`).value = form.ecole || '';
+              document.getElementById(`form_${formCounter}_annee`).value = form.annee || '';
+            });
+          } else {
+            formCounter++;
+            formationsContainer.appendChild(createFormBlock(formCounter));
+          }
+          languesContainer.innerHTML = '';
+          if (data.langues && data.langues.length) {
+            data.langues.forEach((lang, i) => {
+              langueCounter++;
+              const block = createLangueBlock(langueCounter);
+              languesContainer.appendChild(block);
+              const selectLang = document.getElementById(`langue_${langueCounter}_langue`);
+              const selectNiv = document.getElementById(`langue_${langueCounter}_niveau`);
+              const autreDiv = document.getElementById(`langue_${langueCounter}_autre_container`);
+              if (langueOptions.includes(lang.langue)) {
+                selectLang.value = lang.langue;
+              } else {
+                selectLang.value = 'Autre';
+                autreDiv.style.display = 'block';
+                document.getElementById(`langue_${langueCounter}_autre`).value = lang.langue;
+              }
+              selectNiv.value = lang.niveau;
+            });
+          }
+          updatePreview();
+          initSortable();
+        } else {
+          // Pas de données cloud, utiliser localStorage
+          loadFromLocalStorage();
+        }
+      } catch (error) {
+        console.error('Erreur chargement cloud', error);
+      }
+    }
+
+    // Gestion authentification
+    authToggle.addEventListener('click', () => {
+      isLoginMode = !isLoginMode;
+      authTitle.textContent = isLoginMode ? 'Connexion' : 'Inscription';
+      authAction.textContent = isLoginMode ? 'Se connecter' : "S'inscrire";
+      authToggle.textContent = isLoginMode ? "Pas encore de compte ? S'inscrire" : "Déjà un compte ? Se connecter";
+      authMessage.textContent = '';
+    });
+
+    authAction.addEventListener('click', async () => {
+      const email = authEmail.value.trim();
+      const password = authPassword.value.trim();
+      authMessage.textContent = '';
+      if (!email || !password) {
+        authMessage.textContent = 'Veuillez remplir tous les champs';
+        return;
+      }
+      try {
+        if (isLoginMode) {
+          await auth.signInWithEmailAndPassword(email, password);
+        } else {
+          await auth.createUserWithEmailAndPassword(email, password);
+        }
+        authModal.classList.remove('active');
+      } catch (error) {
+        authMessage.textContent = error.message;
+      }
+    });
+
+    loginBtn.addEventListener('click', () => {
+      if (currentUser) {
+        auth.signOut();
+      } else {
+        authModal.classList.add('active');
+      }
+    });
+
+    auth.onAuthStateChanged(async (user) => {
+      currentUser = user;
+      if (user) {
+        loginBtn.innerHTML = `<i class="fas fa-user-check"></i> ${user.email}`;
+        await loadFromCloud();
+      } else {
+        loginBtn.innerHTML = `<i class="fas fa-user"></i> Connexion`;
+        loadFromLocalStorage();
+      }
+    });
+
     // Drag & drop
     let sortableInstances = [];
     function initSortable() {
       sortableInstances.forEach(s => s.destroy());
       sortableInstances = [];
       if (typeof Sortable !== 'undefined') {
-        sortableInstances.push(new Sortable(experiencesContainer, { animation: 150, onEnd: () => { updatePreview(); saveToLocalStorage(); } }));
-        sortableInstances.push(new Sortable(formationsContainer, { animation: 150, onEnd: () => { updatePreview(); saveToLocalStorage(); } }));
+        sortableInstances.push(new Sortable(experiencesContainer, {
+          animation: 150,
+          onEnd: () => {
+            updatePreview();
+            saveToLocalStorage();
+            if (currentUser) saveToCloud();
+          }
+        }));
+        sortableInstances.push(new Sortable(formationsContainer, {
+          animation: 150,
+          onEnd: () => {
+            updatePreview();
+            saveToLocalStorage();
+            if (currentUser) saveToCloud();
+          }
+        }));
       }
     }
 
@@ -1682,6 +1982,7 @@
           document.getElementById('photoPreview').style.display = 'block';
           updatePreview();
           saveToLocalStorage();
+          if (currentUser) saveToCloud();
         };
         reader.readAsDataURL(file);
       }
@@ -1693,6 +1994,7 @@
       experiencesContainer.appendChild(createExpBlock(expCounter));
       updatePreview();
       saveToLocalStorage();
+      if (currentUser) saveToCloud();
       initSortable();
     });
     document.getElementById('addFormationBtn').addEventListener('click', () => {
@@ -1700,6 +2002,7 @@
       formationsContainer.appendChild(createFormBlock(formCounter));
       updatePreview();
       saveToLocalStorage();
+      if (currentUser) saveToCloud();
       initSortable();
     });
     document.getElementById('addLangueBtn').addEventListener('click', () => {
@@ -1707,12 +2010,16 @@
       languesContainer.appendChild(createLangueBlock(langueCounter));
       updatePreview();
       saveToLocalStorage();
+      if (currentUser) saveToCloud();
     });
 
     // Réinitialisation
     document.getElementById('resetBtn').addEventListener('click', () => {
       if (confirm('Voulez-vous vraiment réinitialiser toutes les données ?')) {
         localStorage.removeItem('cvBuilderData');
+        if (currentUser) {
+          db.collection('cvs').doc(currentUser.uid).delete().catch(console.error);
+        }
         location.reload();
       }
     });
@@ -1723,191 +2030,50 @@
       const isLight = document.body.classList.contains('light-theme');
       document.getElementById('themeToggle').innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
       saveToLocalStorage();
+      if (currentUser) saveToCloud();
     });
 
-    /* ========== GÉNÉRATION PDF VECTORIEL ========== */
-    function generateVectorPDF() {
-      const d = getData();
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 20; // mm
-      let y = margin;
-
-      // Fonction pour vérifier l'espace et ajouter une page si nécessaire
-      function checkSpace(needed) {
-        if (y + needed > pageHeight - margin) {
+    // GÉNÉRATION PDF PAR CAPTURE D'ÉCRAN (fidèle à l'aperçu)
+    function generatePDF() {
+      const nom = (document.getElementById('nom').value || 'cv').toLowerCase().replace(/\s+/g, '-');
+      html2canvas(cvPreview, {
+        scale: 1.8, // Réduit pour alléger (2.5 était trop lourd)
+        backgroundColor: '#ffffff',
+        logging: false,
+        allowTaint: false,
+        useCORS: true,
+        width: cvPreview.offsetWidth,
+        height: cvPreview.offsetHeight
+      }).then(canvas => {
+        const imgData = canvas.toDataURL('image/jpeg', 0.8); // JPEG à 80% pour réduire le poids
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const pw = pdf.internal.pageSize.getWidth();
+        const ph = pdf.internal.pageSize.getHeight();
+        const ih = (canvas.height * pw) / canvas.width;
+        let left = ih, pos = 0;
+        pdf.addImage(imgData, 'JPEG', 0, pos, pw, ih);
+        left -= ph;
+        while (left > 0) {
+          pos -= ph;
           pdf.addPage();
-          y = margin;
+          pdf.addImage(imgData, 'JPEG', 0, pos, pw, ih);
+          left -= ph;
         }
-      }
-
-      // Styles de base
-      pdf.setFont('helvetica', 'normal');
-
-      // Nom et titre
-      pdf.setFontSize(24);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text(d.nom, margin, y);
-      y += 8;
-      pdf.setFontSize(14);
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(currentAccent);
-      pdf.text(d.titre, margin, y);
-      y += 8;
-      pdf.setTextColor(0);
-
-      // Coordonnées
-      pdf.setFontSize(10);
-      let contactParts = [];
-      if (d.email) contactParts.push(d.email);
-      if (d.telephone) contactParts.push(d.telephone);
-      if (d.adresse) contactParts.push(d.adresse);
-      if (d.linkedin) contactParts.push(d.linkedin);
-      if (d.github) contactParts.push(d.github);
-      const contactLine = contactParts.join(' | ');
-      pdf.text(contactLine, margin, y);
-      y += 8;
-
-      // Photo (si présente)
-      if (photoDataURL) {
-        // Convertir dataURL en image et l'ajouter
-        try {
-          pdf.addImage(photoDataURL, 'JPEG', pageWidth - margin - 30, margin - 5, 30, 30);
-        } catch (e) {
-          console.warn("Impossible d'ajouter la photo", e);
-        }
-      }
-
-      // Résumé
-      if (d.resume) {
-        pdf.setFontSize(11);
-        pdf.setFont('helvetica', 'italic');
-        const lines = pdf.splitTextToSize(d.resume, pageWidth - 2 * margin);
-        checkSpace(lines.length * 5);
-        pdf.text(lines, margin, y);
-        y += lines.length * 5 + 5;
-      }
-
-      // Expériences
-      if (d.exps.length > 0) {
-        pdf.setFontSize(14);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(currentAccent);
-        pdf.text('Expériences', margin, y);
-        y += 6;
-        pdf.setTextColor(0);
-        pdf.setFontSize(11);
-        pdf.setFont('helvetica', 'normal');
-
-        d.exps.forEach(exp => {
-          const titre = `${exp.poste} chez ${exp.entreprise}`;
-          const date = exp.date;
-          const desc = exp.desc;
-
-          pdf.setFont('helvetica', 'bold');
-          pdf.text(titre, margin, y);
-          pdf.setFont('helvetica', 'normal');
-          pdf.text(date, pageWidth - margin - pdf.getTextWidth(date), y);
-          y += 5;
-
-          const descLines = pdf.splitTextToSize(desc, pageWidth - 2 * margin);
-          pdf.text(descLines, margin, y);
-          y += descLines.length * 5 + 3;
-
-          checkSpace(10);
-        });
-        y += 5;
-      }
-
-      // Formations
-      if (d.forms.length > 0) {
-        pdf.setFontSize(14);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(currentAccent);
-        pdf.text('Formation', margin, y);
-        y += 6;
-        pdf.setTextColor(0);
-        pdf.setFontSize(11);
-
-        d.forms.forEach(form => {
-          const diplome = form.diplome;
-          const ecole = form.ecole;
-          const annee = form.annee;
-
-          pdf.setFont('helvetica', 'bold');
-          pdf.text(diplome, margin, y);
-          pdf.setFont('helvetica', 'normal');
-          pdf.text(annee, pageWidth - margin - pdf.getTextWidth(annee), y);
-          y += 5;
-          pdf.text(ecole, margin, y);
-          y += 7;
-
-          checkSpace(7);
-        });
-        y += 3;
-      }
-
-      // Compétences
-      if (d.skills.length > 0) {
-        pdf.setFontSize(14);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(currentAccent);
-        pdf.text('Compétences', margin, y);
-        y += 6;
-        pdf.setTextColor(0);
-        pdf.setFontSize(11);
-        const skillsStr = d.skills.join(' · ');
-        const lines = pdf.splitTextToSize(skillsStr, pageWidth - 2 * margin);
-        pdf.text(lines, margin, y);
-        y += lines.length * 5 + 5;
-      }
-
-      // Langues
-      if (d.langues.length > 0) {
-        pdf.setFontSize(14);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(currentAccent);
-        pdf.text('Langues', margin, y);
-        y += 6;
-        pdf.setTextColor(0);
-        pdf.setFontSize(11);
-        d.langues.forEach(l => {
-          const ligne = `${l.langue} : ${l.niveau}`;
-          pdf.text(ligne, margin, y);
-          y += 5;
-        });
-        y += 3;
-      }
-
-      // Intérêts
-      if (d.interets) {
-        pdf.setFontSize(14);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(currentAccent);
-        pdf.text('Centres d\'intérêt', margin, y);
-        y += 6;
-        pdf.setTextColor(0);
-        pdf.setFontSize(11);
-        pdf.text(d.interets, margin, y);
-        y += 8;
-      }
-
-      // Sauvegarde
-      const nom = d.nom.toLowerCase().replace(/\s+/g, '-') || 'cv';
-      pdf.save(`${nom}-cv.pdf`);
+        pdf.save(`${nom}-cv.pdf`);
+        showToast('PDF téléchargé avec succès !', 'ok');
+      }).catch(err => {
+        console.error(err);
+        showToast('Erreur de génération PDF.', 'err');
+      });
     }
 
-    // Remplacer l'ancien gestionnaire PDF
     document.getElementById('downloadPDF').addEventListener('click', function() {
       loadingOverlay.classList.add('active');
-      // Petit délai pour montrer le loader
       setTimeout(() => {
         try {
-          generateVectorPDF();
+          generatePDF();
           loadingOverlay.classList.remove('active');
-          showToast('PDF vectoriel généré avec succès !', 'ok');
         } catch (err) {
           console.error(err);
           loadingOverlay.classList.remove('active');
@@ -1916,7 +2082,6 @@
       }, 100);
     });
 
-    // Toast
     function showToast(msg, type = 'ok') {
       toastIc.className = 'toast-ic ' + type;
       toastIc.innerHTML = type === 'ok' ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>';
@@ -1930,6 +2095,7 @@
       el.addEventListener('input', () => {
         updatePreview();
         saveToLocalStorage();
+        if (currentUser) saveToCloud();
       });
     });
     document.querySelectorAll('.tpl-card').forEach(card => {
@@ -1939,6 +2105,7 @@
         currentTemplate = card.dataset.tpl;
         updatePreview();
         saveToLocalStorage();
+        if (currentUser) saveToCloud();
       });
     });
     document.querySelectorAll('.color-dot').forEach(dot => {
@@ -1948,6 +2115,7 @@
         currentAccent = dot.dataset.color;
         updatePreview();
         saveToLocalStorage();
+        if (currentUser) saveToCloud();
       });
     });
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1971,11 +2139,9 @@
         expCounter++; experiencesContainer.appendChild(createExpBlock(expCounter));
         formCounter++; formationsContainer.appendChild(createFormBlock(formCounter));
       }
-      loadFromLocalStorage();
-      initSortable();
+      // Ne pas charger localStorage ici, l'état auth le fera
     });
   })();
 </script>
 </body>
 </html>
-
