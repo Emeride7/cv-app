@@ -1,84 +1,102 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
   <title>CV Builder Pro — Multi‑Templates</title>
-  <!-- Polices & icônes -->
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <!-- Librairies -->
+
+  <!-- Libs -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-  <!-- Firebase SDK -->
+
+  <!-- Firebase (optional: app works without it) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
   <style>
-    /* ========== STYLES ========== */
+    /* ========== STYLES (Modern Pro) ========== */
     :root {
       --accent: #6366f1;
       --accent-light: #818cf8;
       --accent-dark: #4f46e5;
       --accent-glow: rgba(99,102,241,0.28);
+
       --bg-main: #080a10;
+      --bg-main-rgb: 8,10,16; /* FIX: utilisé par le header */
       --bg-card: #0f1117;
       --bg-card2: #161922;
       --bg-input: #1c1f2e;
+
       --border: rgba(255,255,255,0.07);
       --border-hover: rgba(255,255,255,0.13);
       --border-focus: rgba(99,102,241,0.55);
+
       --text-primary: #eeeef5;
       --text-secondary: #8b8fa8;
       --text-muted: #45495e;
+
       --success: #10b981;
+
       --radius: 16px;
       --radius-sm: 10px;
       --shadow-card: 0 0 0 1px rgba(255,255,255,0.04), 0 24px 60px rgba(0,0,0,0.55);
     }
+
     /* Thème clair */
     body.light-theme {
       --bg-main: #f8fafc;
+      --bg-main-rgb: 248,250,252;
       --bg-card: #ffffff;
       --bg-card2: #f1f5f9;
       --bg-input: #ffffff;
+
       --border: rgba(0,0,0,0.1);
       --border-hover: rgba(0,0,0,0.15);
       --border-focus: var(--accent);
+
       --text-primary: #0f172a;
       --text-secondary: #475569;
       --text-muted: #94a3b8;
+
       --shadow-card: 0 0 0 1px rgba(0,0,0,0.02), 0 20px 30px -10px rgba(0,0,0,0.1);
     }
+
     *,
     *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    html {
-      scroll-behavior: smooth;
-    }
+    *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background: var(--bg-main);
       color: var(--text-primary);
       min-height: 100vh;
       overflow-x: hidden;
       transition: background 0.2s, color 0.2s;
     }
+
     body::before {
-      content: '';
+      content: "";
       position: fixed;
       inset: 0;
-      background: radial-gradient(ellipse 70% 50% at 10% -5%, rgba(99,102,241,0.13) 0%, transparent 55%),
+      background:
+        radial-gradient(ellipse 70% 50% at 10% -5%, rgba(99,102,241,0.13) 0%, transparent 55%),
         radial-gradient(ellipse 50% 40% at 90% 105%, rgba(139,92,246,0.1) 0%, transparent 55%),
         radial-gradient(ellipse 40% 30% at 50% 50%, rgba(6,182,212,0.04) 0%, transparent 60%);
       pointer-events: none;
       z-index: 0;
     }
+
     /* HEADER */
     .site-header {
       position: sticky;
@@ -90,102 +108,91 @@
       justify-content: space-between;
       gap: 16px;
       border-bottom: 1px solid var(--border);
+
+      /* FIX: header background valide partout */
       background: rgba(var(--bg-main-rgb), 0.82);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
     }
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      flex-shrink: 0;
-    }
+
+    .logo { display:flex; align-items:center; gap:10px; text-decoration:none; flex-shrink:0; }
     .logo-icon {
-      width: 34px;
-      height: 34px;
+      width:34px; height:34px; border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:15px; color:#fff;
       background: linear-gradient(135deg, var(--accent), #8b5cf6);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      color: white;
       box-shadow: 0 0 18px var(--accent-glow);
     }
     .logo-text {
-      font-weight: 800;
-      font-size: 1.05rem;
+      font-weight:800; font-size:1.05rem;
       background: linear-gradient(135deg, #eeeef5, #a5b4fc);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
     }
     .logo-badge {
-      font-size: 0.6rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--accent-light);
+      font-size:0.6rem; font-weight:700; text-transform:uppercase;
+      letter-spacing:0.06em;
+      color:var(--accent-light);
       background: rgba(99,102,241,0.14);
-      border: 1px solid rgba(99,102,241,0.28);
-      padding: 2px 7px;
-      border-radius: 20px;
-      margin-left: 2px;
+      border:1px solid rgba(99,102,241,0.28);
+      padding:2px 7px; border-radius:20px; margin-left:2px;
     }
+
     .header-center {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      display:flex; align-items:center; gap:8px;
       background: var(--bg-card2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 6px 12px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:6px 12px;
     }
-    .color-picker-label {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-right: 4px;
-      white-space: nowrap;
-    }
+    .color-picker-label { font-size:0.75rem; color:var(--text-muted); margin-right:4px; white-space:nowrap; }
+
+    /* color-dot devient un button */
     .color-dot {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
+      width: 20px; height: 20px; border-radius: 999px;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
       border: 2px solid transparent;
       flex-shrink: 0;
+      background: transparent;
     }
-    .color-dot:hover {
-      transform: scale(1.2);
-    }
-    .color-dot.active {
-      border-color: white;
-      box-shadow: 0 0 8px currentColor;
-    }
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .btn-dl,
-    .btn-icon,
-    .btn-login {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 9px 20px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 0.83rem;
-      cursor: pointer;
-      border: none;
-      background: linear-gradient(135deg, var(--accent), #8b5cf6);
-      color: white;
-      box-shadow: 0 4px 18px var(--accent-glow), 0 0 0 1px rgba(255,255,255,0.09) inset;
+    .color-dot:hover { transform: scale(1.2); }
+    .color-dot.active { border-color: #fff; box-shadow: 0 0 8px currentColor; }
+
+    .header-right { display:flex; align-items:center; gap:10px; }
+
+    .btn-dl, .btn-icon, .btn-login {
+      display:inline-flex; align-items:center; gap:7px;
+      padding:9px 20px;
+      border-radius:10px;
+      font-weight:600;
+      font-size:0.83rem;
+      cursor:pointer;
+      border:none;
+      color:white;
       transition: all 0.28s ease;
       white-space: nowrap;
     }
+
+    /* FIX: pseudo-element et animation => button doit être relative */
+    .btn-dl {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      box-shadow: 0 4px 18px var(--accent-glow), 0 0 0 1px rgba(255,255,255,0.09) inset;
+    }
+    .btn-dl::after {
+      content: '';
+      position:absolute;
+      inset:0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+      opacity:0;
+      transition: opacity 0.3s;
+    }
+    .btn-dl:hover::after { opacity: 1; }
+    .btn-dl:hover { transform: translateY(-2px); box-shadow: 0 8px 28px var(--accent-glow); }
+    .btn-dl:active { transform: translateY(0); }
+
     .btn-icon, .btn-login {
       padding: 9px 12px;
       background: var(--bg-card2);
@@ -193,43 +200,23 @@
       box-shadow: none;
       border: 1px solid var(--border);
     }
-    .btn-icon:hover, .btn-login:hover {
-      background: var(--bg-card);
-    }
-    .btn-dl::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .btn-dl:hover::after {
-      opacity: 1;
-    }
-    .btn-dl:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 28px var(--accent-glow);
-    }
-    .btn-dl:active {
-      transform: translateY(0);
-    }
+    .btn-icon:hover, .btn-login:hover { background: var(--bg-card); }
+
     .btn-add {
-      background: none;
-      border: 1px dashed var(--accent);
-      color: var(--accent);
-      padding: 8px 16px;
-      border-radius: 30px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 12px;
+      background:none;
+      border:1px dashed var(--accent);
+      color:var(--accent);
+      padding:8px 16px;
+      border-radius:30px;
+      font-size:0.8rem;
+      font-weight:600;
+      cursor:pointer;
+      width:100%;
+      margin-top:12px;
       transition: background 0.2s;
     }
-    .btn-add:hover {
-      background: var(--accent-glow);
-    }
+    .btn-add:hover { background: var(--accent-glow); }
+
     /* MAIN LAYOUT */
     .main-wrapper {
       position: relative;
@@ -242,6 +229,7 @@
       gap: 28px;
       align-items: start;
     }
+
     /* FORM PANEL */
     .form-panel {
       position: sticky;
@@ -251,13 +239,9 @@
       scrollbar-width: thin;
       scrollbar-color: var(--border) transparent;
     }
-    .form-panel::-webkit-scrollbar {
-      width: 3px;
-    }
-    .form-panel::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 2px;
-    }
+    .form-panel::-webkit-scrollbar { width: 3px; }
+    .form-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
     .form-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -265,33 +249,20 @@
       box-shadow: var(--shadow-card);
       overflow: hidden;
     }
-    .form-card-header {
-      padding: 18px 22px 0;
-      border-bottom: 1px solid var(--border);
-    }
+    .form-card-header { padding: 18px 22px 0; border-bottom: 1px solid var(--border); }
+
     .form-card-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
       color: var(--text-muted);
       margin-bottom: 14px;
     }
-    .form-card-badge i {
-      color: var(--accent-light);
-    }
-    .tabs {
-      display: flex;
-      overflow-x: auto;
-      scrollbar-width: none;
-      gap: 0;
-    }
-    .tabs::-webkit-scrollbar {
-      display: none;
-    }
+    .form-card-badge i { color: var(--accent-light); }
+
+    .tabs { display:flex; overflow-x:auto; scrollbar-width:none; }
+    .tabs::-webkit-scrollbar { display:none; }
+
     .tab-btn {
       padding: 10px 14px;
       font-size: 0.8rem;
@@ -304,86 +275,78 @@
       white-space: nowrap;
       border-bottom: 2px solid transparent;
     }
-    .tab-btn i {
-      margin-right: 5px;
-      font-size: 0.75rem;
-    }
-    .tab-btn:hover {
-      color: var(--text-primary);
-    }
-    .tab-btn.active {
-      color: var(--accent-light);
-      border-bottom-color: var(--accent);
-    }
-    .form-body {
-      padding: 22px;
-    }
-    .tab-panel {
-      display: none;
-      animation: fadeUp 0.3s ease;
-    }
-    .tab-panel.active {
-      display: block;
-    }
+    .tab-btn i { margin-right: 5px; font-size: 0.75rem; }
+    .tab-btn:hover { color: var(--text-primary); }
+    .tab-btn.active { color: var(--accent-light); border-bottom-color: var(--accent); }
+
+    .form-body { padding: 22px; }
+    .tab-panel { display:none; animation: fadeUp 0.3s ease; }
+    .tab-panel.active { display:block; }
+
     @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity:0; transform: translateY(10px); }
+      to { opacity:1; transform: translateY(0); }
     }
-    /* Champs de formulaire */
-    .field-g {
-      margin-bottom: 16px;
-    }
-    .field-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+
+    /* Fields */
+    .field-g { margin-bottom: 16px; }
+    .field-row { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
     .field-lbl {
-      display: block;
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
+      display:block;
+      font-size:0.72rem;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.07em;
       color: var(--text-secondary);
-      margin-bottom: 6px;
+      margin-bottom:6px;
     }
-    .fi,
-    .ft {
-      width: 100%;
+
+    .req { color: #ef4444; margin-left: 4px; }
+
+    .field-hint {
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .field-error {
+      min-height: 16px;
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: #ef4444;
+    }
+
+    .fi, .ft {
+      width:100%;
       padding: 9px 13px;
       background: var(--bg-input);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       color: var(--text-primary);
-      font-family: 'Inter', sans-serif;
+      font-family: inherit;
       font-size: 0.85rem;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
       outline: none;
     }
-    .fi::placeholder,
-    .ft::placeholder {
-      color: var(--text-muted);
-    }
-    .fi:focus,
-    .ft:focus {
+
+    .fi::placeholder, .ft::placeholder { color: var(--text-muted); }
+    .fi:focus, .ft:focus {
       border-color: var(--border-focus);
       background: rgba(99,102,241,0.06);
       box-shadow: 0 0 0 3px var(--accent-glow);
     }
-    .ft {
-      resize: vertical;
-      min-height: 66px;
-      line-height: 1.5;
+
+    .fi:invalid[data-touched="1"] {
+      border-color: rgba(239,68,68,0.7);
+      box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
     }
-    /* Blocs dynamiques */
-    .exp-block,
-    .langue-block {
+
+    .ft { resize: vertical; min-height: 66px; line-height: 1.5; }
+
+    /* Dynamic blocks */
+    .exp-block, .langue-block {
       background: var(--bg-card2);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
@@ -391,27 +354,22 @@
       margin-bottom: 13px;
       transition: border-color 0.2s;
     }
-    .exp-block:hover,
-    .langue-block:hover {
-      border-color: rgba(99,102,241,0.25);
-    }
-    .exp-block-hdr,
-    .langue-block-hdr {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
+    .exp-block:hover, .langue-block:hover { border-color: rgba(99,102,241,0.25); }
+    .exp-block-hdr, .langue-block-hdr {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:12px;
     }
     .exp-num {
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+      font-size:0.7rem;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
       color: var(--accent-light);
       background: rgba(99,102,241,0.14);
       padding: 2px 9px;
       border-radius: 20px;
     }
+
     .btn-remove {
       background: none;
       border: none;
@@ -420,31 +378,24 @@
       font-size: 1rem;
       padding: 4px;
     }
-    .btn-remove:hover {
-      color: #ef4444;
-    }
+    .btn-remove:hover { color: #ef4444; }
+
     .sdivider {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      display:flex;
+      align-items:center;
+      gap:10px;
       margin: 22px 0 16px;
     }
     .sdivider span {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      font-size:0.72rem;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.1em;
       color: var(--text-secondary);
       white-space: nowrap;
     }
-    .sdivider::before,
-    .sdivider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-    /* Photo preview */
+    .sdivider::before, .sdivider::after { content:""; flex:1; height:1px; background: var(--border); }
+
     .photo-preview-container img {
       border-radius: 50%;
       border: 2px solid var(--accent);
@@ -452,26 +403,14 @@
       max-width: 80px;
       max-height: 80px;
     }
+
     /* Langue row */
-    .langue-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .langue-row select,
-    .langue-row input {
-      flex: 1;
-    }
-    .langue-row .btn-remove {
-      flex-shrink: 0;
-    }
+    .langue-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+    .langue-row select, .langue-row input { flex: 1; }
+
     /* PREVIEW PANEL */
-    .preview-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
+    .preview-panel { display:flex; flex-direction:column; gap:16px; }
+
     .template-selector-wrap {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -486,162 +425,128 @@
       letter-spacing: 0.1em;
       color: var(--text-muted);
       margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
+      display:flex; align-items:center; gap:7px;
     }
-    .tpl-selector-title i {
-      color: var(--accent-light);
-    }
-    .tpl-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-    }
+    .tpl-selector-title i { color: var(--accent-light); }
+
+    .tpl-grid { display:grid; grid-template-columns: repeat(5, 1fr); gap:10px; }
+
     .tpl-card {
-      cursor: pointer;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 2px solid var(--border);
+      cursor:pointer;
+      border-radius:10px;
+      overflow:hidden;
+      border:2px solid var(--border);
       transition: all 0.25s ease;
       position: relative;
       background: var(--bg-card2);
+      outline: none;
     }
     .tpl-card:hover {
       border-color: rgba(99,102,241,0.4);
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     }
+    .tpl-card:focus-visible {
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
     .tpl-card.active {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px var(--accent-glow), 0 8px 24px rgba(0,0,0,0.3);
     }
     .tpl-card.active::before {
-      content: '✓';
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
+      content: "✓";
+      position:absolute;
+      top:5px; right:5px;
+      width: 16px; height: 16px;
+      border-radius:50%;
       background: var(--accent);
       font-size: 9px;
       font-weight: 700;
       color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2;
+      display:flex; align-items:center; justify-content:center;
+      z-index:2;
     }
-    .tpl-thumb {
-      height: 80px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      pointer-events: none;
-    }
+
+    .tpl-thumb { height: 80px; display:flex; flex-direction:column; overflow:hidden; pointer-events:none; }
     .tpl-label {
-      text-align: center;
-      font-size: 0.68rem;
-      font-weight: 600;
-      padding: 5px 4px;
+      text-align:center;
+      font-size:0.68rem;
+      font-weight:600;
+      padding:5px 4px;
       color: var(--text-secondary);
       border-top: 1px solid var(--border);
       background: var(--bg-card);
-      letter-spacing: 0.03em;
+      letter-spacing:0.03em;
     }
-    .tpl-card.active .tpl-label {
-      color: var(--accent-light);
-    }
+    .tpl-card.active .tpl-label { color: var(--accent-light); }
+
     /* CV PAPER */
     .cv-paper-wrapper {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      overflow: hidden;
+      overflow:hidden;
       box-shadow: var(--shadow-card);
       transition: box-shadow 0.3s;
-      position: relative;
     }
     .cv-paper-wrapper:hover {
       box-shadow: 0 0 0 1px rgba(99,102,241,0.18), 0 32px 80px rgba(0,0,0,0.6);
     }
-    .cv-transition-wrap {
-      transition: opacity 0.25s ease;
-    }
-    .cv-transition-wrap.fading {
-      opacity: 0;
-    }
-    #cvPreview {
-      min-height: 842px;
-      font-family: 'Inter', sans-serif;
-    }
+    .cv-transition-wrap { transition: opacity 0.25s ease; }
+    .cv-transition-wrap.fading { opacity: 0; }
+
+    #cvPreview { min-height: 842px; font-family: "Inter", sans-serif; }
+
     .preview-topbar {
-      display: flex;
-      align-items: center;
+      display:flex;
+      align-items:center;
       justify-content: space-between;
-      margin-bottom: 0;
       padding: 12px 16px;
       background: var(--bg-card2);
       border-bottom: 1px solid var(--border);
       border-radius: var(--radius) var(--radius) 0 0;
     }
-    .live-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-    }
+    .live-badge { display:flex; align-items:center; gap:6px; font-size:0.72rem; font-weight:600; color: var(--text-secondary); }
     .live-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
+      width:7px; height:7px; border-radius:50%;
       background: var(--success);
       box-shadow: 0 0 6px var(--success);
       animation: livePulse 2s infinite;
     }
-    @keyframes livePulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.85); }
-    }
-    .preview-hint {
-      font-size: 0.7rem;
+    @keyframes livePulse { 0%,100% {opacity:1; transform:scale(1)} 50% {opacity:0.5; transform:scale(0.85)} }
+    .preview-hint { font-size:0.7rem; color: var(--text-muted); }
+
+    .privacy-hint {
+      text-align:center;
+      font-size:0.7rem;
       color: var(--text-muted);
+      padding: 4px 0;
     }
+
     /* LOADING & TOAST */
     .loading-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
+      display:none;
+      position:fixed;
+      inset:0;
       z-index: 9998;
       background: rgba(8,10,16,0.88);
       backdrop-filter: blur(12px);
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 18px;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:18px;
     }
-    .loading-overlay.active {
-      display: flex;
-    }
+    .loading-overlay.active { display:flex; }
     .spinner {
-      width: 48px;
-      height: 48px;
-      border: 3px solid var(--border);
+      width:48px; height:48px;
+      border:3px solid var(--border);
       border-top-color: var(--accent);
-      border-radius: 50%;
+      border-radius:50%;
       animation: spin 0.75s linear infinite;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    .loading-text {
-      font-size: 0.95rem;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
+    @keyframes spin { to { transform: rotate(360deg);} }
+    .loading-text { font-size:0.95rem; color: var(--text-secondary); font-weight:500; }
+
     .toast {
       position: fixed;
       bottom: 28px;
@@ -651,63 +556,48 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 12px 18px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.85rem;
-      font-weight: 500;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:0.85rem;
+      font-weight:500;
       color: var(--text-primary);
       box-shadow: 0 10px 40px rgba(0,0,0,0.45);
       transform: translateY(70px);
       opacity: 0;
       transition: all 0.38s cubic-bezier(0.34,1.56,0.64,1);
-      pointer-events: none;
+      pointer-events:none;
     }
-    .toast.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
+    .toast.show { transform: translateY(0); opacity:1; }
+
     .toast-ic {
-      width: 26px;
-      height: 26px;
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
+      width:26px;height:26px;border-radius:7px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:12px;
     }
-    .toast-ic.ok {
-      background: rgba(16,185,129,0.18);
-      color: var(--success);
-    }
-    .toast-ic.err {
-      background: rgba(239,68,68,0.18);
-      color: #ef4444;
-    }
-    /* ANIMATION AU SCROLL */
+    .toast-ic.ok { background: rgba(16,185,129,0.18); color: var(--success); }
+    .toast-ic.err { background: rgba(239,68,68,0.18); color: #ef4444; }
+
+    /* Scroll animation */
     [data-anim] {
-      opacity: 0;
+      opacity:0;
       transform: translateY(18px);
       transition: opacity 0.6s ease, transform 0.6s ease;
     }
-    [data-anim].visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    /* MODALE DE CONNEXION */
+    [data-anim].visible { opacity:1; transform: translateY(0); }
+
+    /* MODAL */
     .modal-overlay {
-      display: none;
+      display:none;
       position: fixed;
       inset: 0;
       z-index: 10000;
       background: rgba(0,0,0,0.7);
       backdrop-filter: blur(5px);
-      align-items: center;
-      justify-content: center;
+      align-items:center;
+      justify-content:center;
     }
-    .modal-overlay.active {
-      display: flex;
-    }
+    .modal-overlay.active { display:flex; }
     .modal {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -717,35 +607,19 @@
       max-width: 400px;
       box-shadow: var(--shadow-card);
     }
-    .modal h2 {
-      font-size: 1.5rem;
-      margin-bottom: 20px;
-      color: var(--accent-light);
-    }
-    .modal input {
-      width: 100%;
-      margin-bottom: 15px;
-    }
-    .modal .btn {
-      width: 100%;
-      margin-top: 5px;
-    }
-    .modal-toggle {
-      margin-top: 15px;
-      text-align: center;
+    .modal h2 { font-size: 1.5rem; margin-bottom: 20px; color: var(--accent-light); }
+    .modal input { width:100%; margin-bottom: 15px; }
+    .modal .btn { width:100%; margin-top: 5px; }
+    .modal-toggle { margin-top: 15px; text-align:center; color: var(--text-secondary); cursor:pointer; }
+    .modal-toggle:hover { color: var(--accent-light); }
+    .auth-message {
+      margin-top:10px;
+      text-align:center;
       color: var(--text-secondary);
-      cursor: pointer;
-    }
-    .modal-toggle:hover {
-      color: var(--accent-light);
-    }
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--text-primary);
       font-size: 0.85rem;
+      line-height: 1.4;
     }
+
     /* RESPONSIVE */
     @media (max-width: 1100px) {
       .main-wrapper { grid-template-columns: 1fr; }
@@ -755,12 +629,13 @@
     @media (max-width: 700px) {
       .main-wrapper { padding: 16px 12px 60px; }
       .site-header { padding: 12px 16px; }
-      .header-center { display: none; }
+      .header-center { display:none; }
       .tpl-grid { grid-template-columns: repeat(3, 1fr); }
       .field-row { grid-template-columns: 1fr; }
-      .btn-dl span { display: none; }
+      .btn-dl span { display:none; }
     }
-    /* Thumbnails (inchangés depuis l'original) */
+
+    /* Thumbnails (inchangés) */
     .t1-thumb { background:#1e1e2e; display:grid; grid-template-columns:35% 65%; height:100%; }
     .t1-sidebar { background:#1e1e2e; padding:5px 4px; display:flex; flex-direction:column; gap:3px; }
     .t1-av { width:18px; height:18px; border-radius:50%; margin:0 auto 3px; background:linear-gradient(135deg,#6366f1,#8b5cf6); }
@@ -807,1341 +682,1575 @@
   </style>
 </head>
 <body>
+  <noscript>
+    <div style="padding:16px;background:#fee2e2;color:#7f1d1d;font-family:Inter,system-ui;">
+      Cette application nécessite JavaScript.
+    </div>
+  </noscript>
 
-<!-- HEADER -->
-<header class="site-header">
-  <a class="logo" href="#">
-    <div class="logo-icon"><i class="fas fa-file-alt"></i></div>
-    <span class="logo-text">CV Builder</span>
-    <span class="logo-badge">Pro</span>
-  </a>
+  <!-- HEADER -->
+  <header class="site-header">
+    <a class="logo" href="#" aria-label="Accueil">
+      <div class="logo-icon"><i class="fas fa-file-alt" aria-hidden="true"></i></div>
+      <span class="logo-text">CV Builder</span>
+      <span class="logo-badge">Pro</span>
+    </a>
 
-  <!-- Sélecteur de couleur d'accent -->
-  <div class="header-center">
-    <span class="color-picker-label">Accent :</span>
-    <div class="color-dot active" style="background:#6366f1" data-color="#6366f1" title="Indigo"></div>
-    <div class="color-dot" style="background:#0ea5e9" data-color="#0ea5e9" title="Ciel"></div>
-    <div class="color-dot" style="background:#10b981" data-color="#10b981" title="Émeraude"></div>
-    <div class="color-dot" style="background:#f59e0b" data-color="#f59e0b" title="Ambre"></div>
-    <div class="color-dot" style="background:#ef4444" data-color="#ef4444" title="Rouge"></div>
-    <div class="color-dot" style="background:#ec4899" data-color="#ec4899" title="Rose"></div>
-    <div class="color-dot" style="background:#14b8a6" data-color="#14b8a6" title="Teal"></div>
-  </div>
+    <!-- Accent color -->
+    <div class="header-center" aria-label="Sélecteur de couleur d'accent">
+      <span class="color-picker-label">Accent :</span>
+      <button class="color-dot active" style="background:#6366f1" data-color="#6366f1" title="Indigo" aria-label="Indigo"></button>
+      <button class="color-dot" style="background:#0ea5e9" data-color="#0ea5e9" title="Ciel" aria-label="Ciel"></button>
+      <button class="color-dot" style="background:#10b981" data-color="#10b981" title="Émeraude" aria-label="Émeraude"></button>
+      <button class="color-dot" style="background:#f59e0b" data-color="#f59e0b" title="Ambre" aria-label="Ambre"></button>
+      <button class="color-dot" style="background:#ef4444" data-color="#ef4444" title="Rouge" aria-label="Rouge"></button>
+      <button class="color-dot" style="background:#ec4899" data-color="#ec4899" title="Rose" aria-label="Rose"></button>
+      <button class="color-dot" style="background:#14b8a6" data-color="#14b8a6" title="Teal" aria-label="Teal"></button>
+    </div>
 
-  <!-- Actions -->
-  <div class="header-right">
-    <button class="btn-icon" id="themeToggle" title="Changer de thème"><i class="fas fa-moon"></i></button>
-    <button class="btn-icon" id="resetBtn" title="Réinitialiser"><i class="fas fa-undo-alt"></i></button>
-    <button class="btn-login" id="loginBtn"><i class="fas fa-user"></i> <span>Connexion</span></button>
-    <button class="btn-dl" id="downloadPDF">
-      <i class="fas fa-download"></i>
-      <span>Télécharger PDF</span>
-    </button>
-  </div>
-</header>
+    <!-- Actions -->
+    <div class="header-right">
+      <button class="btn-icon" id="themeToggle" title="Changer de thème" aria-label="Changer de thème">
+        <i class="fas fa-moon" aria-hidden="true"></i>
+      </button>
 
-<!-- MODALE DE CONNEXION -->
-<div class="modal-overlay" id="authModal">
-  <div class="modal">
-    <h2 id="authTitle">Connexion</h2>
-    <input type="email" id="authEmail" class="fi" placeholder="Email" autocomplete="email">
-    <input type="password" id="authPassword" class="fi" placeholder="Mot de passe" autocomplete="current-password">
-    <button class="btn-dl" id="authAction">Se connecter</button>
-    <div class="modal-toggle" id="authToggle">Pas encore de compte ? S'inscrire</div>
-    <div style="margin-top:10px; text-align:center; color:var(--text-secondary); font-size:0.8rem;" id="authMessage"></div>
-  </div>
-</div>
+      <button class="btn-icon" id="resetBtn" title="Réinitialiser" aria-label="Réinitialiser">
+        <i class="fas fa-undo-alt" aria-hidden="true"></i>
+      </button>
 
-<!-- MAIN -->
-<div class="main-wrapper">
+      <button class="btn-login" id="loginBtn" type="button">
+        <i class="fas fa-user" aria-hidden="true"></i> <span>Connexion</span>
+      </button>
 
-  <!-- FORM PANEL -->
-  <div class="form-panel" data-anim>
-    <div class="form-card">
-      <div class="form-card-header">
-        <p class="form-card-badge"><i class="fas fa-pen-nib"></i> Éditeur de contenu</p>
-        <nav class="tabs">
-          <button class="tab-btn active" data-tab="identite"><i class="fas fa-user"></i>Identité</button>
-          <button class="tab-btn" data-tab="experiences"><i class="fas fa-briefcase"></i>Expériences</button>
-          <button class="tab-btn" data-tab="formation"><i class="fas fa-graduation-cap"></i>Formation</button>
-          <button class="tab-btn" data-tab="skills"><i class="fas fa-layer-group"></i>Compétences & Langues</button>
-        </nav>
-      </div>
-      <div class="form-body">
+      <button class="btn-dl" id="downloadPDF" type="button">
+        <i class="fas fa-download" aria-hidden="true"></i>
+        <span>Télécharger PDF</span>
+      </button>
+    </div>
+  </header>
 
-        <!-- TAB Identité -->
-        <div class="tab-panel active" id="tab-identite">
-          <div class="field-g">
-            <label class="field-lbl">Photo de profil</label>
-            <input type="file" id="photoUpload" accept="image/*" class="fi" style="padding:6px">
-            <div class="photo-preview-container">
-              <img id="photoPreview" src="#" alt="Aperçu" style="display:none; max-width:80px; border-radius:50%; margin-top:8px;">
-            </div>
-          </div>
-          <div class="field-g">
-            <label class="field-lbl">Nom complet</label>
-            <input class="fi" type="text" id="nom" placeholder="Jean Dupont">
-          </div>
-          <div class="field-g">
-            <label class="field-lbl">Titre professionnel</label>
-            <input class="fi" type="text" id="titre" placeholder="Développeur Full-Stack">
-          </div>
-          <div class="field-row field-g">
-            <div>
-              <label class="field-lbl">Email</label>
-              <input class="fi" type="email" id="email" placeholder="jean@exemple.com">
-            </div>
-            <div>
-              <label class="field-lbl">Téléphone</label>
-              <input class="fi" type="tel" id="telephone" placeholder="+33 6 12 34 56 78">
-            </div>
-          </div>
-          <div class="field-g">
-            <label class="field-lbl">Localisation</label>
-            <input class="fi" type="text" id="adresse" placeholder="Paris, France">
-          </div>
-          <div class="field-row field-g">
-            <div>
-              <label class="field-lbl">LinkedIn</label>
-              <input class="fi" type="text" id="linkedin" placeholder="linkedin.com/in/jean">
-            </div>
-            <div>
-              <label class="field-lbl">GitHub / Portfolio</label>
-              <input class="fi" type="text" id="github" placeholder="github.com/jean">
-            </div>
-          </div>
-          <div class="field-g">
-            <label class="field-lbl">Résumé / Accroche</label>
-            <textarea class="ft" id="resume" rows="3" placeholder="Quelques lignes sur votre profil..."></textarea>
-          </div>
-        </div>
-
-        <!-- TAB Expériences (dynamique) -->
-        <div class="tab-panel" id="tab-experiences">
-          <div class="sdivider"><span>Liste des expériences</span></div>
-          <div id="experiences-container"></div>
-          <button class="btn-add" id="addExperienceBtn"><i class="fas fa-plus-circle"></i> Ajouter une expérience</button>
-        </div>
-
-        <!-- TAB Formation (dynamique) -->
-        <div class="tab-panel" id="tab-formation">
-          <div class="sdivider"><span>Liste des formations</span></div>
-          <div id="formations-container"></div>
-          <button class="btn-add" id="addFormationBtn"><i class="fas fa-plus-circle"></i> Ajouter une formation</button>
-        </div>
-
-        <!-- TAB Compétences & Langues -->
-        <div class="tab-panel" id="tab-skills">
-          <div class="field-g">
-            <label class="field-lbl">Compétences techniques <span style="color:var(--text-muted);font-weight:400;">(séparées par virgule)</span></label>
-            <textarea class="ft" id="competences" rows="3" placeholder="JavaScript, TypeScript, React, Node.js..."></textarea>
-          </div>
-          <div class="sdivider"><span>Langues (ajoutez plusieurs)</span></div>
-          <div id="langues-container"></div>
-          <button class="btn-add" id="addLangueBtn"><i class="fas fa-plus-circle"></i> Ajouter une langue</button>
-          <div class="field-g" style="margin-top:15px;">
-            <label class="field-lbl">Centres d'intérêt</label>
-            <input class="fi" type="text" id="interets" placeholder="Open source, Voyage, Musique">
-          </div>
-        </div>
-      </div>
+  <!-- AUTH MODAL -->
+  <div class="modal-overlay" id="authModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <h2 id="authTitle">Connexion</h2>
+      <input type="email" id="authEmail" class="fi" placeholder="Email" autocomplete="email">
+      <input type="password" id="authPassword" class="fi" placeholder="Mot de passe" autocomplete="current-password">
+      <button class="btn-dl btn" id="authAction" type="button">Se connecter</button>
+      <div class="modal-toggle" id="authToggle">Pas encore de compte ? S'inscrire</div>
+      <div class="auth-message" id="authMessage"></div>
     </div>
   </div>
 
-  <!-- PREVIEW PANEL -->
-  <div class="preview-panel" data-anim>
-    <!-- TEMPLATE SELECTOR -->
-    <div class="template-selector-wrap">
-      <p class="tpl-selector-title"><i class="fas fa-palette"></i>Choisir un template</p>
-      <div class="tpl-grid">
-        <div class="tpl-card active" data-tpl="elite"><div class="tpl-thumb"><div class="t1-thumb" style="flex:1"><div class="t1-sidebar"><div class="t1-av"></div><div class="t1-ln ac"></div><div class="t1-ln" style="width:45%"></div><div style="height:3px"></div><div class="t1-ln" style="width:80%"></div><div class="t1-ln" style="width:65%"></div><div class="t1-ln" style="width:75%"></div><div style="height:3px"></div><div class="t1-ln" style="width:70%"></div><div class="t1-ln" style="width:55%"></div></div><div class="t1-main"><div class="t1-hl"></div><div class="t1-ml"></div><div class="t1-ml short"></div><div class="t1-ml"></div><div style="height:4px"></div><div class="t1-hl" style="width:50%"></div><div class="t1-ml"></div><div class="t1-ml short"></div></div></div></div><div class="tpl-label">Élite</div></div>
-        <div class="tpl-card" data-tpl="minimal"><div class="tpl-thumb"><div class="t2-thumb" style="flex:1;height:100%"><div class="t2-top"><div class="t2-tname"></div><div class="t2-ttag"></div></div><div class="t2-bl acc"></div><div class="t2-bl" style="width:90%"></div><div class="t2-bl" style="width:70%"></div><div style="height:3px"></div><div class="t2-bl acc"></div><div class="t2-bl" style="width:85%"></div><div class="t2-bl" style="width:60%"></div><div style="height:3px"></div><div class="t2-bl acc"></div><div class="t2-bl" style="width:95%"></div></div></div><div class="tpl-label">Minimal</div></div>
-        <div class="tpl-card" data-tpl="modern"><div class="tpl-thumb"><div class="t3-thumb" style="flex:1"><div class="t3-hdr"><div class="t3-hav"></div><div class="t3-htext"><div class="t3-hn"></div><div class="t3-ht"></div></div></div><div class="t3-body"><div class="t3-col"><div class="t3-bl acc"></div><div class="t3-bl"></div><div class="t3-bl" style="width:70%"></div><div class="t3-bl"></div><div style="height:2px"></div><div class="t3-bl acc"></div><div class="t3-bl"></div></div><div class="t3-col"><div class="t3-bl acc"></div><div class="t3-bl"></div><div class="t3-bl" style="width:80%"></div><div style="height:2px"></div><div class="t3-bl acc"></div><div class="t3-bl"></div><div class="t3-bl" style="width:65%"></div></div></div></div></div><div class="tpl-label">Moderne</div></div>
-        <div class="tpl-card" data-tpl="executive"><div class="tpl-thumb"><div class="t4-thumb" style="flex:1;height:100%"><div class="t4-topbar"></div><div class="t4-row"><div class="t4-nm"></div><div class="t4-sep"></div><div class="t4-info"></div><div class="t4-info" style="width:14px"></div></div><div class="t4-line"></div><div class="t4-bl acc"></div><div style="height:2px"></div><div class="t4-bl" style="width:90%"></div><div class="t4-bl" style="width:75%"></div><div class="t4-bl"></div><div style="height:3px"></div><div class="t4-bl acc"></div><div style="height:2px"></div><div class="t4-bl" style="width:85%"></div><div class="t4-bl" style="width:70%"></div></div></div><div class="tpl-label">Executive</div></div>
-        <div class="tpl-card" data-tpl="neo"><div class="tpl-thumb"><div class="t5-thumb" style="flex:1"><div class="t5-hdr"><div class="t5-nav"></div><div class="t5-hn"></div><div class="t5-ht"></div></div><div class="t5-body"><div class="t5-bl acc"></div><div style="display:flex;gap:2px;margin:2px 0"><div class="t5-badge"></div><div class="t5-badge"></div><div class="t5-badge"></div></div><div class="t5-bl" style="width:85%"></div><div class="t5-bl" style="width:70%"></div><div style="height:3px"></div><div class="t5-bl acc"></div><div class="t5-bl" style="width:90%"></div><div class="t5-bl" style="width:75%"></div></div></div></div><div class="tpl-label">Neo Dark</div></div>
-      </div>
-    </div>
+  <!-- MAIN -->
+  <main class="main-wrapper">
+    <!-- FORM PANEL -->
+    <section class="form-panel" data-anim>
+      <div class="form-card">
+        <div class="form-card-header">
+          <p class="form-card-badge"><i class="fas fa-pen-nib" aria-hidden="true"></i> Éditeur de contenu</p>
 
-    <!-- CV PAPER -->
-    <div class="cv-paper-wrapper">
-      <div class="preview-topbar">
-        <div class="live-badge"><div class="live-dot"></div>Aperçu en direct</div>
-        <div class="preview-hint"><i class="fas fa-arrows-alt" style="margin-right:4px"></i>Modifiez les champs à gauche</div>
-      </div>
-      <div class="cv-transition-wrap" id="cvTransitionWrap">
-        <div id="cvPreview"></div>
-      </div>
-    </div>
-    <p style="text-align:center;font-size:0.7rem;color:var(--text-muted);padding:4px 0">
-      <i class="fas fa-lock" style="margin-right:4px"></i>Vos données sont sauvegardées localement ou dans le cloud si connecté.
-    </p>
-  </div>
-</div>
-
-<!-- LOADING & TOAST -->
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="spinner"></div>
-  <p class="loading-text">Génération du PDF en cours…</p>
-</div>
-<div class="toast" id="toast">
-  <div class="toast-ic ok" id="toastIc"><i class="fas fa-check"></i></div>
-  <span id="toastMsg">PDF téléchargé !</span>
-</div>
-
-<script>
-  /* ========== FIREBASE CONFIG ========== */
-  // Remplacez ces valeurs par celles de votre projet Firebase
-  const firebaseConfig = {
-    apiKey: "VOTRE_API_KEY",
-    authDomain: "VOTRE_AUTH_DOMAIN",
-    projectId: "VOTRE_PROJECT_ID",
-    storageBucket: "VOTRE_STORAGE_BUCKET",
-    messagingSenderId: "VOTRE_MESSAGING_SENDER_ID",
-    appId: "VOTRE_APP_ID"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  /* ========== SCRIPT ========== */
-  (function() {
-    // État global
-    let currentTemplate = 'elite';
-    let currentAccent = '#6366f1';
-    let photoDataURL = null;
-    let expCounter = 0, formCounter = 0, langueCounter = 0;
-    let renderTimeout = null;
-    let currentUser = null;
-
-    // Éléments DOM
-    const cvPreview = document.getElementById('cvPreview');
-    const transitionWrap = document.getElementById('cvTransitionWrap');
-    const experiencesContainer = document.getElementById('experiences-container');
-    const formationsContainer = document.getElementById('formations-container');
-    const languesContainer = document.getElementById('langues-container');
-    const toast = document.getElementById('toast');
-    const toastIc = document.getElementById('toastIc');
-    const toastMsg = document.getElementById('toastMsg');
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    const loginBtn = document.getElementById('loginBtn');
-    const authModal = document.getElementById('authModal');
-    const authTitle = document.getElementById('authTitle');
-    const authEmail = document.getElementById('authEmail');
-    const authPassword = document.getElementById('authPassword');
-    const authAction = document.getElementById('authAction');
-    const authToggle = document.getElementById('authToggle');
-    const authMessage = document.getElementById('authMessage');
-
-    let isLoginMode = true;
-
-    // Listes déroulantes pour langues
-    const langueOptions = [
-      'Français', 'Anglais', 'Espagnol', 'Allemand', 'Italien', 'Portugais',
-      'Néerlandais', 'Russe', 'Chinois', 'Japonais', 'Arabe', 'Hébreu',
-      'Turc', 'Polonais', 'Suédois', 'Danois', 'Norvégien', 'Finnois',
-      'Grec', 'Hindi', 'Coréen', 'Vietnamien', 'Thaï', 'Indonésien',
-      'Roumain', 'Hongrois', 'Tchèque', 'Slovaque', 'Ukrainien', 'Autre'
-    ];
-    const niveauOptions = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'Natif', 'Courant', 'Intermédiaire', 'Débutant'];
-
-    // Utilitaires
-    function esc(s) {
-      const d = document.createElement('div');
-      d.appendChild(document.createTextNode(String(s)));
-      return d.innerHTML;
-    }
-    function initials(n) {
-      return n.split(' ').map(w => w[0] || '').join('').substring(0, 2).toUpperCase() || 'CV';
-    }
-    function hex2rgba(hex, a) {
-      const r = parseInt(hex.slice(1, 3), 16);
-      const g = parseInt(hex.slice(3, 5), 16);
-      const b = parseInt(hex.slice(5, 7), 16);
-      return `rgba(${r},${g},${b},${a})`;
-    }
-    function icon(cls, ac) {
-      return `<div style="width:20px;height:20px;border-radius:5px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;font-size:8px;color:${ac};flex-shrink:0;"><i class="${cls}"></i></div>`;
-    }
-
-    // Collecte des données
-    function getData() {
-      const v = id => (document.getElementById(id) || {}).value || '';
-
-      const expElements = document.querySelectorAll('#experiences-container .exp-block');
-      const exps = [];
-      expElements.forEach(block => {
-        const index = block.dataset.index;
-        if (index !== undefined) {
-          exps.push({
-            poste: v(`exp_${index}_poste`),
-            entreprise: v(`exp_${index}_entreprise`),
-            date: v(`exp_${index}_date`),
-            desc: v(`exp_${index}_desc`)
-          });
-        }
-      });
-
-      const formElements = document.querySelectorAll('#formations-container .exp-block');
-      const forms = [];
-      formElements.forEach(block => {
-        const index = block.dataset.index;
-        if (index !== undefined) {
-          forms.push({
-            diplome: v(`form_${index}_diplome`),
-            ecole: v(`form_${index}_ecole`),
-            annee: v(`form_${index}_annee`)
-          });
-        }
-      });
-
-      const langueElements = document.querySelectorAll('#langues-container .langue-block');
-      const langues = [];
-      langueElements.forEach(block => {
-        const index = block.dataset.index;
-        if (index !== undefined) {
-          const langueSelect = document.getElementById(`langue_${index}_langue`);
-          const niveauSelect = document.getElementById(`langue_${index}_niveau`);
-          const autreInput = document.getElementById(`langue_${index}_autre`);
-          let langue = langueSelect ? langueSelect.value : '';
-          if (langue === 'Autre' && autreInput) {
-            langue = autreInput.value.trim() || 'Autre';
-          }
-          const niveau = niveauSelect ? niveauSelect.value : '';
-          if (langue && niveau) {
-            langues.push({ langue, niveau });
-          }
-        }
-      });
-
-      return {
-        nom: v('nom') || 'Votre Nom',
-        titre: v('titre') || 'Titre professionnel',
-        email: v('email'),
-        telephone: v('telephone'),
-        adresse: v('adresse'),
-        linkedin: v('linkedin'),
-        github: v('github'),
-        resume: v('resume'),
-        exps: exps.filter(e => e.poste || e.entreprise),
-        forms: forms.filter(f => f.diplome),
-        skills: v('competences').split(',').map(s => s.trim()).filter(Boolean),
-        langues: langues,
-        interets: v('interets')
-      };
-    }
-
-    /* ========== TEMPLATES HTML (complets) ========== */
-    // Template Élite
-    function renderElite(d, ac, photo) {
-      const sb = '#1e1e2e';
-      const contactHtml = [
-        d.email && icon('fas fa-envelope', ac) + `<span>${esc(d.email)}</span>`,
-        d.telephone && icon('fas fa-phone-alt', ac) + `<span>${esc(d.telephone)}</span>`,
-        d.adresse && icon('fas fa-map-marker-alt', ac) + `<span>${esc(d.adresse)}</span>`,
-        d.linkedin && icon('fab fa-linkedin-in', ac) + `<span>${esc(d.linkedin)}</span>`,
-        d.github && icon('fab fa-github', ac) + `<span>${esc(d.github)}</span>`
-      ].filter(Boolean).map(s => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:rgba(255,255,255,0.72);word-break:break-all;">${s}</div>`).join('');
-
-      const skillsHtml = d.skills.map(s => `<span style="display:inline-block;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.78);padding:3px 9px;border-radius:20px;font-size:10px;font-weight:500;margin:2px;border:1px solid rgba(255,255,255,0.1);">${esc(s)}</span>`).join('');
-
-      const langsHtml = d.langues.map(l => {
-        return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:11px;color:rgba(255,255,255,0.72);font-weight:500;">${esc(l.langue)}</span><span style="font-size:9px;font-weight:700;color:${ac};background:${hex2rgba(ac,0.18)};padding:1px 8px;border-radius:10px;">${esc(l.niveau)}</span></div>`;
-      }).join('');
-
-      const expsHtml = d.exps.map(e => `
-        <div style="margin-bottom:18px;padding-left:14px;border-left:2px solid ${hex2rgba(ac,0.25)};position:relative;">
-          <div style="position:absolute;left:-5px;top:5px;width:8px;height:8px;border-radius:50%;background:${ac};border:2px solid white;box-shadow:0 0 0 1px ${ac};"></div>
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:4px;margin-bottom:2px;">
-            <span style="font-weight:700;font-size:13px;color:#111827;">${esc(e.poste)}</span>
-            <span style="font-size:10px;font-weight:600;color:${ac};background:${hex2rgba(ac,0.1)};padding:2px 9px;border-radius:10px;border:1px solid ${hex2rgba(ac,0.22)};white-space:nowrap;">${esc(e.date)}</span>
-          </div>
-          <div style="font-size:11px;color:#6b7280;font-weight:500;margin-bottom:4px;"><i class="fas fa-building" style="margin-right:5px;color:${ac};font-size:9px;"></i>${esc(e.entreprise)}</div>
-          <div style="font-size:11px;color:#6b7280;line-height:1.65;">${esc(e.desc)}</div>
-        </div>`).join('');
-
-      const formsHtml = d.forms.map(f => `
-        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:13px;">
-          <div style="width:30px;height:30px;border-radius:8px;flex-shrink:0;background:${hex2rgba(ac,0.1)};display:flex;align-items:center;justify-content:center;font-size:11px;color:${ac};border:1px solid ${hex2rgba(ac,0.2)};margin-top:1px;">
-            <i class="fas fa-graduation-cap"></i>
-          </div>
-          <div>
-            <div style="font-weight:700;font-size:12px;color:#111827;margin-bottom:2px;">${esc(f.diplome)}</div>
-            <div style="font-size:11px;color:#6b7280;">${esc(f.ecole)}</div>
-            <span style="font-size:10px;font-weight:600;color:${ac};background:${hex2rgba(ac,0.08)};padding:1px 7px;border-radius:8px;border:1px solid ${hex2rgba(ac,0.18)};display:inline-block;margin-top:2px;">${esc(f.annee)}</span>
-          </div>
-        </div>`).join('');
-
-      const sidebarSection = (title, content) => content ? `
-        <div style="margin-bottom:20px;">
-          <div style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:rgba(255,255,255,0.3);margin-bottom:10px;display:flex;align-items:center;gap:6px;">${esc(title)}<span style="flex:1;height:1px;background:rgba(255,255,255,0.08);display:block;"></span></div>
-          ${content}
-        </div>` : '';
-
-      const mainSection = (icon_cls, title, content) => content ? `
-        <div style="margin-bottom:26px;">
-          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:${ac};margin-bottom:13px;display:flex;align-items:center;gap:7px;">
-            <div style="width:22px;height:22px;border-radius:6px;background:${hex2rgba(ac,0.12)};display:flex;align-items:center;justify-content:center;font-size:9px;color:${ac};flex-shrink:0;"><i class="${icon_cls}"></i></div>
-            ${esc(title)}
-            <span style="flex:1;height:1.5px;background:linear-gradient(90deg,${ac},${hex2rgba(ac,0.08)});display:block;"></span>
-          </div>
-          ${content}
-        </div>` : '';
-
-      const avatarHtml = photo
-        ? `<img src="${photo}" style="width:76px;height:76px;border-radius:50%;object-fit:cover;margin:0 auto 16px;border:3px solid ${ac};box-shadow:0 0 0 3px rgba(255,255,255,0.12),0 8px 20px ${hex2rgba(ac,0.3)};">`
-        : `<div style="width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,${ac},#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:white;margin:0 auto 16px;box-shadow:0 0 0 3px rgba(255,255,255,0.12),0 8px 20px ${hex2rgba(ac,0.3)};">${esc(initials(d.nom))}</div>`;
-
-      return `<div style="display:grid;grid-template-columns:235px 1fr;min-height:842px;background:white;font-family:'Inter',sans-serif;">
-        <div style="background:${sb};padding:32px 22px;color:rgba(255,255,255,0.85);display:flex;flex-direction:column;">
-          ${avatarHtml}
-          <div style="font-size:17px;font-weight:800;text-align:center;color:white;margin-bottom:4px;line-height:1.2;">${esc(d.nom)}</div>
-          <div style="font-size:10px;font-weight:600;text-align:center;color:${ac};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:22px;">${esc(d.titre)}</div>
-          ${sidebarSection('Contact', contactHtml)}
-          ${skillsHtml ? sidebarSection('Compétences', `<div>${skillsHtml}</div>`) : ''}
-          ${langsHtml ? sidebarSection('Langues', langsHtml) : ''}
-          ${d.interets ? sidebarSection('Intérêts', `<div style="color:rgba(255,255,255,0.6);font-size:11px;line-height:1.7;">${esc(d.interets)}</div>`) : ''}
+          <nav class="tabs" aria-label="Navigation des sections">
+            <button class="tab-btn active" data-tab="identite" type="button"><i class="fas fa-user"></i>Identité</button>
+            <button class="tab-btn" data-tab="experiences" type="button"><i class="fas fa-briefcase"></i>Expériences</button>
+            <button class="tab-btn" data-tab="formation" type="button"><i class="fas fa-graduation-cap"></i>Formation</button>
+            <button class="tab-btn" data-tab="skills" type="button"><i class="fas fa-layer-group"></i>Compétences & Langues</button>
+          </nav>
         </div>
-        <div style="padding:32px 28px;">
-          ${d.resume ? `<div style="background:${hex2rgba(ac,0.05)};border-left:3px solid ${ac};border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:24px;font-size:12px;color:#374151;line-height:1.65;font-style:italic;">${esc(d.resume)}</div>` : ''}
-          ${mainSection('fas fa-briefcase', 'Expériences', expsHtml)}
-          ${mainSection('fas fa-graduation-cap', 'Formation', formsHtml)}
-        </div>
-      </div>`;
-    }
 
-    // Template Minimal
-    function renderMinimal(d, ac, photo) {
-      const contactLine = [
-        d.email && `<span><i class="fas fa-envelope" style="margin-right:4px;color:${ac};"></i>${esc(d.email)}</span>`,
-        d.telephone && `<span><i class="fas fa-phone-alt" style="margin-right:4px;color:${ac};"></i>${esc(d.telephone)}</span>`,
-        d.adresse && `<span><i class="fas fa-map-marker-alt" style="margin-right:4px;color:${ac};"></i>${esc(d.adresse)}</span>`,
-        d.linkedin && `<span><i class="fab fa-linkedin-in" style="margin-right:4px;color:${ac};"></i>${esc(d.linkedin)}</span>`,
-        d.github && `<span><i class="fab fa-github" style="margin-right:4px;color:${ac};"></i>${esc(d.github)}</span>`
-      ].filter(Boolean).join('<span style="color:#d1d5db;margin:0 8px;">|</span>');
-
-      const sec = (title, content) => content ? `
-        <div style="margin-bottom:24px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-            <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:${ac};">${esc(title)}</span>
-            <div style="flex:1;height:1px;background:${hex2rgba(ac,0.2)};"></div>
-          </div>
-          ${content}
-        </div>` : '';
-
-      const expsHtml = d.exps.map(e => `
-        <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;margin-bottom:16px;">
-          <div>
-            <div style="font-weight:700;font-size:13px;color:#111827;margin-bottom:2px;">${esc(e.poste)}</div>
-            <div style="font-size:11px;color:${ac};font-weight:600;margin-bottom:5px;">${esc(e.entreprise)}</div>
-            <div style="font-size:11px;color:#6b7280;line-height:1.65;">${esc(e.desc)}</div>
-          </div>
-          <span style="font-size:10px;color:#9ca3af;white-space:nowrap;font-weight:500;background:#f9fafb;padding:2px 8px;border-radius:6px;border:1px solid #e5e7eb;">${esc(e.date)}</span>
-        </div>`).join('');
-
-      const formsHtml = d.forms.map(f => `
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;flex-wrap:wrap;gap:4px;">
-          <div>
-            <div style="font-weight:700;font-size:12px;color:#111827;">${esc(f.diplome)}</div>
-            <div style="font-size:11px;color:#6b7280;">${esc(f.ecole)}</div>
-          </div>
-          <span style="font-size:10px;color:${ac};font-weight:700;">${esc(f.annee)}</span>
-        </div>`).join('');
-
-      const skillsHtml = d.skills.map(s => `<span style="display:inline-block;border:1.5px solid ${hex2rgba(ac,0.35)};color:${ac};padding:3px 10px;border-radius:6px;font-size:10px;font-weight:600;margin:2px;">${esc(s)}</span>`).join('');
-
-      const langsHtml = d.langues.map(l => `<span style="display:inline-block;background:#f9fafb;border:1px solid #e5e7eb;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:500;color:#374151;margin:2px;"><strong style="color:#111827;">${esc(l.langue)}</strong> — ${esc(l.niveau)}</span>`).join('');
-
-      const avatarHtml = photo
-        ? `<img src="${photo}" style="width:52px;height:52px;border-radius:14px;object-fit:cover;border:2px solid ${ac};">`
-        : `<div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,${ac},#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:white;flex-shrink:0;">${esc(initials(d.nom))}</div>`;
-
-      return `<div style="background:white;padding:44px 44px 36px;font-family:'Inter',sans-serif;min-height:840px;">
-        <div style="margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #f3f4f6;">
-          <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:10px;">
-            <div>
-              <h1 style="font-size:32px;font-weight:800;color:#0f172a;letter-spacing:-0.02em;line-height:1.1;margin-bottom:6px;">${esc(d.nom)}</h1>
-              <div style="font-size:13px;font-weight:600;color:${ac};text-transform:uppercase;letter-spacing:0.08em;">${esc(d.titre)}</div>
+        <!-- On met un <form> pour bénéficier de la validation HTML5 -->
+        <form class="form-body" id="cvForm" novalidate>
+          <!-- TAB Identité -->
+          <div class="tab-panel active" id="tab-identite">
+            <div class="field-g">
+              <label class="field-lbl" for="photoUpload">Photo de profil</label>
+              <input type="file" id="photoUpload" accept="image/*" class="fi" style="padding:6px" />
+              <div class="photo-preview-container" aria-live="polite">
+                <img id="photoPreview" src="" alt="Aperçu de la photo" style="display:none; max-width:80px; border-radius:50%; margin-top:8px;">
+              </div>
+              <p class="field-hint">Formats conseillés : JPG/PNG, carré si possible.</p>
             </div>
-            ${avatarHtml}
-          </div>
-          <div style="font-size:11px;color:#6b7280;display:flex;flex-wrap:wrap;gap:4px;align-items:center;">${contactLine}</div>
-          ${d.resume ? `<div style="margin-top:12px;font-size:12px;color:#374151;line-height:1.7;max-width:580px;">${esc(d.resume)}</div>` : ''}
-        </div>
-        ${sec('Expériences professionnelles', expsHtml)}
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
-          <div>${sec('Formation', formsHtml)}</div>
-          <div>
-            ${skillsHtml ? sec('Compétences techniques', `<div>${skillsHtml}</div>`) : ''}
-            ${langsHtml ? sec('Langues', `<div>${langsHtml}</div>`) : ''}
-            ${d.interets ? sec('Intérêts', `<p style="font-size:11px;color:#6b7280;line-height:1.7;">${esc(d.interets)}</p>`) : ''}
-          </div>
-        </div>
-      </div>`;
-    }
 
-    // Template Moderne
-    function renderModern(d, ac, photo) {
-      const expsHtml = d.exps.map((e, i) => `
-        <div style="position:relative;padding-left:20px;margin-bottom:18px;">
-          <div style="position:absolute;left:0;top:4px;width:10px;height:10px;border-radius:50%;background:${i===0?ac:'#e5e7eb'};border:2px solid white;box-shadow:0 0 0 2px ${i===0?ac:'#d1d5db'};"></div>
-          <div style="position:absolute;left:4px;top:16px;width:2px;bottom:-18px;background:linear-gradient(${ac},transparent);"></div>
-          <div style="font-weight:700;font-size:13px;color:#111827;margin-bottom:2px;">${esc(e.poste)}</div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
-            <span style="font-size:11px;color:${ac};font-weight:600;">${esc(e.entreprise)}</span>
-            <span style="font-size:10px;color:#9ca3af;">·</span>
-            <span style="font-size:10px;color:#9ca3af;">${esc(e.date)}</span>
-          </div>
-          <div style="font-size:11px;color:#6b7280;line-height:1.65;">${esc(e.desc)}</div>
-        </div>`).join('');
+            <div class="field-g">
+              <label class="field-lbl" for="nom">Nom complet <span class="req">*</span></label>
+              <input class="fi" type="text" id="nom" placeholder="Jean Dupont" required minlength="2" />
+              <p class="field-error" data-error-for="nom"></p>
+            </div>
 
-      const formsHtml = d.forms.map(f => `
-        <div style="background:#f9fafb;border-radius:10px;padding:12px 14px;margin-bottom:10px;border-left:3px solid ${ac};">
-          <div style="font-weight:700;font-size:12px;color:#111827;margin-bottom:2px;">${esc(f.diplome)}</div>
-          <div style="font-size:11px;color:#6b7280;">${esc(f.ecole)}</div>
-          <div style="font-size:10px;font-weight:700;color:${ac};margin-top:3px;">${esc(f.annee)}</div>
-        </div>`).join('');
+            <div class="field-g">
+              <label class="field-lbl" for="titre">Titre professionnel <span class="req">*</span></label>
+              <input class="fi" type="text" id="titre" placeholder="Développeur Full-Stack" required minlength="2" />
+              <p class="field-error" data-error-for="titre"></p>
+            </div>
 
-      const skillsHtml = d.skills.map(s => `
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">
-          <div style="width:6px;height:6px;border-radius:50%;background:${ac};flex-shrink:0;"></div>
-          <span style="font-size:11px;color:#374151;font-weight:500;">${esc(s)}</span>
-        </div>`).join('');
-
-      const langsHtml = d.langues.map(l => {
-        return `<div style="margin-bottom:8px;">
-          <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
-            <span style="font-size:11px;font-weight:600;color:#374151;">${esc(l.langue)}</span>
-            <span style="font-size:10px;color:${ac};font-weight:600;">${esc(l.niveau)}</span>
-          </div>
-          <div style="height:4px;background:#f3f4f6;border-radius:2px;overflow:hidden;">
-            <div style="height:100%;background:linear-gradient(90deg,${ac},${hex2rgba(ac,0.5)});width:${l.niveau.toLowerCase().includes('natif')||l.niveau.toLowerCase().includes('courant')?'90':'55'}%;border-radius:2px;"></div>
-          </div>
-        </div>`;
-      }).join('');
-
-      const contactItems = [
-        d.email && `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:rgba(255,255,255,0.85);word-break:break-all;"><i class="fas fa-envelope" style="width:14px;color:rgba(255,255,255,0.5);"></i>${esc(d.email)}</div>`,
-        d.telephone && `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:rgba(255,255,255,0.85);"><i class="fas fa-phone-alt" style="width:14px;color:rgba(255,255,255,0.5);"></i>${esc(d.telephone)}</div>`,
-        d.adresse && `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:rgba(255,255,255,0.85);"><i class="fas fa-map-marker-alt" style="width:14px;color:rgba(255,255,255,0.5);"></i>${esc(d.adresse)}</div>`,
-        d.linkedin && `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:rgba(255,255,255,0.85);"><i class="fab fa-linkedin-in" style="width:14px;color:rgba(255,255,255,0.5);"></i>${esc(d.linkedin)}</div>`,
-        d.github && `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:rgba(255,255,255,0.85);"><i class="fab fa-github" style="width:14px;color:rgba(255,255,255,0.5);"></i>${esc(d.github)}</div>`
-      ].filter(Boolean).join('');
-
-      const sCol = (title, content) => content ? `<div style="margin-bottom:20px;"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:rgba(255,255,255,0.35);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.1);">${esc(title)}</div>${content}</div>` : '';
-
-      const avatarHtml = photo
-        ? `<img src="${photo}" style="width:70px;height:70px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.3);">`
-        : `<div style="width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:white;flex-shrink:0;border:2px solid rgba(255,255,255,0.3);backdrop-filter:blur(10px);">${esc(initials(d.nom))}</div>`;
-
-      return `<div style="font-family:'Inter',sans-serif;min-height:840px;background:white;">
-        <div style="background:linear-gradient(135deg,${ac} 0%,#7c3aed 100%);padding:28px 32px;display:flex;align-items:center;gap:22px;">
-          ${avatarHtml}
-          <div style="flex:1;">
-            <h1 style="font-size:26px;font-weight:800;color:white;letter-spacing:-0.01em;line-height:1.2;margin-bottom:4px;">${esc(d.nom)}</h1>
-            <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.75);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">${esc(d.titre)}</div>
-            ${d.resume ? `<div style="font-size:11px;color:rgba(255,255,255,0.8);line-height:1.65;max-width:500px;">${esc(d.resume)}</div>` : ''}
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:200px 1fr;">
-          <div style="background:#1e1e2e;padding:24px 18px;min-height:620px;">
-            ${sCol('Contact', contactItems)}
-            ${d.skills.length ? sCol('Compétences', skillsHtml) : ''}
-            ${d.langues.length ? sCol('Langues', langsHtml) : ''}
-            ${d.interets ? sCol('Intérêts', `<p style="font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">${esc(d.interets)}</p>`) : ''}
-          </div>
-          <div style="padding:24px 26px;">
-            ${d.exps.length ? `<div style="margin-bottom:24px;"><div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:${ac};margin-bottom:14px;display:flex;align-items:center;gap:8px;"><i class="fas fa-briefcase"></i>Expériences<span style="flex:1;height:1.5px;background:linear-gradient(90deg,${ac},transparent);display:block;"></span></div>${expsHtml}</div>` : ''}
-            ${d.forms.length ? `<div><div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:${ac};margin-bottom:14px;display:flex;align-items:center;gap:8px;"><i class="fas fa-graduation-cap"></i>Formation<span style="flex:1;height:1.5px;background:linear-gradient(90deg,${ac},transparent);display:block;"></span></div>${formsHtml}</div>` : ''}
-          </div>
-        </div>
-      </div>`;
-    }
-
-    // Template Executive
-    function renderExecutive(d, ac, photo) {
-      const contactLine = [
-        d.email && `<span style="display:flex;align-items:center;gap:4px;"><i class="fas fa-envelope" style="font-size:9px;color:${ac};"></i>${esc(d.email)}</span>`,
-        d.telephone && `<span style="display:flex;align-items:center;gap:4px;"><i class="fas fa-phone-alt" style="font-size:9px;color:${ac};"></i>${esc(d.telephone)}</span>`,
-        d.adresse && `<span style="display:flex;align-items:center;gap:4px;"><i class="fas fa-map-marker-alt" style="font-size:9px;color:${ac};"></i>${esc(d.adresse)}</span>`,
-        d.linkedin && `<span style="display:flex;align-items:center;gap:4px;"><i class="fab fa-linkedin-in" style="font-size:9px;color:${ac};"></i>${esc(d.linkedin)}</span>`,
-        d.github && `<span style="display:flex;align-items:center;gap:4px;"><i class="fab fa-github" style="font-size:9px;color:${ac};"></i>${esc(d.github)}</span>`
-      ].filter(Boolean).map(s => `<div style="font-size:10px;color:#4b5563;">${s}</div>`).join('');
-
-      const sec = (title, content) => content ? `
-        <div style="margin-bottom:20px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-            <div style="width:3px;height:14px;background:${ac};border-radius:2px;flex-shrink:0;"></div>
-            <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#111827;">${esc(title)}</span>
-            <div style="flex:1;height:1px;background:#e5e7eb;"></div>
-          </div>
-          ${content}
-        </div>` : '';
-
-      const expsHtml = d.exps.map(e => `
-        <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px dashed #f3f4f6;">
-          <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:3px;">
-            <span style="font-weight:700;font-size:13px;color:#0f172a;">${esc(e.poste)}</span>
-            <span style="font-size:10px;font-weight:600;color:#9ca3af;font-style:italic;">${esc(e.date)}</span>
-          </div>
-          <div style="font-size:11px;color:${ac};font-weight:600;margin-bottom:5px;">${esc(e.entreprise)}</div>
-          <div style="font-size:11px;color:#4b5563;line-height:1.65;">${esc(e.desc)}</div>
-        </div>`).join('');
-
-      const formsHtml = d.forms.map(f => `
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:4px;">
-          <div><div style="font-weight:700;font-size:12px;color:#0f172a;">${esc(f.diplome)}</div><div style="font-size:11px;color:#6b7280;">${esc(f.ecole)}</div></div>
-          <span style="font-size:10px;font-weight:700;color:${ac};">${esc(f.annee)}</span>
-        </div>`).join('');
-
-      const skillsHtml = `<div style="display:flex;flex-wrap:wrap;gap:5px;">${d.skills.map(s => `<span style="background:#f8fafc;border:1px solid #e2e8f0;color:#374151;padding:3px 10px;border-radius:5px;font-size:10px;font-weight:500;">${esc(s)}</span>`).join('')}</div>`;
-
-      const langsHtml = d.langues.map(l => `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><span style="font-size:11px;font-weight:600;color:#374151;">${esc(l.langue)}</span><span style="font-size:10px;color:${ac};font-weight:700;">${esc(l.niveau)}</span></div>`).join('');
-
-      const avatarHtml = photo
-        ? `<img src="${photo}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid ${ac}; margin-right:12px;">`
-        : `<div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,${ac},#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:white;flex-shrink:0; margin-right:12px;">${esc(initials(d.nom))}</div>`;
-
-      return `<div style="background:white;padding:36px 40px;font-family:'Inter',sans-serif;min-height:840px;">
-        <div style="border-bottom:3px solid #0f172a;padding-bottom:18px;margin-bottom:22px;">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
-            <div style="display:flex; align-items:center;">
-              ${avatarHtml}
+            <div class="field-row field-g">
               <div>
-                <h1 style="font-size:30px;font-weight:900;color:#0f172a;letter-spacing:-0.03em;line-height:1;margin-bottom:5px;">${esc(d.nom)}</h1>
-                <div style="font-size:12px;font-weight:600;color:${ac};text-transform:uppercase;letter-spacing:0.1em;">${esc(d.titre)}</div>
+                <label class="field-lbl" for="email">Email</label>
+                <input class="fi" type="email" id="email" placeholder="jean@exemple.com" />
+              </div>
+              <div>
+                <label class="field-lbl" for="telephone">Téléphone</label>
+                <input class="fi" type="tel" id="telephone" placeholder="+33 6 12 34 56 78" />
               </div>
             </div>
-            <div style="display:flex;flex-direction:column;gap:3px;text-align:right;">${contactLine}</div>
+
+            <div class="field-g">
+              <label class="field-lbl" for="adresse">Localisation</label>
+              <input class="fi" type="text" id="adresse" placeholder="Paris, France" />
+            </div>
+
+            <div class="field-row field-g">
+              <div>
+                <label class="field-lbl" for="linkedin">LinkedIn</label>
+                <input class="fi" type="url" id="linkedin" placeholder="https://linkedin.com/in/jean" />
+              </div>
+              <div>
+                <label class="field-lbl" for="github">GitHub / Portfolio</label>
+                <input class="fi" type="url" id="github" placeholder="https://github.com/jean" />
+              </div>
+            </div>
+
+            <div class="field-g">
+              <label class="field-lbl" for="resume">Résumé / Accroche</label>
+              <textarea class="ft" id="resume" rows="3" placeholder="Quelques lignes sur votre profil..."></textarea>
+            </div>
           </div>
-          ${d.resume ? `<div style="margin-top:12px;font-size:12px;color:#374151;line-height:1.7;max-width:620px;border-top:1px solid #f3f4f6;padding-top:10px;">${esc(d.resume)}</div>` : ''}
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 200px;gap:32px;">
-          <div>${sec('Expériences professionnelles', expsHtml)}</div>
-          <div>
-            ${sec('Formation', formsHtml)}
-            ${d.skills.length ? sec('Compétences', skillsHtml) : ''}
-            ${d.langues.length ? sec('Langues', langsHtml) : ''}
-            ${d.interets ? sec('Intérêts', `<p style="font-size:11px;color:#6b7280;line-height:1.7;">${esc(d.interets)}</p>`) : ''}
+
+          <!-- TAB Expériences -->
+          <div class="tab-panel" id="tab-experiences">
+            <div class="sdivider"><span>Liste des expériences</span></div>
+            <div id="experiences-container"></div>
+            <button class="btn-add" id="addExperienceBtn" type="button"><i class="fas fa-plus-circle"></i> Ajouter une expérience</button>
+          </div>
+
+          <!-- TAB Formation -->
+          <div class="tab-panel" id="tab-formation">
+            <div class="sdivider"><span>Liste des formations</span></div>
+            <div id="formations-container"></div>
+            <button class="btn-add" id="addFormationBtn" type="button"><i class="fas fa-plus-circle"></i> Ajouter une formation</button>
+          </div>
+
+          <!-- TAB Skills -->
+          <div class="tab-panel" id="tab-skills">
+            <div class="field-g">
+              <label class="field-lbl" for="competences">
+                Compétences techniques <span style="color:var(--text-muted);font-weight:400;">(séparées par virgule)</span>
+              </label>
+              <textarea class="ft" id="competences" rows="3" placeholder="JavaScript, TypeScript, React, Node.js..."></textarea>
+            </div>
+
+            <div class="sdivider"><span>Langues (ajoutez plusieurs)</span></div>
+            <div id="langues-container"></div>
+            <button class="btn-add" id="addLangueBtn" type="button"><i class="fas fa-plus-circle"></i> Ajouter une langue</button>
+
+            <div class="field-g" style="margin-top:15px;">
+              <label class="field-lbl" for="interets">Centres d'intérêt</label>
+              <input class="fi" type="text" id="interets" placeholder="Open source, Voyage, Musique" />
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- PREVIEW PANEL -->
+    <section class="preview-panel" data-anim>
+      <div class="template-selector-wrap">
+        <p class="tpl-selector-title"><i class="fas fa-palette"></i>Choisir un template</p>
+
+        <div class="tpl-grid" role="list">
+          <div class="tpl-card active" data-tpl="elite" role="listitem" tabindex="0">
+            <div class="tpl-thumb">
+              <div class="t1-thumb" style="flex:1">
+                <div class="t1-sidebar">
+                  <div class="t1-av"></div><div class="t1-ln ac"></div><div class="t1-ln" style="width:45%"></div><div style="height:3px"></div>
+                  <div class="t1-ln" style="width:80%"></div><div class="t1-ln" style="width:65%"></div><div class="t1-ln" style="width:75%"></div>
+                  <div style="height:3px"></div><div class="t1-ln" style="width:70%"></div><div class="t1-ln" style="width:55%"></div>
+                </div>
+                <div class="t1-main">
+                  <div class="t1-hl"></div><div class="t1-ml"></div><div class="t1-ml short"></div><div class="t1-ml"></div><div style="height:4px"></div>
+                  <div class="t1-hl" style="width:50%"></div><div class="t1-ml"></div><div class="t1-ml short"></div>
+                </div>
+              </div>
+            </div>
+            <div class="tpl-label">Élite</div>
+          </div>
+
+          <div class="tpl-card" data-tpl="minimal" role="listitem" tabindex="0">
+            <div class="tpl-thumb">
+              <div class="t2-thumb" style="flex:1;height:100%">
+                <div class="t2-top"><div class="t2-tname"></div><div class="t2-ttag"></div></div>
+                <div class="t2-bl acc"></div><div class="t2-bl" style="width:90%"></div><div class="t2-bl" style="width:70%"></div><div style="height:3px"></div>
+                <div class="t2-bl acc"></div><div class="t2-bl" style="width:85%"></div><div class="t2-bl" style="width:60%"></div><div style="height:3px"></div>
+                <div class="t2-bl acc"></div><div class="t2-bl" style="width:95%"></div>
+              </div>
+            </div>
+            <div class="tpl-label">Minimal</div>
+          </div>
+
+          <div class="tpl-card" data-tpl="modern" role="listitem" tabindex="0">
+            <div class="tpl-thumb">
+              <div class="t3-thumb" style="flex:1">
+                <div class="t3-hdr"><div class="t3-hav"></div><div class="t3-htext"><div class="t3-hn"></div><div class="t3-ht"></div></div></div>
+                <div class="t3-body">
+                  <div class="t3-col"><div class="t3-bl acc"></div><div class="t3-bl"></div><div class="t3-bl" style="width:70%"></div><div class="t3-bl"></div><div style="height:2px"></div><div class="t3-bl acc"></div><div class="t3-bl"></div></div>
+                  <div class="t3-col"><div class="t3-bl acc"></div><div class="t3-bl"></div><div class="t3-bl" style="width:80%"></div><div style="height:2px"></div><div class="t3-bl acc"></div><div class="t3-bl"></div><div class="t3-bl" style="width:65%"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="tpl-label">Moderne</div>
+          </div>
+
+          <div class="tpl-card" data-tpl="executive" role="listitem" tabindex="0">
+            <div class="tpl-thumb">
+              <div class="t4-thumb" style="flex:1;height:100%">
+                <div class="t4-topbar"></div>
+                <div class="t4-row"><div class="t4-nm"></div><div class="t4-sep"></div><div class="t4-info"></div><div class="t4-info" style="width:14px"></div></div>
+                <div class="t4-line"></div><div class="t4-bl acc"></div><div style="height:2px"></div>
+                <div class="t4-bl" style="width:90%"></div><div class="t4-bl" style="width:75%"></div><div class="t4-bl"></div><div style="height:3px"></div>
+                <div class="t4-bl acc"></div><div style="height:2px"></div><div class="t4-bl" style="width:85%"></div><div class="t4-bl" style="width:70%"></div>
+              </div>
+            </div>
+            <div class="tpl-label">Executive</div>
+          </div>
+
+          <div class="tpl-card" data-tpl="neo" role="listitem" tabindex="0">
+            <div class="tpl-thumb">
+              <div class="t5-thumb" style="flex:1">
+                <div class="t5-hdr"><div class="t5-nav"></div><div class="t5-hn"></div><div class="t5-ht"></div></div>
+                <div class="t5-body">
+                  <div class="t5-bl acc"></div>
+                  <div style="display:flex;gap:2px;margin:2px 0"><div class="t5-badge"></div><div class="t5-badge"></div><div class="t5-badge"></div></div>
+                  <div class="t5-bl" style="width:85%"></div><div class="t5-bl" style="width:70%"></div><div style="height:3px"></div>
+                  <div class="t5-bl acc"></div><div class="t5-bl" style="width:90%"></div><div class="t5-bl" style="width:75%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="tpl-label">Neo Dark</div>
           </div>
         </div>
-      </div>`;
-    }
+      </div>
 
-    // Template Neo Dark
-    function renderNeo(d, ac, photo) {
-      const expsHtml = d.exps.map(e => `
-        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px;margin-bottom:10px;transition:all 0.2s;">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px;margin-bottom:4px;">
-            <span style="font-weight:700;font-size:13px;color:#f0f0f5;">${esc(e.poste)}</span>
-            <span style="font-size:9px;font-weight:700;color:${ac};background:${hex2rgba(ac,0.15)};padding:2px 9px;border-radius:20px;border:1px solid ${hex2rgba(ac,0.3)};white-space:nowrap;">${esc(e.date)}</span>
-          </div>
-          <div style="font-size:11px;color:${ac};font-weight:600;margin-bottom:6px;">${esc(e.entreprise)}</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.5);line-height:1.65;">${esc(e.desc)}</div>
-        </div>`).join('');
-
-      const formsHtml = d.forms.map(f => `
-        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
-          <div style="width:8px;height:8px;border-radius:50%;background:${ac};flex-shrink:0;margin-top:5px;box-shadow:0 0 8px ${hex2rgba(ac,0.6)};"></div>
-          <div>
-            <div style="font-weight:700;font-size:12px;color:#f0f0f5;margin-bottom:1px;">${esc(f.diplome)}</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.45);">${esc(f.ecole)} · ${esc(f.annee)}</div>
-          </div>
-        </div>`).join('');
-
-      const skillsHtml = d.skills.map(s => `<span style="display:inline-block;background:${hex2rgba(ac,0.12)};color:${ac};padding:4px 11px;border-radius:20px;font-size:10px;font-weight:600;margin:2px;border:1px solid ${hex2rgba(ac,0.25)};">${esc(s)}</span>`).join('');
-
-      const langsHtml = d.langues.map(l => `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:7px;border:1px solid rgba(255,255,255,0.06);"><span style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.75);">${esc(l.langue)}</span><span style="font-size:10px;color:${ac};font-weight:700;">${esc(l.niveau)}</span></div>`).join('');
-
-      const contactItems = [
-        d.email && `<i class="fas fa-envelope"></i> ${esc(d.email)}`,
-        d.telephone && `<i class="fas fa-phone-alt"></i> ${esc(d.telephone)}`,
-        d.adresse && `<i class="fas fa-map-marker-alt"></i> ${esc(d.adresse)}`,
-        d.linkedin && `<i class="fab fa-linkedin-in"></i> ${esc(d.linkedin)}`,
-        d.github && `<i class="fab fa-github"></i> ${esc(d.github)}`
-      ].filter(Boolean).map(s => `<div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:5px;display:flex;align-items:center;gap:7px;">${s}</div>`).join('');
-
-      const sec = (icon_cls, title, content) => content ? `
-        <div style="margin-bottom:22px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-            <div style="width:20px;height:20px;border-radius:6px;background:${hex2rgba(ac,0.15)};display:flex;align-items:center;justify-content:center;font-size:9px;color:${ac};"><i class="${icon_cls}"></i></div>
-            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:rgba(255,255,255,0.35);">${esc(title)}</span>
-            <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
-          </div>
-          ${content}
-        </div>` : '';
-
-      const neoSec = (icon_cls, title, content) => content ? `
-        <div style="margin-bottom:24px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-            <div style="width:24px;height:24px;border-radius:7px;background:${hex2rgba(ac,0.15)};display:flex;align-items:center;justify-content:center;font-size:10px;color:${ac};border:1px solid ${hex2rgba(ac,0.2)};"><i class="${icon_cls}"></i></div>
-            <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:${ac};">${esc(title)}</span>
-            <span style="flex:1;height:1px;background:${hex2rgba(ac,0.2)};display:block;"></span>
-          </div>
-          ${content}
-        </div>` : '';
-
-      const avatarHtml = photo
-        ? `<img src="${photo}" style="width:68px;height:68px;border-radius:18px;object-fit:cover;border:2px solid ${ac}; box-shadow:0 8px 24px ${hex2rgba(ac,0.4)};">`
-        : `<div style="width:68px;height:68px;border-radius:18px;background:linear-gradient(135deg,${ac},#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:white;margin:0 auto 14px;box-shadow:0 8px 24px ${hex2rgba(ac,0.4)};">${esc(initials(d.nom))}</div>`;
-
-      return `<div style="background:#0d0f18;min-height:840px;font-family:'Inter',sans-serif;display:grid;grid-template-columns:210px 1fr;">
-        <div style="background:#0a0b12;border-right:1px solid rgba(255,255,255,0.05);padding:28px 18px;display:flex;flex-direction:column;">
-          ${avatarHtml}
-          <div style="font-size:15px;font-weight:800;text-align:center;color:#f0f0f5;line-height:1.2;margin-bottom:4px;">${esc(d.nom)}</div>
-          <div style="font-size:9px;font-weight:700;text-align:center;color:${ac};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:20px;">${esc(d.titre)}</div>
-          ${contactItems ? sec('fas fa-address-card', 'Contact', contactItems) : ''}
-          ${d.skills.length ? sec('fas fa-code', 'Compétences', `<div>${skillsHtml}</div>`) : ''}
-          ${d.langues.length ? sec('fas fa-globe', 'Langues', langsHtml) : ''}
-          ${d.interets ? sec('fas fa-heart', 'Intérêts', `<p style="font-size:11px;color:rgba(255,255,255,0.4);line-height:1.7;">${esc(d.interets)}</p>`) : ''}
+      <div class="cv-paper-wrapper">
+        <div class="preview-topbar">
+          <div class="live-badge"><div class="live-dot"></div>Aperçu en direct</div>
+          <div class="preview-hint"><i class="fas fa-arrows-alt" style="margin-right:4px"></i>Modifiez les champs à gauche</div>
         </div>
-        <div style="padding:28px 26px;">
-          ${d.resume ? `<div style="background:${hex2rgba(ac,0.08)};border:1px solid ${hex2rgba(ac,0.2)};border-radius:10px;padding:14px 16px;margin-bottom:22px;font-size:12px;color:rgba(255,255,255,0.65);line-height:1.7;">${esc(d.resume)}</div>` : ''}
-          ${d.exps.length ? neoSec('fas fa-briefcase', 'Expériences', expsHtml) : ''}
-          ${d.forms.length ? neoSec('fas fa-graduation-cap', 'Formation', formsHtml) : ''}
+        <div class="cv-transition-wrap" id="cvTransitionWrap">
+          <div id="cvPreview"></div>
         </div>
-      </div>`;
-    }
+      </div>
 
-    const renderers = {
-      elite: renderElite,
-      minimal: renderMinimal,
-      modern: renderModern,
-      executive: renderExecutive,
-      neo: renderNeo
-    };
+      <p class="privacy-hint">
+        <i class="fas fa-lock" style="margin-right:4px"></i>
+        Vos données sont sauvegardées localement (et dans le cloud si connecté).
+      </p>
+    </section>
+  </main>
 
-    // Mise à jour du preview
-    function updatePreview() {
-      clearTimeout(renderTimeout);
-      renderTimeout = setTimeout(() => {
-        const d = getData();
-        const renderFn = renderers[currentTemplate];
-        if (!renderFn) return;
-        const html = renderFn(d, currentAccent, photoDataURL);
-        transitionWrap.classList.add('fading');
-        setTimeout(() => {
-          cvPreview.innerHTML = html;
-          transitionWrap.classList.remove('fading');
-        }, 200);
-      }, 80);
-    }
+  <!-- LOADING & TOAST -->
+  <div class="loading-overlay" id="loadingOverlay" aria-hidden="true">
+    <div class="spinner" aria-hidden="true"></div>
+    <p class="loading-text">Génération du PDF en cours…</p>
+  </div>
 
-    // Création des blocs dynamiques
-    function createExpBlock(index) {
-      const block = document.createElement('div');
-      block.className = 'exp-block';
-      block.dataset.index = index;
-      block.innerHTML = `
-        <div class="exp-block-hdr">
-          <span class="exp-num">Expérience ${index}</span>
-          <button class="btn-remove" onclick="removeBlock(this)"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="field-row field-g">
-          <div><label class="field-lbl">Poste</label><input class="fi" type="text" id="exp_${index}_poste" placeholder="Développeur Full-Stack"></div>
-          <div><label class="field-lbl">Entreprise</label><input class="fi" type="text" id="exp_${index}_entreprise" placeholder="Tech Solutions"></div>
-        </div>
-        <div class="field-g"><label class="field-lbl">Période</label><input class="fi" type="text" id="exp_${index}_date" placeholder="2022 — Présent"></div>
-        <div class="field-g"><label class="field-lbl">Description</label><textarea class="ft" id="exp_${index}_desc" placeholder="Conception et développement..."></textarea></div>
-      `;
-      return block;
-    }
-    function createFormBlock(index) {
-      const block = document.createElement('div');
-      block.className = 'exp-block';
-      block.dataset.index = index;
-      block.innerHTML = `
-        <div class="exp-block-hdr">
-          <span class="exp-num">Formation ${index}</span>
-          <button class="btn-remove" onclick="removeBlock(this)"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="field-g"><label class="field-lbl">Diplôme</label><input class="fi" type="text" id="form_${index}_diplome" placeholder="Master Informatique"></div>
-        <div class="field-row field-g">
-          <div><label class="field-lbl">Établissement</label><input class="fi" type="text" id="form_${index}_ecole" placeholder="Université Paris Saclay"></div>
-          <div><label class="field-lbl">Année</label><input class="fi" type="text" id="form_${index}_annee" placeholder="2022"></div>
-        </div>
-      `;
-      return block;
-    }
-    function createLangueBlock(index) {
-      const block = document.createElement('div');
-      block.className = 'langue-block';
-      block.dataset.index = index;
-      block.innerHTML = `
-        <div class="langue-block-hdr">
-          <span class="exp-num">Langue ${index}</span>
-          <button class="btn-remove" onclick="removeBlock(this)"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="langue-row">
-          <select class="fi" id="langue_${index}_langue" style="flex:1;">
-            ${langueOptions.map(l => `<option value="${l}">${l}</option>`).join('')}
-          </select>
-          <select class="fi" id="langue_${index}_niveau" style="flex:1;">
-            ${niveauOptions.map(n => `<option value="${n}">${n}</option>`).join('')}
-          </select>
-        </div>
-        <div class="field-g" id="langue_${index}_autre_container" style="display:none;">
-          <input class="fi" type="text" id="langue_${index}_autre" placeholder="Précisez la langue">
-        </div>
-      `;
-      const select = block.querySelector(`#langue_${index}_langue`);
-      const autreDiv = block.querySelector(`#langue_${index}_autre_container`);
-      select.addEventListener('change', () => {
-        autreDiv.style.display = select.value === 'Autre' ? 'block' : 'none';
-      });
-      return block;
-    }
-    window.removeBlock = function(btn) {
-      const block = btn.closest('.exp-block, .langue-block');
-      if (block) {
-        block.remove();
-        updatePreview();
-        saveToLocalStorage();
-        if (currentUser) saveToCloud();
-      }
-    };
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <div class="toast-ic ok" id="toastIc"><i class="fas fa-check"></i></div>
+    <span id="toastMsg">PDF téléchargé !</span>
+  </div>
 
-    // Sauvegarde locale (localStorage)
-    function saveToLocalStorage() {
-      const data = {
-        inputs: {},
-        exps: [],
-        forms: [],
-        langues: [],
-        photo: photoDataURL,
-        template: currentTemplate,
-        accent: currentAccent,
-        theme: document.body.classList.contains('light-theme') ? 'light' : 'dark'
+  <script>
+    /* ========== app.js ========== */
+    "use strict";
+
+    /* =========================
+       CV Builder Pro - app.js
+       - Preview live
+       - Multi templates
+       - PDF export (offline ok)
+       - localStorage + Cloud (Firebase optional)
+       - No console errors
+    ========================= */
+
+    (() => {
+      /* ---------- Optional Firebase init (app still works if unavailable) ---------- */
+      const firebaseConfig = {
+        apiKey: "AIzaSyALnIjuhNi560q16fdGShLE2KC0VnKBlI4",
+        authDomain: "cv-builder-5df65.firebaseapp.com",
+        projectId: "cv-builder-5df65",
+        storageBucket: "cv-builder-5df65.firebasestorage.app",
+        messagingSenderId: "632755749738",
+        appId: "1:632755749738:web:8f1d7a4294aae14c5d5b13"
       };
-      ['nom','titre','email','telephone','adresse','linkedin','github','resume','competences','interets'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) data.inputs[id] = el.value;
-      });
-      document.querySelectorAll('#experiences-container .exp-block').forEach(block => {
-        const idx = block.dataset.index;
-        if (idx) {
-          data.exps.push({
-            poste: document.getElementById(`exp_${idx}_poste`)?.value || '',
-            entreprise: document.getElementById(`exp_${idx}_entreprise`)?.value || '',
-            date: document.getElementById(`exp_${idx}_date`)?.value || '',
-            desc: document.getElementById(`exp_${idx}_desc`)?.value || ''
-          });
-        }
-      });
-      document.querySelectorAll('#formations-container .exp-block').forEach(block => {
-        const idx = block.dataset.index;
-        if (idx) {
-          data.forms.push({
-            diplome: document.getElementById(`form_${idx}_diplome`)?.value || '',
-            ecole: document.getElementById(`form_${idx}_ecole`)?.value || '',
-            annee: document.getElementById(`form_${idx}_annee`)?.value || ''
-          });
-        }
-      });
-      document.querySelectorAll('#langues-container .langue-block').forEach(block => {
-        const idx = block.dataset.index;
-        if (idx) {
-          const langueSelect = document.getElementById(`langue_${idx}_langue`);
-          const niveauSelect = document.getElementById(`langue_${idx}_niveau`);
-          const autreInput = document.getElementById(`langue_${idx}_autre`);
-          let langue = langueSelect?.value || '';
-          if (langue === 'Autre' && autreInput) {
-            langue = autreInput.value.trim() || 'Autre';
-          }
-          const niveau = niveauSelect?.value || '';
-          if (langue && niveau) {
-            data.langues.push({ langue, niveau });
-          }
-        }
-      });
-      localStorage.setItem('cvBuilderData', JSON.stringify(data));
-    }
 
-    function loadFromLocalStorage() {
-      const saved = localStorage.getItem('cvBuilderData');
-      if (!saved) return;
+      const hasFirebase = !!(window.firebase && window.firebase.initializeApp);
+      let auth = null;
+      let db = null;
+
       try {
-        const data = JSON.parse(saved);
-        if (data.inputs) {
-          Object.entries(data.inputs).forEach(([id, val]) => {
-            const el = document.getElementById(id);
-            if (el) el.value = val;
-          });
+        if (hasFirebase) {
+          window.firebase.initializeApp(firebaseConfig);
+          auth = window.firebase.auth();
+          db = window.firebase.firestore();
         }
-        if (data.photo) {
-          photoDataURL = data.photo;
-          document.getElementById('photoPreview').src = photoDataURL;
-          document.getElementById('photoPreview').style.display = 'block';
-        }
-        if (data.template) {
-          currentTemplate = data.template;
-          document.querySelectorAll('.tpl-card').forEach(c => {
-            c.classList.toggle('active', c.dataset.tpl === currentTemplate);
-          });
-        }
-        if (data.accent) {
-          currentAccent = data.accent;
-          document.querySelectorAll('.color-dot').forEach(d => {
-            d.classList.toggle('active', d.dataset.color === currentAccent);
-          });
-        }
-        if (data.theme === 'light') {
-          document.body.classList.add('light-theme');
-          document.getElementById('themeToggle').innerHTML = '<i class="fas fa-sun"></i>';
-        }
-        experiencesContainer.innerHTML = '';
-        if (data.exps && data.exps.length) {
-          data.exps.forEach((exp, i) => {
-            expCounter++;
-            const block = createExpBlock(expCounter);
-            experiencesContainer.appendChild(block);
-            document.getElementById(`exp_${expCounter}_poste`).value = exp.poste || '';
-            document.getElementById(`exp_${expCounter}_entreprise`).value = exp.entreprise || '';
-            document.getElementById(`exp_${expCounter}_date`).value = exp.date || '';
-            document.getElementById(`exp_${expCounter}_desc`).value = exp.desc || '';
-          });
-        } else {
-          expCounter++;
-          experiencesContainer.appendChild(createExpBlock(expCounter));
-        }
-        formationsContainer.innerHTML = '';
-        if (data.forms && data.forms.length) {
-          data.forms.forEach((form, i) => {
-            formCounter++;
-            const block = createFormBlock(formCounter);
-            formationsContainer.appendChild(block);
-            document.getElementById(`form_${formCounter}_diplome`).value = form.diplome || '';
-            document.getElementById(`form_${formCounter}_ecole`).value = form.ecole || '';
-            document.getElementById(`form_${formCounter}_annee`).value = form.annee || '';
-          });
-        } else {
-          formCounter++;
-          formationsContainer.appendChild(createFormBlock(formCounter));
-        }
-        languesContainer.innerHTML = '';
-        if (data.langues && data.langues.length) {
-          data.langues.forEach((lang, i) => {
-            langueCounter++;
-            const block = createLangueBlock(langueCounter);
-            languesContainer.appendChild(block);
-            const selectLang = document.getElementById(`langue_${langueCounter}_langue`);
-            const selectNiv = document.getElementById(`langue_${langueCounter}_niveau`);
-            const autreDiv = document.getElementById(`langue_${langueCounter}_autre_container`);
-            if (langueOptions.includes(lang.langue)) {
-              selectLang.value = lang.langue;
-            } else {
-              selectLang.value = 'Autre';
-              autreDiv.style.display = 'block';
-              document.getElementById(`langue_${langueCounter}_autre`).value = lang.langue;
-            }
-            selectNiv.value = lang.niveau;
-          });
-        }
-        updatePreview();
-        initSortable();
       } catch (e) {
-        console.warn('Erreur de chargement localStorage', e);
+        console.warn("Firebase indisponible (mode offline).", e);
+        auth = null;
+        db = null;
       }
-    }
 
-    // Sauvegarde cloud Firestore
-    async function saveToCloud() {
-      if (!currentUser) return;
-      const data = {
-        inputs: {},
-        exps: [],
-        forms: [],
-        langues: [],
-        photo: photoDataURL,
-        template: currentTemplate,
-        accent: currentAccent,
-        theme: document.body.classList.contains('light-theme') ? 'light' : 'dark'
+      /* ---------- State ---------- */
+      const state = {
+        currentTemplate: "elite",
+        currentAccent: "#6366f1",
+        photoDataURL: null,
+        expCounter: 0,
+        formCounter: 0,
+        langueCounter: 0,
+        renderTimeout: null,
+        currentUser: null,
+        isLoginMode: true
       };
-      // Même logique que saveToLocalStorage
-      ['nom','titre','email','telephone','adresse','linkedin','github','resume','competences','interets'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) data.inputs[id] = el.value;
-      });
-      document.querySelectorAll('#experiences-container .exp-block').forEach(block => {
-        const idx = block.dataset.index;
-        if (idx) {
-          data.exps.push({
-            poste: document.getElementById(`exp_${idx}_poste`)?.value || '',
-            entreprise: document.getElementById(`exp_${idx}_entreprise`)?.value || '',
-            date: document.getElementById(`exp_${idx}_date`)?.value || '',
-            desc: document.getElementById(`exp_${idx}_desc`)?.value || ''
-          });
-        }
-      });
-      document.querySelectorAll('#formations-container .exp-block').forEach(block => {
-        const idx = block.dataset.index;
-        if (idx) {
-          data.forms.push({
-            diplome: document.getElementById(`form_${idx}_diplome`)?.value || '',
-            ecole: document.getElementById(`form_${idx}_ecole`)?.value || '',
-            annee: document.getElementById(`form_${idx}_annee`)?.value || ''
-          });
-        }
-      });
-      document.querySelectorAll('#langues-container .langue-block').forEach(block => {
-        const idx = block.dataset.index;
-        if (idx) {
-          const langueSelect = document.getElementById(`langue_${idx}_langue`);
-          const niveauSelect = document.getElementById(`langue_${idx}_niveau`);
-          const autreInput = document.getElementById(`langue_${idx}_autre`);
-          let langue = langueSelect?.value || '';
-          if (langue === 'Autre' && autreInput) {
-            langue = autreInput.value.trim() || 'Autre';
-          }
-          const niveau = niveauSelect?.value || '';
-          if (langue && niveau) {
-            data.langues.push({ langue, niveau });
-          }
-        }
-      });
-      try {
-        await db.collection('cvs').doc(currentUser.uid).set(data);
-        console.log('Sauvegarde cloud réussie');
-      } catch (error) {
-        console.error('Erreur sauvegarde cloud', error);
-      }
-    }
 
-    async function loadFromCloud() {
-      if (!currentUser) return;
-      try {
-        const doc = await db.collection('cvs').doc(currentUser.uid).get();
-        if (doc.exists) {
-          const data = doc.data();
+      /* ---------- DOM ---------- */
+      const $ = (id) => document.getElementById(id);
+
+      const cvForm = $("cvForm");
+      const cvPreview = $("cvPreview");
+      const transitionWrap = $("cvTransitionWrap");
+
+      const experiencesContainer = $("experiences-container");
+      const formationsContainer = $("formations-container");
+      const languesContainer = $("langues-container");
+
+      const toast = $("toast");
+      const toastIc = $("toastIc");
+      const toastMsg = $("toastMsg");
+      const loadingOverlay = $("loadingOverlay");
+
+      const loginBtn = $("loginBtn");
+      const authModal = $("authModal");
+      const authTitle = $("authTitle");
+      const authEmail = $("authEmail");
+      const authPassword = $("authPassword");
+      const authAction = $("authAction");
+      const authToggle = $("authToggle");
+      const authMessage = $("authMessage");
+
+      const downloadBtn = $("downloadPDF");
+
+      /* ---------- Utils ---------- */
+      const debounce = (fn, wait = 400) => {
+        let t = null;
+        return (...args) => {
+          window.clearTimeout(t);
+          t = window.setTimeout(() => fn(...args), wait);
+        };
+      };
+
+      function esc(s) {
+        const d = document.createElement("div");
+        d.appendChild(document.createTextNode(String(s ?? "")));
+        return d.innerHTML;
+      }
+
+      function initials(name) {
+        const n = String(name || "").trim();
+        if (!n) return "CV";
+        return n.split(/\s+/).map(w => w[0] || "").join("").slice(0, 2).toUpperCase() || "CV";
+      }
+
+      function hex2rgba(hex, a) {
+        const h = String(hex || "#000000");
+        const r = parseInt(h.slice(1, 3), 16);
+        const g = parseInt(h.slice(3, 5), 16);
+        const b = parseInt(h.slice(5, 7), 16);
+        return `rgba(${r},${g},${b},${a})`;
+      }
+
+      function hexToRgb(hex) {
+        const h = String(hex || "#000000").replace("#", "");
+        const r = parseInt(h.substring(0, 2), 16);
+        const g = parseInt(h.substring(2, 4), 16);
+        const b = parseInt(h.substring(4, 6), 16);
+        return { r, g, b };
+      }
+
+      function setPdfAccent(pdf, hex) {
+        const { r, g, b } = hexToRgb(hex);
+        pdf.setTextColor(r, g, b);
+      }
+
+      function dataUrlImageType(dataUrl) {
+        if (!dataUrl || typeof dataUrl !== "string") return null;
+        if (dataUrl.startsWith("data:image/png")) return "PNG";
+        if (dataUrl.startsWith("data:image/jpeg") || dataUrl.startsWith("data:image/jpg")) return "JPEG";
+        if (dataUrl.startsWith("data:image/webp")) return "WEBP";
+        return null;
+      }
+
+      function showToast(msg, type = "ok") {
+        toastIc.className = "toast-ic " + type;
+        toastIc.innerHTML = type === "ok" ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>';
+        toastMsg.textContent = msg;
+        toast.classList.add("show");
+        window.setTimeout(() => toast.classList.remove("show"), 3600);
+      }
+
+      function icon(cls, ac) {
+        return `<div style="width:20px;height:20px;border-radius:5px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;font-size:8px;color:${ac};flex-shrink:0;"><i class="${cls}"></i></div>`;
+      }
+
+      /* ---------- Data collection ---------- */
+      function getVal(id) {
+        const el = $(id);
+        return el ? (el.value || "") : "";
+      }
+
+      function getData() {
+        const v = getVal;
+
+        const exps = Array.from(document.querySelectorAll("#experiences-container .exp-block")).map((block) => {
+          const idx = block.dataset.index;
+          return {
+            poste: v(`exp_${idx}_poste`),
+            entreprise: v(`exp_${idx}_entreprise`),
+            date: v(`exp_${idx}_date`),
+            desc: v(`exp_${idx}_desc`)
+          };
+        }).filter(e => e.poste || e.entreprise || e.date || e.desc);
+
+        const forms = Array.from(document.querySelectorAll("#formations-container .exp-block")).map((block) => {
+          const idx = block.dataset.index;
+          return {
+            diplome: v(`form_${idx}_diplome`),
+            ecole: v(`form_${idx}_ecole`),
+            annee: v(`form_${idx}_annee`)
+          };
+        }).filter(f => f.diplome || f.ecole || f.annee);
+
+        const langues = Array.from(document.querySelectorAll("#langues-container .langue-block")).map((block) => {
+          const idx = block.dataset.index;
+          const langueSelect = $(`langue_${idx}_langue`);
+          const niveauSelect = $(`langue_${idx}_niveau`);
+          const autreInput = $(`langue_${idx}_autre`);
+
+          let langue = langueSelect ? langueSelect.value : "";
+          if (langue === "Autre" && autreInput) langue = autreInput.value.trim() || "Autre";
+          const niveau = niveauSelect ? niveauSelect.value : "";
+          if (!langue || !niveau) return null;
+          return { langue, niveau };
+        }).filter(Boolean);
+
+        return {
+          nom: v("nom") || "Votre Nom",
+          titre: v("titre") || "Titre professionnel",
+          email: v("email"),
+          telephone: v("telephone"),
+          adresse: v("adresse"),
+          linkedin: v("linkedin"),
+          github: v("github"),
+          resume: v("resume"),
+          exps,
+          forms,
+          skills: v("competences").split(",").map(s => s.trim()).filter(Boolean),
+          langues,
+          interets: v("interets")
+        };
+      }
+
+      /* ---------- Templates (reprend tes renderers, inchangés sur le fond) ---------- */
+      function renderElite(d, ac, photo) {
+        const contactHtml = [
+          d.email && icon("fas fa-envelope", ac) + `<span>${esc(d.email)}</span>`,
+          d.telephone && icon("fas fa-phone-alt", ac) + `<span>${esc(d.telephone)}</span>`,
+          d.adresse && icon("fas fa-map-marker-alt", ac) + `<span>${esc(d.adresse)}</span>`,
+          d.linkedin && icon("fab fa-linkedin-in", ac) + `<span>${esc(d.linkedin)}</span>`,
+          d.github && icon("fab fa-github", ac) + `<span>${esc(d.github)}</span>`
+        ].filter(Boolean).map(s => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:rgba(255,255,255,0.72);word-break:break-all;">${s}</div>`).join("");
+
+        const skillsHtml = d.skills.map(s => `<span style="display:inline-block;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.78);padding:3px 9px;border-radius:20px;font-size:10px;font-weight:500;margin:2px;border:1px solid rgba(255,255,255,0.1);">${esc(s)}</span>`).join("");
+
+        const langsHtml = d.langues.map(l =>
+          `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-size:11px;color:rgba(255,255,255,0.72);font-weight:500;">${esc(l.langue)}</span>
+            <span style="font-size:9px;font-weight:700;color:${ac};background:${hex2rgba(ac,0.18)};padding:1px 8px;border-radius:10px;">${esc(l.niveau)}</span>
+          </div>`
+        ).join("");
+
+        const expsHtml = d.exps.map(e => `
+          <div style="margin-bottom:18px;padding-left:14px;border-left:2px solid ${hex2rgba(ac,0.25)};position:relative;">
+            <div style="position:absolute;left:-5px;top:5px;width:8px;height:8px;border-radius:50%;background:${ac};border:2px solid white;box-shadow:0 0 0 1px ${ac};"></div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:4px;margin-bottom:2px;">
+              <span style="font-weight:700;font-size:13px;color:#111827;">${esc(e.poste)}</span>
+              <span style="font-size:10px;font-weight:600;color:${ac};background:${hex2rgba(ac,0.1)};padding:2px 9px;border-radius:10px;border:1px solid ${hex2rgba(ac,0.22)};white-space:nowrap;">${esc(e.date)}</span>
+            </div>
+            <div style="font-size:11px;color:#6b7280;font-weight:500;margin-bottom:4px;"><i class="fas fa-building" style="margin-right:5px;color:${ac};font-size:9px;"></i>${esc(e.entreprise)}</div>
+            <div style="font-size:11px;color:#6b7280;line-height:1.65;">${esc(e.desc)}</div>
+          </div>`).join("");
+
+        const formsHtml = d.forms.map(f => `
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:13px;">
+            <div style="width:30px;height:30px;border-radius:8px;flex-shrink:0;background:${hex2rgba(ac,0.1)};display:flex;align-items:center;justify-content:center;font-size:11px;color:${ac};border:1px solid ${hex2rgba(ac,0.2)};margin-top:1px;">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:12px;color:#111827;margin-bottom:2px;">${esc(f.diplome)}</div>
+              <div style="font-size:11px;color:#6b7280;">${esc(f.ecole)}</div>
+              <span style="font-size:10px;font-weight:600;color:${ac};background:${hex2rgba(ac,0.08)};padding:1px 7px;border-radius:8px;border:1px solid ${hex2rgba(ac,0.18)};display:inline-block;margin-top:2px;">${esc(f.annee)}</span>
+            </div>
+          </div>`).join("");
+
+        const sidebarSection = (title, content) => content ? `
+          <div style="margin-bottom:20px;">
+            <div style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:rgba(255,255,255,0.3);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+              ${esc(title)}<span style="flex:1;height:1px;background:rgba(255,255,255,0.08);display:block;"></span>
+            </div>
+            ${content}
+          </div>` : "";
+
+        const mainSection = (icon_cls, title, content) => content ? `
+          <div style="margin-bottom:26px;">
+            <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:${ac};margin-bottom:13px;display:flex;align-items:center;gap:7px;">
+              <div style="width:22px;height:22px;border-radius:6px;background:${hex2rgba(ac,0.12)};display:flex;align-items:center;justify-content:center;font-size:9px;color:${ac};flex-shrink:0;">
+                <i class="${icon_cls}"></i>
+              </div>
+              ${esc(title)}
+              <span style="flex:1;height:1.5px;background:linear-gradient(90deg,${ac},${hex2rgba(ac,0.08)});display:block;"></span>
+            </div>
+            ${content}
+          </div>` : "";
+
+        const avatarHtml = photo
+          ? `<img src="${photo}" style="width:76px;height:76px;border-radius:50%;object-fit:cover;margin:0 auto 16px;border:3px solid ${ac};box-shadow:0 0 0 3px rgba(255,255,255,0.12),0 8px 20px ${hex2rgba(ac,0.3)};">`
+          : `<div style="width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,${ac},#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:white;margin:0 auto 16px;box-shadow:0 0 0 3px rgba(255,255,255,0.12),0 8px 20px ${hex2rgba(ac,0.3)};">${esc(initials(d.nom))}</div>`;
+
+        return `<div style="min-height:842px;font-family:'Inter',sans-serif;background:linear-gradient(90deg, #1e1e2e 235px, white 235px);display:grid;grid-template-columns:235px 1fr;">
+          <div style="padding:32px 22px;color:rgba(255,255,255,0.85);">
+            ${avatarHtml}
+            <div style="font-size:17px;font-weight:800;text-align:center;color:white;margin-bottom:4px;line-height:1.2;">${esc(d.nom)}</div>
+            <div style="font-size:10px;font-weight:600;text-align:center;color:${ac};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:22px;">${esc(d.titre)}</div>
+            ${sidebarSection("Contact", contactHtml)}
+            ${skillsHtml ? sidebarSection("Compétences", `<div>${skillsHtml}</div>`) : ""}
+            ${langsHtml ? sidebarSection("Langues", langsHtml) : ""}
+            ${d.interets ? sidebarSection("Intérêts", `<div style="color:rgba(255,255,255,0.6);font-size:11px;line-height:1.7;">${esc(d.interets)}</div>`) : ""}
+          </div>
+          <div style="padding:32px 28px;">
+            ${d.resume ? `<div style="background:${hex2rgba(ac,0.05)};border-left:3px solid ${ac};border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:24px;font-size:12px;color:#374151;line-height:1.65;font-style:italic;">${esc(d.resume)}</div>` : ""}
+            ${mainSection("fas fa-briefcase", "Expériences", expsHtml)}
+            ${mainSection("fas fa-graduation-cap", "Formation", formsHtml)}
+          </div>
+        </div>`;
+      }
+
+      /* Pour rester concis ici : on conserve tes autres templates via copie directe.
+         Je les réintègre intégralement ci-dessous (Minimal, Modern, Executive, Neo),
+         identiques à ta base, avec esc/hex2rgba/initials déjà gérés. */
+
+      function renderMinimal(d, ac, photo) {
+        const contactLine = [
+          d.email && `<span><i class="fas fa-envelope" style="margin-right:4px;color:${ac};"></i>${esc(d.email)}</span>`,
+          d.telephone && `<span><i class="fas fa-phone-alt" style="margin-right:4px;color:${ac};"></i>${esc(d.telephone)}</span>`,
+          d.adresse && `<span><i class="fas fa-map-marker-alt" style="margin-right:4px;color:${ac};"></i>${esc(d.adresse)}</span>`,
+          d.linkedin && `<span><i class="fab fa-linkedin-in" style="margin-right:4px;color:${ac};"></i>${esc(d.linkedin)}</span>`,
+          d.github && `<span><i class="fab fa-github" style="margin-right:4px;color:${ac};"></i>${esc(d.github)}</span>`
+        ].filter(Boolean).join('<span style="color:#d1d5db;margin:0 8px;">|</span>');
+
+        const sec = (title, content) => content ? `
+          <div style="margin-bottom:24px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+              <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:${ac};">${esc(title)}</span>
+              <div style="flex:1;height:1px;background:${hex2rgba(ac,0.2)};"></div>
+            </div>
+            ${content}
+          </div>` : "";
+
+        const expsHtml = d.exps.map(e => `
+          <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;margin-bottom:16px;">
+            <div>
+              <div style="font-weight:700;font-size:13px;color:#111827;margin-bottom:2px;">${esc(e.poste)}</div>
+              <div style="font-size:11px;color:${ac};font-weight:600;margin-bottom:5px;">${esc(e.entreprise)}</div>
+              <div style="font-size:11px;color:#6b7280;line-height:1.65;">${esc(e.desc)}</div>
+            </div>
+            <span style="font-size:10px;color:#9ca3af;white-space:nowrap;font-weight:500;background:#f9fafb;padding:2px 8px;border-radius:6px;border:1px solid #e5e7eb;">${esc(e.date)}</span>
+          </div>`).join("");
+
+        const formsHtml = d.forms.map(f => `
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;flex-wrap:wrap;gap:4px;">
+            <div>
+              <div style="font-weight:700;font-size:12px;color:#111827;">${esc(f.diplome)}</div>
+              <div style="font-size:11px;color:#6b7280;">${esc(f.ecole)}</div>
+            </div>
+            <span style="font-size:10px;color:${ac};font-weight:700;">${esc(f.annee)}</span>
+          </div>`).join("");
+
+        const skillsHtml = d.skills.map(s => `<span style="display:inline-block;border:1.5px solid ${hex2rgba(ac,0.35)};color:${ac};padding:3px 10px;border-radius:6px;font-size:10px;font-weight:600;margin:2px;">${esc(s)}</span>`).join("");
+        const langsHtml = d.langues.map(l => `<span style="display:inline-block;background:#f9fafb;border:1px solid #e5e7eb;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:500;color:#374151;margin:2px;"><strong style="color:#111827;">${esc(l.langue)}</strong> — ${esc(l.niveau)}</span>`).join("");
+
+        const avatarHtml = photo
+          ? `<img src="${photo}" style="width:52px;height:52px;border-radius:14px;object-fit:cover;border:2px solid ${ac};">`
+          : `<div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,${ac},#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:white;flex-shrink:0;">${esc(initials(d.nom))}</div>`;
+
+        return `<div style="background:white;padding:44px 44px 36px;font-family:'Inter',sans-serif;min-height:840px;">
+          <div style="margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #f3f4f6;">
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:10px;">
+              <div>
+                <h1 style="font-size:32px;font-weight:800;color:#0f172a;letter-spacing:-0.02em;line-height:1.1;margin-bottom:6px;">${esc(d.nom)}</h1>
+                <div style="font-size:13px;font-weight:600;color:${ac};text-transform:uppercase;letter-spacing:0.08em;">${esc(d.titre)}</div>
+              </div>
+              ${avatarHtml}
+            </div>
+            <div style="font-size:11px;color:#6b7280;display:flex;flex-wrap:wrap;gap:4px;align-items:center;">${contactLine}</div>
+            ${d.resume ? `<div style="margin-top:12px;font-size:12px;color:#374151;line-height:1.7;max-width:580px;">${esc(d.resume)}</div>` : ""}
+          </div>
+          ${sec("Expériences professionnelles", expsHtml)}
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+            <div>${sec("Formation", formsHtml)}</div>
+            <div>
+              ${skillsHtml ? sec("Compétences techniques", `<div>${skillsHtml}</div>`) : ""}
+              ${langsHtml ? sec("Langues", `<div>${langsHtml}</div>`) : ""}
+              ${d.interets ? sec("Intérêts", `<p style="font-size:11px;color:#6b7280;line-height:1.7;">${esc(d.interets)}</p>`) : ""}
+            </div>
+          </div>
+        </div>`;
+      }
+
+      /* Modern / Executive / Neo : mêmes fonctions que ton code (compatibles).
+         (Je les conserve tels quels pour éviter de changer ton design/structure.) */
+
+      function renderModern(d, ac, photo) {
+        const expsHtml = d.exps.map((e, i) => `
+          <div style="position:relative;padding-left:20px;margin-bottom:18px;">
+            <div style="position:absolute;left:0;top:4px;width:10px;height:10px;border-radius:50%;background:${i===0?ac:'#e5e7eb'};border:2px solid white;box-shadow:0 0 0 2px ${i===0?ac:'#d1d5db'};"></div>
+            <div style="position:absolute;left:4px;top:16px;width:2px;bottom:-18px;background:linear-gradient(${ac},transparent);"></div>
+            <div style="font-weight:700;font-size:13px;color:#111827;margin-bottom:2px;">${esc(e.poste)}</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
+              <span style="font-size:11px;color:${ac};font-weight:600;">${esc(e.entreprise)}</span>
+              <span style="font-size:10px;color:#9ca3af;">·</span>
+              <span style="font-size:10px;color:#9ca3af;">${esc(e.date)}</span>
+            </div>
+            <div style="font-size:11px;color:#6b7280;line-height:1.65;">${esc(e.desc)}</div>
+          </div>`).join("");
+
+        const formsHtml = d.forms.map(f => `
+          <div style="background:#f9fafb;border-radius:10px;padding:12px 14px;margin-bottom:10px;border-left:3px solid ${ac};">
+            <div style="font-weight:700;font-size:12px;color:#111827;margin-bottom:2px;">${esc(f.diplome)}</div>
+            <div style="font-size:11px;color:#6b7280;">${esc(f.ecole)}</div>
+            <div style="font-size:10px;font-weight:700;color:${ac};margin-top:3px;">${esc(f.annee)}</div>
+          </div>`).join("");
+
+        const skillsHtml = d.skills.map(s => `
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:${ac};flex-shrink:0;"></div>
+            <span style="font-size:11px;color:#374151;font-weight:500;">${esc(s)}</span>
+          </div>`).join("");
+
+        const langsHtml = d.langues.map(l => `
+          <div style="margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+              <span style="font-size:11px;font-weight:600;color:#374151;">${esc(l.langue)}</span>
+              <span style="font-size:10px;color:${ac};font-weight:600;">${esc(l.niveau)}</span>
+            </div>
+            <div style="height:4px;background:#f3f4f6;border-radius:2px;overflow:hidden;">
+              <div style="height:100%;background:linear-gradient(90deg,${ac},${hex2rgba(ac,0.5)});width:${l.niveau.toLowerCase().includes("natif")||l.niveau.toLowerCase().includes("courant")?"90":"55"}%;border-radius:2px;"></div>
+            </div>
+          </div>`).join("");
+
+        const contactItems = [
+          d.email && `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:rgba(255,255,255,0.85);word-break:break-all;"><i class="fas fa-envelope" style="width:14px;color:rgba(255,255,255,0.5);"></i>${esc(d.email)}</div>`,
+          d.telephone && `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:rgba(255,255,255,0.85);"><i class="fas fa-phone-alt" style="width:14px;color:rgba(255,255,255,0.5);"></i>${esc(d.telephone)}</div>`,
+          d.adresse && `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:rgba(255,255,255,0.85);"><i class="fas fa-map-marker-alt" style="width:14px;color:rgba(255,255,255,0.5);"></i>${esc(d.adresse)}</div>`,
+          d.linkedin && `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:rgba(255,255,255,0.85);"><i class="fab fa-linkedin-in" style="width:14px;color:rgba(255,255,255,0.5);"></i>${esc(d.linkedin)}</div>`,
+          d.github && `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:rgba(255,255,255,0.85);"><i class="fab fa-github" style="width:14px;color:rgba(255,255,255,0.5);"></i>${esc(d.github)}</div>`
+        ].filter(Boolean).join("");
+
+        const sCol = (title, content) => content ? `<div style="margin-bottom:20px;"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:rgba(255,255,255,0.35);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.1);">${esc(title)}</div>${content}</div>` : "";
+
+        const avatarHtml = photo
+          ? `<img src="${photo}" style="width:70px;height:70px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.3);">`
+          : `<div style="width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:white;flex-shrink:0;border:2px solid rgba(255,255,255,0.3);backdrop-filter:blur(10px);">${esc(initials(d.nom))}</div>`;
+
+        return `<div style="font-family:'Inter',sans-serif;min-height:840px;background:white;">
+          <div style="background:linear-gradient(135deg,${ac} 0%,#7c3aed 100%);padding:28px 32px;display:flex;align-items:center;gap:22px;">
+            ${avatarHtml}
+            <div style="flex:1;">
+              <h1 style="font-size:26px;font-weight:800;color:white;letter-spacing:-0.01em;line-height:1.2;margin-bottom:4px;">${esc(d.nom)}</h1>
+              <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.75);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">${esc(d.titre)}</div>
+              ${d.resume ? `<div style="font-size:11px;color:rgba(255,255,255,0.8);line-height:1.65;max-width:500px;">${esc(d.resume)}</div>` : ""}
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:200px 1fr;background:linear-gradient(90deg, #1e1e2e 200px, white 200px);">
+            <div style="padding:24px 18px;color:rgba(255,255,255,0.85);">
+              ${sCol("Contact", contactItems)}
+              ${d.skills.length ? sCol("Compétences", skillsHtml) : ""}
+              ${d.langues.length ? sCol("Langues", langsHtml) : ""}
+              ${d.interets ? sCol("Intérêts", `<p style="font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">${esc(d.interets)}</p>`) : ""}
+            </div>
+            <div style="padding:24px 26px;">
+              ${d.exps.length ? `<div style="margin-bottom:24px;"><div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:${ac};margin-bottom:14px;display:flex;align-items:center;gap:8px;"><i class="fas fa-briefcase"></i>Expériences<span style="flex:1;height:1.5px;background:linear-gradient(90deg,${ac},transparent);display:block;"></span></div>${expsHtml}</div>` : ""}
+              ${d.forms.length ? `<div><div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:${ac};margin-bottom:14px;display:flex;align-items:center;gap:8px;"><i class="fas fa-graduation-cap"></i>Formation<span style="flex:1;height:1.5px;background:linear-gradient(90deg,${ac},transparent);display:block;"></span></div>${formsHtml}</div>` : ""}
+            </div>
+          </div>
+        </div>`;
+      }
+
+      function renderExecutive(d, ac, photo) {
+        const contactLine = [
+          d.email && `<span style="display:flex;align-items:center;gap:4px;"><i class="fas fa-envelope" style="font-size:9px;color:${ac};"></i>${esc(d.email)}</span>`,
+          d.telephone && `<span style="display:flex;align-items:center;gap:4px;"><i class="fas fa-phone-alt" style="font-size:9px;color:${ac};"></i>${esc(d.telephone)}</span>`,
+          d.adresse && `<span style="display:flex;align-items:center;gap:4px;"><i class="fas fa-map-marker-alt" style="font-size:9px;color:${ac};"></i>${esc(d.adresse)}</span>`,
+          d.linkedin && `<span style="display:flex;align-items:center;gap:4px;"><i class="fab fa-linkedin-in" style="font-size:9px;color:${ac};"></i>${esc(d.linkedin)}</span>`,
+          d.github && `<span style="display:flex;align-items:center;gap:4px;"><i class="fab fa-github" style="font-size:9px;color:${ac};"></i>${esc(d.github)}</span>`
+        ].filter(Boolean).map(s => `<div style="font-size:10px;color:#4b5563;">${s}</div>`).join("");
+
+        const sec = (title, content) => content ? `
+          <div style="margin-bottom:20px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <div style="width:3px;height:14px;background:${ac};border-radius:2px;flex-shrink:0;"></div>
+              <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#111827;">${esc(title)}</span>
+              <div style="flex:1;height:1px;background:#e5e7eb;"></div>
+            </div>
+            ${content}
+          </div>` : "";
+
+        const expsHtml = d.exps.map(e => `
+          <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px dashed #f3f4f6;">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:3px;">
+              <span style="font-weight:700;font-size:13px;color:#0f172a;">${esc(e.poste)}</span>
+              <span style="font-size:10px;font-weight:600;color:#9ca3af;font-style:italic;">${esc(e.date)}</span>
+            </div>
+            <div style="font-size:11px;color:${ac};font-weight:600;margin-bottom:5px;">${esc(e.entreprise)}</div>
+            <div style="font-size:11px;color:#4b5563;line-height:1.65;">${esc(e.desc)}</div>
+          </div>`).join("");
+
+        const formsHtml = d.forms.map(f => `
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:4px;">
+            <div><div style="font-weight:700;font-size:12px;color:#0f172a;">${esc(f.diplome)}</div><div style="font-size:11px;color:#6b7280;">${esc(f.ecole)}</div></div>
+            <span style="font-size:10px;font-weight:700;color:${ac};">${esc(f.annee)}</span>
+          </div>`).join("");
+
+        const skillsHtml = `<div style="display:flex;flex-wrap:wrap;gap:5px;">${d.skills.map(s => `<span style="background:#f8fafc;border:1px solid #e2e8f0;color:#374151;padding:3px 10px;border-radius:5px;font-size:10px;font-weight:500;">${esc(s)}</span>`).join("")}</div>`;
+        const langsHtml = d.langues.map(l => `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><span style="font-size:11px;font-weight:600;color:#374151;">${esc(l.langue)}</span><span style="font-size:10px;color:${ac};font-weight:700;">${esc(l.niveau)}</span></div>`).join("");
+
+        const avatarHtml = photo
+          ? `<img src="${photo}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid ${ac}; margin-right:12px;">`
+          : `<div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,${ac},#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:white;flex-shrink:0; margin-right:12px;">${esc(initials(d.nom))}</div>`;
+
+        return `<div style="background:white;padding:36px 40px;font-family:'Inter',sans-serif;min-height:840px;">
+          <div style="border-bottom:3px solid #0f172a;padding-bottom:18px;margin-bottom:22px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
+              <div style="display:flex; align-items:center;">
+                ${avatarHtml}
+                <div>
+                  <h1 style="font-size:30px;font-weight:900;color:#0f172a;letter-spacing:-0.03em;line-height:1;margin-bottom:5px;">${esc(d.nom)}</h1>
+                  <div style="font-size:12px;font-weight:600;color:${ac};text-transform:uppercase;letter-spacing:0.1em;">${esc(d.titre)}</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:3px;text-align:right;">${contactLine}</div>
+            </div>
+            ${d.resume ? `<div style="margin-top:12px;font-size:12px;color:#374151;line-height:1.7;max-width:620px;border-top:1px solid #f3f4f6;padding-top:10px;">${esc(d.resume)}</div>` : ""}
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 200px;gap:32px;">
+            <div>${sec("Expériences professionnelles", expsHtml)}</div>
+            <div>
+              ${sec("Formation", formsHtml)}
+              ${d.skills.length ? sec("Compétences", skillsHtml) : ""}
+              ${d.langues.length ? sec("Langues", langsHtml) : ""}
+              ${d.interets ? sec("Intérêts", `<p style="font-size:11px;color:#6b7280;line-height:1.7;">${esc(d.interets)}</p>`) : ""}
+            </div>
+          </div>
+        </div>`;
+      }
+
+      function renderNeo(d, ac, photo) {
+        const expsHtml = d.exps.map(e => `
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px;margin-bottom:10px;transition:all 0.2s;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px;margin-bottom:4px;">
+              <span style="font-weight:700;font-size:13px;color:#f0f0f5;">${esc(e.poste)}</span>
+              <span style="font-size:9px;font-weight:700;color:${ac};background:${hex2rgba(ac,0.15)};padding:2px 9px;border-radius:20px;border:1px solid ${hex2rgba(ac,0.3)};white-space:nowrap;">${esc(e.date)}</span>
+            </div>
+            <div style="font-size:11px;color:${ac};font-weight:600;margin-bottom:6px;">${esc(e.entreprise)}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.5);line-height:1.65;">${esc(e.desc)}</div>
+          </div>`).join("");
+
+        const formsHtml = d.forms.map(f => `
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:${ac};flex-shrink:0;margin-top:5px;box-shadow:0 0 8px ${hex2rgba(ac,0.6)};"></div>
+            <div>
+              <div style="font-weight:700;font-size:12px;color:#f0f0f5;margin-bottom:1px;">${esc(f.diplome)}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.45);">${esc(f.ecole)} · ${esc(f.annee)}</div>
+            </div>
+          </div>`).join("");
+
+        const skillsHtml = d.skills.map(s => `<span style="display:inline-block;background:${hex2rgba(ac,0.12)};color:${ac};padding:4px 11px;border-radius:20px;font-size:10px;font-weight:600;margin:2px;border:1px solid ${hex2rgba(ac,0.25)};">${esc(s)}</span>`).join("");
+
+        const langsHtml = d.langues.map(l => `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:7px;border:1px solid rgba(255,255,255,0.06);"><span style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.75);">${esc(l.langue)}</span><span style="font-size:10px;color:${ac};font-weight:700;">${esc(l.niveau)}</span></div>`).join("");
+
+        const contactItems = [
+          d.email && `<i class="fas fa-envelope"></i> ${esc(d.email)}`,
+          d.telephone && `<i class="fas fa-phone-alt"></i> ${esc(d.telephone)}`,
+          d.adresse && `<i class="fas fa-map-marker-alt"></i> ${esc(d.adresse)}`,
+          d.linkedin && `<i class="fab fa-linkedin-in"></i> ${esc(d.linkedin)}`,
+          d.github && `<i class="fab fa-github"></i> ${esc(d.github)}`
+        ].filter(Boolean).map(s => `<div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:5px;display:flex;align-items:center;gap:7px;">${s}</div>`).join("");
+
+        const sec = (icon_cls, title, content) => content ? `
+          <div style="margin-bottom:22px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <div style="width:20px;height:20px;border-radius:6px;background:${hex2rgba(ac,0.15)};display:flex;align-items:center;justify-content:center;font-size:9px;color:${ac};"><i class="${icon_cls}"></i></div>
+              <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:rgba(255,255,255,0.35);">${esc(title)}</span>
+              <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
+            </div>
+            ${content}
+          </div>` : "";
+
+        const neoSec = (icon_cls, title, content) => content ? `
+          <div style="margin-bottom:24px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+              <div style="width:24px;height:24px;border-radius:7px;background:${hex2rgba(ac,0.15)};display:flex;align-items:center;justify-content:center;font-size:10px;color:${ac};border:1px solid ${hex2rgba(ac,0.2)};"><i class="${icon_cls}"></i></div>
+              <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:${ac};">${esc(title)}</span>
+              <span style="flex:1;height:1px;background:${hex2rgba(ac,0.2)};display:block;"></span>
+            </div>
+            ${content}
+          </div>` : "";
+
+        const avatarHtml = photo
+          ? `<img src="${photo}" style="width:68px;height:68px;border-radius:18px;object-fit:cover;border:2px solid ${ac}; box-shadow:0 8px 24px ${hex2rgba(ac,0.4)};">`
+          : `<div style="width:68px;height:68px;border-radius:18px;background:linear-gradient(135deg,${ac},#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:white;margin:0 auto 14px;box-shadow:0 8px 24px ${hex2rgba(ac,0.4)};">${esc(initials(d.nom))}</div>`;
+
+        return `<div style="background:#0d0f18;min-height:840px;font-family:'Inter',sans-serif;display:grid;grid-template-columns:210px 1fr;background:linear-gradient(90deg, #0a0b12 210px, #0d0f18 210px);">
+          <div style="padding:28px 18px;border-right:1px solid rgba(255,255,255,0.05);">
+            ${avatarHtml}
+            <div style="font-size:15px;font-weight:800;text-align:center;color:#f0f0f5;line-height:1.2;margin-bottom:4px;">${esc(d.nom)}</div>
+            <div style="font-size:9px;font-weight:700;text-align:center;color:${ac};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:20px;">${esc(d.titre)}</div>
+            ${contactItems ? sec("fas fa-address-card", "Contact", contactItems) : ""}
+            ${d.skills.length ? sec("fas fa-code", "Compétences", `<div>${skillsHtml}</div>`) : ""}
+            ${d.langues.length ? sec("fas fa-globe", "Langues", langsHtml) : ""}
+            ${d.interets ? sec("fas fa-heart", "Intérêts", `<p style="font-size:11px;color:rgba(255,255,255,0.4);line-height:1.7;">${esc(d.interets)}</p>`) : ""}
+          </div>
+          <div style="padding:28px 26px;">
+            ${d.resume ? `<div style="background:${hex2rgba(ac,0.08)};border:1px solid ${hex2rgba(ac,0.2)};border-radius:10px;padding:14px 16px;margin-bottom:22px;font-size:12px;color:rgba(255,255,255,0.65);line-height:1.7;">${esc(d.resume)}</div>` : ""}
+            ${d.exps.length ? neoSec("fas fa-briefcase", "Expériences", expsHtml) : ""}
+            ${d.forms.length ? neoSec("fas fa-graduation-cap", "Formation", formsHtml) : ""}
+          </div>
+        </div>`;
+      }
+
+      const renderers = {
+        elite: renderElite,
+        minimal: renderMinimal,
+        modern: renderModern,
+        executive: renderExecutive,
+        neo: renderNeo
+      };
+
+      /* ---------- Preview render ---------- */
+      function updatePreview() {
+        window.clearTimeout(state.renderTimeout);
+        state.renderTimeout = window.setTimeout(() => {
+          const d = getData();
+          const renderFn = renderers[state.currentTemplate];
+          if (!renderFn) return;
+
+          const html = renderFn(d, state.currentAccent, state.photoDataURL);
+
+          transitionWrap.classList.add("fading");
+          window.setTimeout(() => {
+            cvPreview.innerHTML = html;
+            transitionWrap.classList.remove("fading");
+          }, 200);
+        }, 80);
+      }
+
+      /* ---------- Validation (minimal required fields) ---------- */
+      function setTouched(el) {
+        if (!el) return;
+        el.setAttribute("data-touched", "1");
+      }
+
+      function showFieldError(id, msg) {
+        const zone = document.querySelector(`[data-error-for="${id}"]`);
+        const el = $(id);
+        if (zone) zone.textContent = msg || "";
+        if (el && msg) el.setAttribute("data-touched", "1");
+      }
+
+      function clearFieldError(id) {
+        showFieldError(id, "");
+      }
+
+      function validateRequired() {
+        const nom = $("nom");
+        const titre = $("titre");
+
+        let ok = true;
+
+        if (!nom.value.trim() || nom.value.trim().length < 2) {
+          showFieldError("nom", "Veuillez renseigner votre nom (min. 2 caractères).");
+          ok = false;
+        } else {
+          clearFieldError("nom");
+        }
+
+        if (!titre.value.trim() || titre.value.trim().length < 2) {
+          showFieldError("titre", "Veuillez renseigner votre titre (min. 2 caractères).");
+          ok = false;
+        } else {
+          clearFieldError("titre");
+        }
+
+        return ok;
+      }
+
+      /* ---------- Dynamic blocks ---------- */
+      const langueOptions = [
+        "Français","Anglais","Espagnol","Allemand","Italien","Portugais",
+        "Néerlandais","Russe","Chinois","Japonais","Arabe","Hébreu",
+        "Turc","Polonais","Suédois","Danois","Norvégien","Finnois",
+        "Grec","Hindi","Coréen","Vietnamien","Thaï","Indonésien",
+        "Roumain","Hongrois","Tchèque","Slovaque","Ukrainien","Autre"
+      ];
+      const niveauOptions = ["A1","A2","B1","B2","C1","C2","Natif","Courant","Intermédiaire","Débutant"];
+
+      function createExpBlock(index) {
+        const block = document.createElement("div");
+        block.className = "exp-block";
+        block.dataset.index = String(index);
+        block.innerHTML = `
+          <div class="exp-block-hdr">
+            <span class="exp-num">Expérience</span>
+            <button class="btn-remove" type="button" data-action="remove-block" aria-label="Supprimer expérience">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <div class="field-row field-g">
+            <div><label class="field-lbl">Poste</label><input class="fi" type="text" id="exp_${index}_poste" placeholder="Développeur Full-Stack"></div>
+            <div><label class="field-lbl">Entreprise</label><input class="fi" type="text" id="exp_${index}_entreprise" placeholder="Tech Solutions"></div>
+          </div>
+
+          <div class="field-g"><label class="field-lbl">Période</label><input class="fi" type="text" id="exp_${index}_date" placeholder="2022 — Présent"></div>
+          <div class="field-g"><label class="field-lbl">Description</label><textarea class="ft" id="exp_${index}_desc" placeholder="Conception et développement..."></textarea></div>
+        `;
+        return block;
+      }
+
+      function createFormBlock(index) {
+        const block = document.createElement("div");
+        block.className = "exp-block";
+        block.dataset.index = String(index);
+        block.innerHTML = `
+          <div class="exp-block-hdr">
+            <span class="exp-num">Formation</span>
+            <button class="btn-remove" type="button" data-action="remove-block" aria-label="Supprimer formation">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <div class="field-g"><label class="field-lbl">Diplôme</label><input class="fi" type="text" id="form_${index}_diplome" placeholder="Master Informatique"></div>
+          <div class="field-row field-g">
+            <div><label class="field-lbl">Établissement</label><input class="fi" type="text" id="form_${index}_ecole" placeholder="Université Paris Saclay"></div>
+            <div><label class="field-lbl">Année</label><input class="fi" type="text" id="form_${index}_annee" placeholder="2022"></div>
+          </div>
+        `;
+        return block;
+      }
+
+      function createLangueBlock(index) {
+        const block = document.createElement("div");
+        block.className = "langue-block";
+        block.dataset.index = String(index);
+        block.innerHTML = `
+          <div class="langue-block-hdr">
+            <span class="exp-num">Langue</span>
+            <button class="btn-remove" type="button" data-action="remove-block" aria-label="Supprimer langue">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <div class="langue-row">
+            <select class="fi" id="langue_${index}_langue" style="flex:1;">
+              ${langueOptions.map(l => `<option value="${esc(l)}">${esc(l)}</option>`).join("")}
+            </select>
+            <select class="fi" id="langue_${index}_niveau" style="flex:1;">
+              ${niveauOptions.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join("")}
+            </select>
+          </div>
+
+          <div class="field-g" id="langue_${index}_autre_container" style="display:none;">
+            <input class="fi" type="text" id="langue_${index}_autre" placeholder="Précisez la langue">
+          </div>
+        `;
+
+        const select = block.querySelector(`#langue_${index}_langue`);
+        const autreDiv = block.querySelector(`#langue_${index}_autre_container`);
+        select.addEventListener("change", () => {
+          autreDiv.style.display = select.value === "Autre" ? "block" : "none";
+        });
+
+        return block;
+      }
+
+      function updateBlockBadges() {
+        Array.from(experiencesContainer.querySelectorAll(".exp-block")).forEach((b, i) => {
+          const badge = b.querySelector(".exp-num");
+          if (badge) badge.textContent = `Expérience ${i + 1}`;
+        });
+        Array.from(formationsContainer.querySelectorAll(".exp-block")).forEach((b, i) => {
+          const badge = b.querySelector(".exp-num");
+          if (badge) badge.textContent = `Formation ${i + 1}`;
+        });
+        Array.from(languesContainer.querySelectorAll(".langue-block")).forEach((b, i) => {
+          const badge = b.querySelector(".exp-num");
+          if (badge) badge.textContent = `Langue ${i + 1}`;
+        });
+      }
+
+      /* ---------- localStorage ---------- */
+      function collectPersistableData() {
+        const data = {
+          inputs: {},
+          exps: [],
+          forms: [],
+          langues: [],
+          photo: state.photoDataURL,
+          template: state.currentTemplate,
+          accent: state.currentAccent,
+          theme: document.body.classList.contains("light-theme") ? "light" : "dark"
+        };
+
+        ["nom","titre","email","telephone","adresse","linkedin","github","resume","competences","interets"].forEach(id => {
+          const el = $(id);
+          if (el) data.inputs[id] = el.value;
+        });
+
+        document.querySelectorAll("#experiences-container .exp-block").forEach(block => {
+          const idx = block.dataset.index;
+          data.exps.push({
+            poste: $(`exp_${idx}_poste`)?.value || "",
+            entreprise: $(`exp_${idx}_entreprise`)?.value || "",
+            date: $(`exp_${idx}_date`)?.value || "",
+            desc: $(`exp_${idx}_desc`)?.value || ""
+          });
+        });
+
+        document.querySelectorAll("#formations-container .exp-block").forEach(block => {
+          const idx = block.dataset.index;
+          data.forms.push({
+            diplome: $(`form_${idx}_diplome`)?.value || "",
+            ecole: $(`form_${idx}_ecole`)?.value || "",
+            annee: $(`form_${idx}_annee`)?.value || ""
+          });
+        });
+
+        document.querySelectorAll("#langues-container .langue-block").forEach(block => {
+          const idx = block.dataset.index;
+          const langueSelect = $(`langue_${idx}_langue`);
+          const niveauSelect = $(`langue_${idx}_niveau`);
+          const autreInput = $(`langue_${idx}_autre`);
+          let langue = langueSelect?.value || "";
+          if (langue === "Autre" && autreInput) langue = autreInput.value.trim() || "Autre";
+          const niveau = niveauSelect?.value || "";
+          if (langue && niveau) data.langues.push({ langue, niveau });
+        });
+
+        return data;
+      }
+
+      function saveToLocalStorage() {
+        const data = collectPersistableData();
+        localStorage.setItem("cvBuilderData", JSON.stringify(data));
+      }
+
+      function resetCountersAndContainers() {
+        state.expCounter = 0;
+        state.formCounter = 0;
+        state.langueCounter = 0;
+        experiencesContainer.innerHTML = "";
+        formationsContainer.innerHTML = "";
+        languesContainer.innerHTML = "";
+      }
+
+      function loadFromLocalStorage() {
+        const saved = localStorage.getItem("cvBuilderData");
+        if (!saved) return false;
+
+        try {
+          const data = JSON.parse(saved);
+
+          resetCountersAndContainers();
+
           if (data.inputs) {
             Object.entries(data.inputs).forEach(([id, val]) => {
-              const el = document.getElementById(id);
-              if (el) el.value = val;
+              const el = $(id);
+              if (el) el.value = val ?? "";
             });
           }
+
           if (data.photo) {
-            photoDataURL = data.photo;
-            document.getElementById('photoPreview').src = photoDataURL;
-            document.getElementById('photoPreview').style.display = 'block';
+            state.photoDataURL = data.photo;
+            const img = $("photoPreview");
+            img.src = state.photoDataURL;
+            img.style.display = "block";
           }
-          if (data.template) {
-            currentTemplate = data.template;
-            document.querySelectorAll('.tpl-card').forEach(c => {
-              c.classList.toggle('active', c.dataset.tpl === currentTemplate);
+
+          if (data.template && renderers[data.template]) {
+            state.currentTemplate = data.template;
+            document.querySelectorAll(".tpl-card").forEach(c => {
+              c.classList.toggle("active", c.dataset.tpl === state.currentTemplate);
             });
           }
+
           if (data.accent) {
-            currentAccent = data.accent;
-            document.querySelectorAll('.color-dot').forEach(d => {
-              d.classList.toggle('active', d.dataset.color === currentAccent);
+            state.currentAccent = data.accent;
+            document.querySelectorAll(".color-dot").forEach(d => {
+              d.classList.toggle("active", d.dataset.color === state.currentAccent);
             });
           }
-          if (data.theme === 'light') {
-            document.body.classList.add('light-theme');
-            document.getElementById('themeToggle').innerHTML = '<i class="fas fa-sun"></i>';
+
+          if (data.theme === "light") {
+            document.body.classList.add("light-theme");
+            $("themeToggle").innerHTML = '<i class="fas fa-sun"></i>';
           }
-          experiencesContainer.innerHTML = '';
-          if (data.exps && data.exps.length) {
-            data.exps.forEach((exp, i) => {
-              expCounter++;
-              const block = createExpBlock(expCounter);
-              experiencesContainer.appendChild(block);
-              document.getElementById(`exp_${expCounter}_poste`).value = exp.poste || '';
-              document.getElementById(`exp_${expCounter}_entreprise`).value = exp.entreprise || '';
-              document.getElementById(`exp_${expCounter}_date`).value = exp.date || '';
-              document.getElementById(`exp_${expCounter}_desc`).value = exp.desc || '';
-            });
-          } else {
-            expCounter++;
-            experiencesContainer.appendChild(createExpBlock(expCounter));
-          }
-          formationsContainer.innerHTML = '';
-          if (data.forms && data.forms.length) {
-            data.forms.forEach((form, i) => {
-              formCounter++;
-              const block = createFormBlock(formCounter);
-              formationsContainer.appendChild(block);
-              document.getElementById(`form_${formCounter}_diplome`).value = form.diplome || '';
-              document.getElementById(`form_${formCounter}_ecole`).value = form.ecole || '';
-              document.getElementById(`form_${formCounter}_annee`).value = form.annee || '';
+
+          if (Array.isArray(data.exps) && data.exps.length) {
+            data.exps.forEach((exp) => {
+              state.expCounter++;
+              experiencesContainer.appendChild(createExpBlock(state.expCounter));
+              $(`exp_${state.expCounter}_poste`).value = exp.poste || "";
+              $(`exp_${state.expCounter}_entreprise`).value = exp.entreprise || "";
+              $(`exp_${state.expCounter}_date`).value = exp.date || "";
+              $(`exp_${state.expCounter}_desc`).value = exp.desc || "";
             });
           } else {
-            formCounter++;
-            formationsContainer.appendChild(createFormBlock(formCounter));
+            state.expCounter++;
+            experiencesContainer.appendChild(createExpBlock(state.expCounter));
           }
-          languesContainer.innerHTML = '';
-          if (data.langues && data.langues.length) {
-            data.langues.forEach((lang, i) => {
-              langueCounter++;
-              const block = createLangueBlock(langueCounter);
-              languesContainer.appendChild(block);
-              const selectLang = document.getElementById(`langue_${langueCounter}_langue`);
-              const selectNiv = document.getElementById(`langue_${langueCounter}_niveau`);
-              const autreDiv = document.getElementById(`langue_${langueCounter}_autre_container`);
+
+          if (Array.isArray(data.forms) && data.forms.length) {
+            data.forms.forEach((form) => {
+              state.formCounter++;
+              formationsContainer.appendChild(createFormBlock(state.formCounter));
+              $(`form_${state.formCounter}_diplome`).value = form.diplome || "";
+              $(`form_${state.formCounter}_ecole`).value = form.ecole || "";
+              $(`form_${state.formCounter}_annee`).value = form.annee || "";
+            });
+          } else {
+            state.formCounter++;
+            formationsContainer.appendChild(createFormBlock(state.formCounter));
+          }
+
+          if (Array.isArray(data.langues) && data.langues.length) {
+            data.langues.forEach((lang) => {
+              state.langueCounter++;
+              languesContainer.appendChild(createLangueBlock(state.langueCounter));
+
+              const selectLang = $(`langue_${state.langueCounter}_langue`);
+              const selectNiv = $(`langue_${state.langueCounter}_niveau`);
+              const autreDiv = $(`langue_${state.langueCounter}_autre_container`);
+
               if (langueOptions.includes(lang.langue)) {
                 selectLang.value = lang.langue;
               } else {
-                selectLang.value = 'Autre';
-                autreDiv.style.display = 'block';
-                document.getElementById(`langue_${langueCounter}_autre`).value = lang.langue;
+                selectLang.value = "Autre";
+                autreDiv.style.display = "block";
+                $(`langue_${state.langueCounter}_autre`).value = lang.langue;
               }
               selectNiv.value = lang.niveau;
             });
           }
-          updatePreview();
+
+          updateBlockBadges();
           initSortable();
-        } else {
-          // Pas de données cloud, utiliser localStorage
-          loadFromLocalStorage();
+          updatePreview();
+          return true;
+        } catch (e) {
+          console.warn("Erreur de chargement localStorage", e);
+          return false;
         }
-      } catch (error) {
-        console.error('Erreur chargement cloud', error);
       }
-    }
 
-    // Gestion authentification
-    authToggle.addEventListener('click', () => {
-      isLoginMode = !isLoginMode;
-      authTitle.textContent = isLoginMode ? 'Connexion' : 'Inscription';
-      authAction.textContent = isLoginMode ? 'Se connecter' : "S'inscrire";
-      authToggle.textContent = isLoginMode ? "Pas encore de compte ? S'inscrire" : "Déjà un compte ? Se connecter";
-      authMessage.textContent = '';
-    });
-
-    authAction.addEventListener('click', async () => {
-      const email = authEmail.value.trim();
-      const password = authPassword.value.trim();
-      authMessage.textContent = '';
-      if (!email || !password) {
-        authMessage.textContent = 'Veuillez remplir tous les champs';
-        return;
-      }
-      try {
-        if (isLoginMode) {
-          await auth.signInWithEmailAndPassword(email, password);
-        } else {
-          await auth.createUserWithEmailAndPassword(email, password);
+      /* ---------- Cloud (Firebase) ---------- */
+      const saveToCloudDebounced = debounce(async () => {
+        if (!db || !state.currentUser) return;
+        try {
+          await db.collection("cvs").doc(state.currentUser.uid).set(collectPersistableData());
+        } catch (e) {
+          console.warn("Sauvegarde cloud impossible", e);
         }
-        authModal.classList.remove('active');
-      } catch (error) {
-        authMessage.textContent = error.message;
-      }
-    });
+      }, 900);
 
-    loginBtn.addEventListener('click', () => {
-      if (currentUser) {
-        auth.signOut();
-      } else {
-        authModal.classList.add('active');
-      }
-    });
+      async function loadFromCloud() {
+        if (!db || !state.currentUser) return false;
+        try {
+          const doc = await db.collection("cvs").doc(state.currentUser.uid).get();
+          if (!doc.exists) return false;
 
-    auth.onAuthStateChanged(async (user) => {
-      currentUser = user;
-      if (user) {
-        loginBtn.innerHTML = `<i class="fas fa-user-check"></i> ${user.email}`;
-        await loadFromCloud();
-      } else {
-        loginBtn.innerHTML = `<i class="fas fa-user"></i> Connexion`;
-        loadFromLocalStorage();
+          const data = doc.data();
+          localStorage.setItem("cvBuilderData", JSON.stringify(data)); // garde une copie locale
+          return loadFromLocalStorage(); // réutilise le loader unique
+        } catch (e) {
+          console.warn("Erreur chargement cloud", e);
+          return false;
+        }
       }
-    });
 
-    // Drag & drop
-    let sortableInstances = [];
-    function initSortable() {
-      sortableInstances.forEach(s => s.destroy());
-      sortableInstances = [];
-      if (typeof Sortable !== 'undefined') {
+      /* ---------- Sortable ---------- */
+      let sortableInstances = [];
+      function initSortable() {
+        sortableInstances.forEach(s => s.destroy());
+        sortableInstances = [];
+
+        if (typeof Sortable === "undefined") return;
+
         sortableInstances.push(new Sortable(experiencesContainer, {
           animation: 150,
           onEnd: () => {
+            updateBlockBadges();
             updatePreview();
             saveToLocalStorage();
-            if (currentUser) saveToCloud();
+            saveToCloudDebounced();
           }
         }));
+
         sortableInstances.push(new Sortable(formationsContainer, {
           animation: 150,
           onEnd: () => {
+            updateBlockBadges();
             updatePreview();
             saveToLocalStorage();
-            if (currentUser) saveToCloud();
+            saveToCloudDebounced();
           }
         }));
       }
-    }
 
-    // Photo
-    document.getElementById('photoUpload').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
+      /* ---------- PDF generation (offline OK) ---------- */
+      function generatePDF() {
+        if (!validateRequired()) {
+          showToast("Veuillez compléter les champs obligatoires.", "err");
+          return;
+        }
+
+        loadingOverlay.classList.add("active");
+
+        window.setTimeout(() => {
+          html2canvas(cvPreview, {
+            scale: 2, // Bonne qualité
+            backgroundColor: '#ffffff',
+            logging: false,
+            allowTaint: false,
+            useCORS: true,
+            width: cvPreview.offsetWidth,
+            height: cvPreview.offsetHeight
+          }).then(canvas => {
+            const imgData = canvas.toDataURL('image/jpeg', 0.9); // JPEG à 90%
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const pw = pdf.internal.pageSize.getWidth();
+            const ph = pdf.internal.pageSize.getHeight();
+            const ih = (canvas.height * pw) / canvas.width;
+            let left = ih, pos = 0;
+            pdf.addImage(imgData, 'JPEG', 0, pos, pw, ih);
+            left -= ph;
+            while (left > 0) {
+              pos -= ph;
+              pdf.addPage();
+              pdf.addImage(imgData, 'JPEG', 0, pos, pw, ih);
+              left -= ph;
+            }
+            const nom = (document.getElementById('nom').value || 'cv').toLowerCase().replace(/\s+/g, '-');
+            pdf.save(`${nom}-cv.pdf`);
+            loadingOverlay.classList.remove('active');
+            showToast('PDF téléchargé avec succès !', 'ok');
+          }).catch(err => {
+            console.error(err);
+            loadingOverlay.classList.remove('active');
+            showToast('Erreur de génération PDF.', 'err');
+          });
+        }, 100);
+      }
+
+      /* ---------- Handlers ---------- */
+      downloadBtn.addEventListener("click", () => generatePDF());
+
+      // Photo upload
+      $("photoUpload").addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        // Guard basic size (optional)
+        if (file.size > 3.5 * 1024 * 1024) {
+          showToast("Image trop lourde (max ~3.5MB conseillé).", "err");
+          e.target.value = "";
+          return;
+        }
+
         const reader = new FileReader();
-        reader.onload = function(ev) {
-          photoDataURL = ev.target.result;
-          document.getElementById('photoPreview').src = photoDataURL;
-          document.getElementById('photoPreview').style.display = 'block';
+        reader.onload = (ev) => {
+          state.photoDataURL = ev.target.result;
+          const img = $("photoPreview");
+          img.src = state.photoDataURL;
+          img.style.display = "block";
           updatePreview();
           saveToLocalStorage();
-          if (currentUser) saveToCloud();
+          saveToCloudDebounced();
         };
         reader.readAsDataURL(file);
-      }
-    });
+      });
 
-    // Boutons d'ajout
-    document.getElementById('addExperienceBtn').addEventListener('click', () => {
-      expCounter++;
-      experiencesContainer.appendChild(createExpBlock(expCounter));
-      updatePreview();
-      saveToLocalStorage();
-      if (currentUser) saveToCloud();
-      initSortable();
-    });
-    document.getElementById('addFormationBtn').addEventListener('click', () => {
-      formCounter++;
-      formationsContainer.appendChild(createFormBlock(formCounter));
-      updatePreview();
-      saveToLocalStorage();
-      if (currentUser) saveToCloud();
-      initSortable();
-    });
-    document.getElementById('addLangueBtn').addEventListener('click', () => {
-      langueCounter++;
-      languesContainer.appendChild(createLangueBlock(langueCounter));
-      updatePreview();
-      saveToLocalStorage();
-      if (currentUser) saveToCloud();
-    });
+      // Add buttons
+      $("addExperienceBtn").addEventListener("click", () => {
+        state.expCounter++;
+        experiencesContainer.appendChild(createExpBlock(state.expCounter));
+        updateBlockBadges();
+        initSortable();
+        updatePreview();
+        saveToLocalStorage();
+        saveToCloudDebounced();
+      });
 
-    // Réinitialisation
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      if (confirm('Voulez-vous vraiment réinitialiser toutes les données ?')) {
-        localStorage.removeItem('cvBuilderData');
-        if (currentUser) {
-          db.collection('cvs').doc(currentUser.uid).delete().catch(console.error);
+      $("addFormationBtn").addEventListener("click", () => {
+        state.formCounter++;
+        formationsContainer.appendChild(createFormBlock(state.formCounter));
+        updateBlockBadges();
+        initSortable();
+        updatePreview();
+        saveToLocalStorage();
+        saveToCloudDebounced();
+      });
+
+      $("addLangueBtn").addEventListener("click", () => {
+        state.langueCounter++;
+        languesContainer.appendChild(createLangueBlock(state.langueCounter));
+        updateBlockBadges();
+        updatePreview();
+        saveToLocalStorage();
+        saveToCloudDebounced();
+      });
+
+      // Remove dynamic blocks (event delegation)
+      cvForm.addEventListener("click", (e) => {
+        const btn = e.target.closest('[data-action="remove-block"]');
+        if (!btn) return;
+
+        const block = btn.closest(".exp-block, .langue-block");
+        if (!block) return;
+
+        block.remove();
+        updateBlockBadges();
+        updatePreview();
+        saveToLocalStorage();
+        saveToCloudDebounced();
+      });
+
+      // Theme
+      $("themeToggle").addEventListener("click", () => {
+        document.body.classList.toggle("light-theme");
+        const isLight = document.body.classList.contains("light-theme");
+        $("themeToggle").innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        saveToLocalStorage();
+        saveToCloudDebounced();
+      });
+
+      // Reset
+      $("resetBtn").addEventListener("click", async () => {
+        if (!confirm("Voulez-vous vraiment réinitialiser toutes les données ?")) return;
+
+        localStorage.removeItem("cvBuilderData");
+        if (db && state.currentUser) {
+          try { await db.collection("cvs").doc(state.currentUser.uid).delete(); }
+          catch (e) { console.warn("Suppression cloud impossible", e); }
         }
         location.reload();
+      });
+
+      // Accent
+      document.querySelectorAll(".color-dot").forEach(dot => {
+        dot.addEventListener("click", () => {
+          document.querySelectorAll(".color-dot").forEach(d => d.classList.remove("active"));
+          dot.classList.add("active");
+          state.currentAccent = dot.dataset.color;
+          updatePreview();
+          saveToLocalStorage();
+          saveToCloudDebounced();
+        });
+      });
+
+      // Templates
+      function setTemplate(tpl) {
+        if (!renderers[tpl]) return;
+        document.querySelectorAll(".tpl-card").forEach(c => c.classList.toggle("active", c.dataset.tpl === tpl));
+        state.currentTemplate = tpl;
+        updatePreview();
+        saveToLocalStorage();
+        saveToCloudDebounced();
       }
-    });
 
-    // Thème
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      document.body.classList.toggle('light-theme');
-      const isLight = document.body.classList.contains('light-theme');
-      document.getElementById('themeToggle').innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-      saveToLocalStorage();
-      if (currentUser) saveToCloud();
-    });
+      document.querySelectorAll(".tpl-card").forEach(card => {
+        card.addEventListener("click", () => setTemplate(card.dataset.tpl));
+        card.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setTemplate(card.dataset.tpl);
+          }
+        });
+      });
 
-    // GÉNÉRATION PDF PAR CAPTURE D'ÉCRAN (fidèle à l'aperçu)
-    function generatePDF() {
-      const nom = (document.getElementById('nom').value || 'cv').toLowerCase().replace(/\s+/g, '-');
-      html2canvas(cvPreview, {
-        scale: 1.8, // Réduit pour alléger (2.5 était trop lourd)
-        backgroundColor: '#ffffff',
-        logging: false,
-        allowTaint: false,
-        useCORS: true,
-        width: cvPreview.offsetWidth,
-        height: cvPreview.offsetHeight
-      }).then(canvas => {
-        const imgData = canvas.toDataURL('image/jpeg', 0.8); // JPEG à 80% pour réduire le poids
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-        const pw = pdf.internal.pageSize.getWidth();
-        const ph = pdf.internal.pageSize.getHeight();
-        const ih = (canvas.height * pw) / canvas.width;
-        let left = ih, pos = 0;
-        pdf.addImage(imgData, 'JPEG', 0, pos, pw, ih);
-        left -= ph;
-        while (left > 0) {
-          pos -= ph;
-          pdf.addPage();
-          pdf.addImage(imgData, 'JPEG', 0, pos, pw, ih);
-          left -= ph;
+      // Tabs
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+          document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+          btn.classList.add("active");
+          const panel = $("tab-" + btn.dataset.tab);
+          if (panel) panel.classList.add("active");
+        });
+      });
+
+      // Input handling (FIX: works for dynamic fields too)
+      const onAnyInput = debounce(() => {
+        validateRequired();
+        updatePreview();
+        saveToLocalStorage();
+        saveToCloudDebounced();
+      }, 120);
+
+      cvForm.addEventListener("input", (e) => {
+        const el = e.target;
+        if (el && (el.matches("input, textarea, select"))) {
+          setTouched(el);
+          onAnyInput();
         }
-        pdf.save(`${nom}-cv.pdf`);
-        showToast('PDF téléchargé avec succès !', 'ok');
-      }).catch(err => {
-        console.error(err);
-        showToast('Erreur de génération PDF.', 'err');
-      });
-    }
+      }, true);
 
-    document.getElementById('downloadPDF').addEventListener('click', function() {
-      loadingOverlay.classList.add('active');
-      setTimeout(() => {
-        try {
-          generatePDF();
-          loadingOverlay.classList.remove('active');
-        } catch (err) {
-          console.error(err);
-          loadingOverlay.classList.remove('active');
-          showToast('Erreur de génération PDF.', 'err');
+      cvForm.addEventListener("change", (e) => {
+        const el = e.target;
+        if (el && el.matches("input, textarea, select")) {
+          setTouched(el);
+          onAnyInput();
         }
-      }, 100);
-    });
+      }, true);
 
-    function showToast(msg, type = 'ok') {
-      toastIc.className = 'toast-ic ' + type;
-      toastIc.innerHTML = type === 'ok' ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>';
-      toastMsg.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3600);
-    }
-
-    // Écouteurs généraux
-    document.querySelectorAll('input, textarea, select').forEach(el => {
-      el.addEventListener('input', () => {
-        updatePreview();
-        saveToLocalStorage();
-        if (currentUser) saveToCloud();
-      });
-    });
-    document.querySelectorAll('.tpl-card').forEach(card => {
-      card.addEventListener('click', () => {
-        document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        currentTemplate = card.dataset.tpl;
-        updatePreview();
-        saveToLocalStorage();
-        if (currentUser) saveToCloud();
-      });
-    });
-    document.querySelectorAll('.color-dot').forEach(dot => {
-      dot.addEventListener('click', () => {
-        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
-        dot.classList.add('active');
-        currentAccent = dot.dataset.color;
-        updatePreview();
-        saveToLocalStorage();
-        if (currentUser) saveToCloud();
-      });
-    });
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-      });
-    });
-
-    // Animation au scroll
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: 0.06 });
-    document.querySelectorAll('[data-anim]').forEach(el => observer.observe(el));
-
-    // Initialisation
-    window.addEventListener('load', () => {
-      if (!localStorage.getItem('cvBuilderData')) {
-        expCounter++; experiencesContainer.appendChild(createExpBlock(expCounter));
-        formCounter++; formationsContainer.appendChild(createFormBlock(formCounter));
+      /* ---------- Auth modal (only if Firebase available) ---------- */
+      function openModal() {
+        authModal.classList.add("active");
+        authModal.setAttribute("aria-hidden", "false");
+        authMessage.textContent = "";
+        authEmail.focus();
       }
-      // Ne pas charger localStorage ici, l'état auth le fera
-    });
-  })();
-</script>
+      function closeModal() {
+        authModal.classList.remove("active");
+        authModal.setAttribute("aria-hidden", "true");
+      }
+
+      if (!auth || !db) {
+        // Firebase absent => on cache login
+        loginBtn.style.display = "none";
+      } else {
+        authToggle.addEventListener("click", () => {
+          state.isLoginMode = !state.isLoginMode;
+          authTitle.textContent = state.isLoginMode ? "Connexion" : "Inscription";
+          authAction.textContent = state.isLoginMode ? "Se connecter" : "S'inscrire";
+          authToggle.textContent = state.isLoginMode ? "Pas encore de compte ? S'inscrire" : "Déjà un compte ? Se connecter";
+          authMessage.textContent = "";
+        });
+
+        authAction.addEventListener("click", async () => {
+          const email = authEmail.value.trim();
+          const password = authPassword.value.trim();
+          authMessage.textContent = "";
+
+          if (!email || !password) {
+            authMessage.textContent = "Veuillez remplir tous les champs.";
+            return;
+          }
+
+          try {
+            if (state.isLoginMode) {
+              await auth.signInWithEmailAndPassword(email, password);
+            } else {
+              await auth.createUserWithEmailAndPassword(email, password);
+            }
+            closeModal();
+          } catch (error) {
+            const code = error?.code || "";
+            if (code === "auth/wrong-password") authMessage.textContent = "Mot de passe incorrect.";
+            else if (code === "auth/user-not-found") authMessage.textContent = "Aucun compte avec cet email.";
+            else if (code === "auth/email-already-in-use") authMessage.textContent = "Cet email est déjà utilisé.";
+            else if (code === "auth/weak-password") authMessage.textContent = "Le mot de passe doit contenir au moins 6 caractères.";
+            else authMessage.textContent = error?.message || "Erreur d'authentification.";
+          }
+        });
+
+        loginBtn.addEventListener("click", () => {
+          if (state.currentUser) auth.signOut();
+          else openModal();
+        });
+
+        // Close modal on overlay click
+        authModal.addEventListener("click", (e) => {
+          if (e.target === authModal) closeModal();
+        });
+        window.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && authModal.classList.contains("active")) closeModal();
+        });
+
+        auth.onAuthStateChanged(async (user) => {
+          state.currentUser = user;
+
+          if (user) {
+            loginBtn.innerHTML = `<i class="fas fa-user-check"></i> <span>${esc(user.email)}</span>`;
+            // Charge cloud sinon fallback local
+            const ok = await loadFromCloud();
+            if (!ok) loadFromLocalStorage();
+          } else {
+            loginBtn.innerHTML = `<i class="fas fa-user"></i> <span>Connexion</span>`;
+            loadFromLocalStorage();
+          }
+          validateRequired();
+          updatePreview();
+        });
+      }
+
+      /* ---------- Scroll animations (fallback safe) ---------- */
+      function initScrollAnim() {
+        const items = document.querySelectorAll("[data-anim]");
+        if (!("IntersectionObserver" in window)) {
+          items.forEach(el => el.classList.add("visible"));
+          return;
+        }
+
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(ent => {
+            if (ent.isIntersecting) ent.target.classList.add("visible");
+          });
+        }, { threshold: 0.06 });
+
+        items.forEach(el => observer.observe(el));
+      }
+
+      /* ---------- Boot ---------- */
+      function ensureMinimumBlocks() {
+        if (!experiencesContainer.children.length) {
+          state.expCounter++;
+          experiencesContainer.appendChild(createExpBlock(state.expCounter));
+        }
+        if (!formationsContainer.children.length) {
+          state.formCounter++;
+          formationsContainer.appendChild(createFormBlock(state.formCounter));
+        }
+        updateBlockBadges();
+        initSortable();
+      }
+
+      window.addEventListener("load", () => {
+        // Si Firebase absent, on charge direct le local
+        if (!auth || !db) loadFromLocalStorage();
+
+        ensureMinimumBlocks();
+        validateRequired();
+        updatePreview();
+        initScrollAnim();
+      });
+    })();
+  </script>
 </body>
 </html>
