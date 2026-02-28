@@ -27,7 +27,7 @@
 
       <nav class="top-actions" aria-label="Actions globales">
         <button id="resume-btn" class="btn btn--ghost" type="button" title="Reprendre depuis la sauvegarde">
-          Reprendre plus tard
+          Reprendre
         </button>
         <button id="import-btn" class="btn btn--ghost" type="button" title="Importer LinkedIn ou un CV PDF">
           Import
@@ -92,13 +92,13 @@
 
         <div class="cv__actions">
           <button id="download-pdf" type="button" class="btn btn--success" disabled>
-            Télécharger PDF (A4)
+            ⬇ PDF (A4)
           </button>
           <button id="download-docx" type="button" class="btn btn--success" disabled>
-            Télécharger DOCX
+            ⬇ DOCX
           </button>
           <button id="print-btn" type="button" class="btn btn--ghost" disabled>
-            Imprimer
+            🖨 Imprimer
           </button>
         </div>
 
@@ -119,23 +119,23 @@
         </div>
 
         <div class="tabs" role="tablist" aria-label="Options d'import">
-          <button class="tab is-active" type="button" data-tab="linkedin" role="tab" aria-selected="true">Texte LinkedIn</button>
+          <button class="tab is-active" type="button" data-tab="linkedin" role="tab" aria-selected="true">Texte LinkedIn / CV</button>
           <button class="tab" type="button" data-tab="pdf" role="tab" aria-selected="false">CV PDF</button>
         </div>
 
         <section class="tabpane" id="tab-linkedin" data-tabpane="linkedin">
           <p class="muted">
-            Collez votre texte LinkedIn (sections “Expérience”, “Formation”, etc.). Le parsing est heuristique : vous pourrez ajuster ensuite.
+            Collez votre texte LinkedIn ou CV (sections "Expérience", "Formation", "Compétences", etc.). Le parsing détecte automatiquement les sections.
           </p>
-          <textarea id="linkedin-text" class="textarea" rows="10" placeholder="Collez ici le contenu LinkedIn…"></textarea>
+          <textarea id="linkedin-text" class="textarea" rows="10" placeholder="Collez ici le contenu LinkedIn ou votre CV texte…"></textarea>
           <div class="modal__actions">
-            <button id="parse-linkedin" class="btn btn--primary" type="button">Parser LinkedIn</button>
+            <button id="parse-linkedin" class="btn btn--primary" type="button">Parser et analyser</button>
           </div>
         </section>
 
         <section class="tabpane" id="tab-pdf" data-tabpane="pdf" hidden>
           <p class="muted">
-            Import d’un PDF via PDF.js. Les données extraites dépendent de la structure du document.
+            Import d'un PDF via PDF.js. Les données extraites dépendent de la structure du document.
           </p>
           <input id="pdf-file" class="file" type="file" accept="application/pdf" />
           <div class="modal__actions">
@@ -151,7 +151,7 @@
         </div>
 
         <div class="import-preview" id="import-preview" hidden>
-          <h3 class="import-preview__title">Aperçu de l’import</h3>
+          <h3 class="import-preview__title">Aperçu de l'import</h3>
           <pre class="import-preview__pre" id="import-preview-pre"></pre>
         </div>
       </div>
