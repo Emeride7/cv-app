@@ -1,36 +1,167 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot CV - Version Dynamique</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Troptop CV — Assistant conversationnel</title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- PDF export (html2pdf inclut html2canvas + jsPDF) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- PDF import (PDF.js) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <!-- DOCX export (docx UMD browser) -->
+  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.min.js"></script>
 </head>
+
 <body>
+  <main class="app" role="application" aria-label="Troptop CV - Assistant de création de CV">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand__title">Troptop CV</div>
+        <div class="brand__subtitle">Chatbot + aperçu + export PDF/DOCX + Mode ATS</div>
+      </div>
+
+      <nav class="top-actions" aria-label="Actions globales">
+        <button id="resume-btn" class="btn btn--ghost" type="button" title="Reprendre depuis la sauvegarde">
+          Reprendre plus tard
+        </button>
+        <button id="import-btn" class="btn btn--ghost" type="button" title="Importer LinkedIn ou un CV PDF">
+          Import
+        </button>
+        <button id="reset-btn" class="btn btn--ghost" type="button" title="Réinitialiser le projet">
+          Réinitialiser
+        </button>
+      </nav>
+    </header>
+
     <div class="container">
-        <div class="chat-section">
-            <h2>🤖 Assistant CV</h2>
-            <div class="chat-box" id="chat-box">
-                <div class="bot-message">Bonjour ! Commençons par votre identité. Quel est votre prénom ?</div>
-            </div>
-            <div class="input-area" id="input-area">
-                <input type="text" id="user-input" placeholder="Votre réponse..." autofocus>
-                <button onclick="sendMessage()">Envoyer</button>
-            </div>
-            <!-- Zone pour les boutons de choix (apparaît quand nécessaire) -->
-            <div class="choice-area" id="choice-area" style="display: none;">
-                <!-- Les boutons seront générés ici dynamiquement -->
-            </div>
+      <!-- CHAT -->
+      <section class="chat card" aria-label="Conversation">
+        <div class="card__head">
+          <h2 class="card__title">Conversation</h2>
+          <div class="chat-tools">
+            <button id="back-btn" type="button" class="btn btn--ghost" disabled title="Retour à la question précédente">
+              Retour
+            </button>
+            <label class="switch" title="Activer/Désactiver le mode ATS">
+              <input id="ats-toggle" type="checkbox" checked />
+              <span class="switch__ui"></span>
+              <span class="switch__label">Mode ATS</span>
+            </label>
+          </div>
         </div>
-        <div class="cv-section">
-            <h2>📄 Aperçu du CV</h2>
-            <div class="cv-preview" id="cv-content">
-                <div style="text-align:center; color:#999;">Remplissez le questionnaire pour voir le CV</div>
-            </div>
-            <button id="download-pdf" onclick="downloadCV()" style="display:none;">📥 Télécharger en PDF</button>
+
+        <div class="chat__log" id="chat-log" role="log" aria-live="polite" aria-relevant="additions"></div>
+
+        <!-- Widgets (choix, formulaires, tableaux...) -->
+        <div class="chat__widgets" id="widget-area" hidden></div>
+
+        <div class="chat__input" id="input-area">
+          <label class="sr-only" for="user-input">Votre réponse</label>
+          <input id="user-input" type="text" placeholder="Votre réponse…" autocomplete="on" />
+          <button id="send-btn" type="button" class="btn btn--primary">Envoyer</button>
         </div>
+
+        <div class="hint" id="input-hint" aria-live="polite"></div>
+      </section>
+
+      <!-- CV -->
+      <section class="cv card" aria-label="Aperçu du CV">
+        <div class="cv__header">
+          <div class="cv__headerLeft">
+            <h2 class="card__title">Aperçu</h2>
+            <div class="ats-badge" id="ats-badge" hidden>
+              <div class="ats-badge__score" id="ats-score">—</div>
+              <div class="ats-badge__label">Score ATS</div>
+            </div>
+          </div>
+
+          <div class="template-switcher" id="template-switcher" hidden>
+            <span class="template-switcher__label">Modèle :</span>
+            <button type="button" class="btn btn--ghost is-active" data-template="t1">Modèle 1</button>
+            <button type="button" class="btn btn--ghost" data-template="t2">Modèle 2</button>
+            <button type="button" class="btn btn--ghost" data-template="t3">Modèle 3</button>
+          </div>
+        </div>
+
+        <div class="cv__preview" id="cv-preview" aria-label="Aperçu rendu du CV"></div>
+
+        <div class="cv__actions">
+          <button id="download-pdf" type="button" class="btn btn--success" disabled>
+            Télécharger PDF (A4)
+          </button>
+          <button id="download-docx" type="button" class="btn btn--success" disabled>
+            Télécharger DOCX
+          </button>
+          <button id="print-btn" type="button" class="btn btn--ghost" disabled>
+            Imprimer
+          </button>
+        </div>
+
+        <div class="ats-panel" id="ats-panel" hidden aria-label="Recommandations ATS">
+          <h3 class="ats-panel__title">Recommandations ATS</h3>
+          <ul class="ats-panel__list" id="ats-recos"></ul>
+        </div>
+      </section>
     </div>
-    <script src="script.js"></script>
+
+    <!-- MODAL IMPORT -->
+    <div class="modal" id="import-modal" hidden role="dialog" aria-modal="true" aria-label="Importer des informations">
+      <div class="modal__backdrop" data-close="true"></div>
+      <div class="modal__panel">
+        <div class="modal__head">
+          <h2 class="modal__title">Importer</h2>
+          <button class="btn btn--ghost" type="button" data-close="true">Fermer</button>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="Options d'import">
+          <button class="tab is-active" type="button" data-tab="linkedin" role="tab" aria-selected="true">Texte LinkedIn</button>
+          <button class="tab" type="button" data-tab="pdf" role="tab" aria-selected="false">CV PDF</button>
+        </div>
+
+        <section class="tabpane" id="tab-linkedin" data-tabpane="linkedin">
+          <p class="muted">
+            Collez votre texte LinkedIn (sections “Expérience”, “Formation”, etc.). Le parsing est heuristique : vous pourrez ajuster ensuite.
+          </p>
+          <textarea id="linkedin-text" class="textarea" rows="10" placeholder="Collez ici le contenu LinkedIn…"></textarea>
+          <div class="modal__actions">
+            <button id="parse-linkedin" class="btn btn--primary" type="button">Parser LinkedIn</button>
+          </div>
+        </section>
+
+        <section class="tabpane" id="tab-pdf" data-tabpane="pdf" hidden>
+          <p class="muted">
+            Import d’un PDF via PDF.js. Les données extraites dépendent de la structure du document.
+          </p>
+          <input id="pdf-file" class="file" type="file" accept="application/pdf" />
+          <div class="modal__actions">
+            <button id="parse-pdf" class="btn btn--primary" type="button">Parser le PDF</button>
+          </div>
+          <div class="muted small" id="pdf-status"></div>
+        </section>
+
+        <hr class="hr" />
+
+        <div class="modal__actions">
+          <button id="apply-import" class="btn btn--success" type="button" disabled>Appliquer à mon CV</button>
+        </div>
+
+        <div class="import-preview" id="import-preview" hidden>
+          <h3 class="import-preview__title">Aperçu de l’import</h3>
+          <pre class="import-preview__pre" id="import-preview-pre"></pre>
+        </div>
+      </div>
+    </div>
+
+    <noscript>
+      <p class="noscript">Cette application nécessite JavaScript.</p>
+    </noscript>
+  </main>
+
+  <script src="script.js" defer></script>
 </body>
 </html>
