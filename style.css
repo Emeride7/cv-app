@@ -1,0 +1,158 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: #f0f2f5;
+}
+.container {
+    display: flex;
+    gap: 20px;
+    max-width: 1400px;
+    margin: auto;
+}
+.chat-section {
+    flex: 1;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+.cv-section {
+    flex: 1;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+.chat-box {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background: #fafafa;
+}
+.bot-message, .user-message {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 10px;
+    max-width: 80%;
+}
+.bot-message {
+    background: #e3f2fd;
+    align-self: flex-start;
+}
+.user-message {
+    background: #dcf8c6;
+    align-self: flex-end;
+    margin-left: auto;
+}
+.input-area {
+    display: flex;
+    gap: 10px;
+}
+#user-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+button {
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+button:hover {
+    background: #0056b3;
+}
+.cv-preview {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+    background: #fafafa;
+    margin-bottom: 10px;
+}
+#download-pdf {
+    width: 100%;
+    background: #28a745;
+}
+#download-pdf:hover {
+    background: #218838;
+}
+/* Style simple pour le CV généré */
+.cv-template {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+}
+.cv-template h1 {
+    color: #333;
+    border-bottom: 2px solid #007bff;
+}
+.cv-template .section {
+    margin-bottom: 20px;
+}
+.cv-template .section-title {
+    font-weight: bold;
+    color: #007bff;
+}
+/* Ajoutez ceci à la fin du fichier style.css existant */
+
+.choice-area {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.choice-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.choice-btn.yes {
+    background: #28a745;
+    color: white;
+}
+
+.choice-btn.yes:hover {
+    background: #218838;
+}
+
+.choice-btn.no {
+    background: #dc3545;
+    color: white;
+}
+
+.choice-btn.no:hover {
+    background: #c82333;
+}
+
+/* Style pour les messages système */
+.system-message {
+    background: #fff3cd;
+    color: #856404;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+    text-align: center;
+    font-style: italic;
+}
