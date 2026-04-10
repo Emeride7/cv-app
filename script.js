@@ -2,8 +2,15 @@
   "use strict";
 
   /* =========================================================
-   * Troptop CV v3 — Formations, Certifications, PDF fix,
-   *   Mobile download, Smart parsing, Responsive
+   * Troptop CV v3.1 — Corrections :
+   *  - PDF ATS : impression navigateur (texte sélectionnable)
+   *  - Contact : sans labels redondants, séparateur propre
+   *  - Emoji supprimés du contenu CV (incompatibles ATS)
+   *  - monthNames : clé "jan" dupliquée corrigée
+   *  - Suggestions pills : mise à jour après ajout
+   *  - Score ATS : coloration dynamique (rouge/orange/vert)
+   *  - Mode ATS : compétences en texte plat
+   *  - font-weight standardisé
    * ========================================================= */
 
   /* ========================= Utils ========================= */
@@ -32,7 +39,8 @@
 
   const normalizeSpace = (s) => String(s ?? "").replace(/\s+/g, " ").trim();
 
-  const isMobile = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  const isMobile = () =>
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     || window.innerWidth <= 768;
 
   const monthInputSupported = () => {
@@ -83,7 +91,6 @@
   const downloadBlob = (blob, filename) => {
     try {
       if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-        // IE / old Edge
         window.navigator.msSaveOrOpenBlob(blob, filename);
         return;
       }
@@ -98,7 +105,6 @@
       setTimeout(() => URL.revokeObjectURL(url), 3000);
     } catch (e) {
       console.error("downloadBlob error:", e);
-      // Fallback: ouvrir dans nouvel onglet
       const url = URL.createObjectURL(blob);
       window.open(url, "_blank");
     }
@@ -172,7 +178,6 @@
 
   const clearStorage = () => {
     try { localStorage.removeItem(STORAGE_KEY); } catch {}
-    // Also clear old version
     try { localStorage.removeItem("troptopcv:v2"); } catch {}
   };
 
@@ -207,8 +212,8 @@
     data: {
       identity: { prenom: "", nom: "", email: "", telephone: "", ville: "", titre: "" },
       profile: { summary: "" },
-      experiences: [], // {id, entreprise, poste, startYM, endYM, isCurrent, missions:[{id,text}]}
-      formations: [],  // {id, diplome, etablissement, ville, startYM, endYM}
+      experiences: [],  // {id, entreprise, poste, startYM, endYM, isCurrent, missions:[{id,text}]}
+      formations: [],   // {id, diplome, etablissement, ville, startYM, endYM}
       certifications: [], // {id, nom, organisme, annee}
       skills: { hard: [], soft: [], passions: [] },
       languages: [], // {id, langue, niveau}
@@ -302,12 +307,20 @@
     const fullName = normalizeSpace(`${id.prenom} ${id.nom}`) || "Votre Nom";
     const title = normalizeSpace(id.titre);
     const summary = normalizeSpace(a.profile.summary);
+    const isATS = !!state.ui.atsMode;
 
-    const contacts = [
-      id.email ? `Email : ${id.email}` : "",
-      id.telephone ? `Tél : ${id.telephone}` : "",
-      id.ville ? `Ville : ${id.ville}` : "",
+    /* FIX : contact sans labels redondants (ATS lit directement les valeurs)
+       Séparateur visuel « | » uniquement, pas "Email :" ou "Tél :" */
+    const contactParts = [
+      id.email || "",
+      id.telephone || "",
+      id.ville || "",
     ].filter(Boolean);
+
+    const contactHTML = contactParts
+      .map((c, i) =>
+        `<span>${escapeHTML(c)}</span>${i < contactParts.length - 1 ? '<span class="cv-contact-sep">|</span>' : ""}`
+      ).join("");
 
     // === Expériences ===
     const expHTML = (a.experiences || []).map((exp) => {
@@ -327,6 +340,7 @@
     // === Formations ===
     const eduHTML = (a.formations || []).map((edu) => {
       const dates = computeEduDisplay(edu);
+      /* FIX : ville sans emoji 📍 — les emojis sont ignorés ou mal parsés par les ATS */
       return `
         <div class="edu-item avoid-pagebreak">
           <div class="edu-top">
@@ -334,7 +348,7 @@
             ${edu.etablissement ? `<span class="edu-school">&nbsp;— ${escapeHTML(edu.etablissement)}</span>` : ""}
           </div>
           ${dates ? `<div class="edu-dates">${escapeHTML(dates)}</div>` : ""}
-          ${edu.ville ? `<div class="edu-ville">📍 ${escapeHTML(edu.ville)}</div>` : ""}
+          ${edu.ville ? `<div class="edu-ville">${escapeHTML(edu.ville)}</div>` : ""}
         </div>`;
     }).join("");
 
@@ -345,13 +359,33 @@
         <div class="cert-meta">${escapeHTML(cert.organisme || "")}${cert.annee ? ` — ${escapeHTML(cert.annee)}` : ""}</div>
       </div>`).join("");
 
-    const hardSkills = (a.skills.hard || []).map((s) => `<span class="chip">${escapeHTML(s)}</span>`).join("");
-    const softSkills = (a.skills.soft || []).map((s) => `<span class="chip">${escapeHTML(s)}</span>`).join("");
-    const passions = (a.skills.passions || []).map((s) => `<span class="chip">${escapeHTML(s)}</span>`).join("");
-    const langs = (a.languages || []).map((l) => `<span class="chip">${escapeHTML(l.langue)} — ${escapeHTML(l.niveau)}</span>`).join("");
+    // === Compétences : chips visuelles + texte plat ATS ===
+    const hardArr = a.skills.hard || [];
+    const softArr = a.skills.soft || [];
+    const passionsArr = a.skills.passions || [];
+    const langsArr = a.languages || [];
 
-    const atsClass = state.ui.atsMode ? "is-ats" : "";
-    const tpl = state.ui.atsMode ? "t2" : state.ui.selectedTemplate;
+    const hardChips = hardArr.map((s) => `<span class="chip">${escapeHTML(s)}</span>`).join("");
+    const softChips = softArr.map((s) => `<span class="chip">${escapeHTML(s)}</span>`).join("");
+    const passionChips = passionsArr.map((s) => `<span class="chip">${escapeHTML(s)}</span>`).join("");
+    const langsChips = langsArr.map((l) => `<span class="chip">${escapeHTML(l.langue)} — ${escapeHTML(l.niveau)}</span>`).join("");
+
+    /* FIX : texte plat pour ATS (une compétence par virgule) */
+    const hardText = hardArr.join(", ");
+    const softText = softArr.join(", ");
+    const passionText = passionsArr.join(", ");
+    const langsText = langsArr.map(l => `${l.langue} (${l.niveau})`).join(", ");
+
+    const atsClass = isATS ? "is-ats" : "";
+    const tpl = isATS ? "t2" : state.ui.selectedTemplate;
+
+    const skillSection = (title, chips, text, empty = "—") => `
+      <section class="cv-section avoid-pagebreak">
+        <h2 class="cv-section-title">${title}</h2>
+        ${chips ? `<div class="chips">${chips}</div>` : ""}
+        ${text ? `<p class="cv-skills-text">${escapeHTML(text)}</p>` : (!chips ? `<div class="muted">${empty}</div>` : "")}
+        ${!chips && !text ? `<div class="muted">${empty}</div>` : ""}
+      </section>`;
 
     cvPreview.innerHTML = `
       <div class="cv-paper" id="cv-paper">
@@ -359,7 +393,7 @@
           <div class="cv-headline avoid-pagebreak">
             <h1 class="cv-name">${escapeHTML(fullName)}</h1>
             ${title ? `<div class="cv-title">${escapeHTML(title)}</div>` : ""}
-            ${contacts.length ? `<div class="cv-contact">${contacts.map(c => `<span>${escapeHTML(c)}</span>`).join("")}</div>` : ""}
+            ${contactHTML ? `<div class="cv-contact">${contactHTML}</div>` : ""}
           </div>
 
           ${summary ? `
@@ -369,16 +403,16 @@
           </section>` : ""}
 
           <div class="two-col">
-            <!-- Colonne gauche -->
+            <!-- Colonne principale -->
             <div>
               <section class="cv-section">
-                <h2 class="cv-section-title">Expériences</h2>
+                <h2 class="cv-section-title">Expériences professionnelles</h2>
                 ${expHTML || `<div class="muted">Aucune expérience renseignée.</div>`}
               </section>
 
               ${(a.formations || []).length ? `
               <section class="cv-section avoid-pagebreak">
-                <h2 class="cv-section-title">Formations</h2>
+                <h2 class="cv-section-title">Formation</h2>
                 ${eduHTML}
               </section>` : ""}
 
@@ -389,34 +423,19 @@
               </section>` : ""}
             </div>
 
-            <!-- Colonne droite -->
+            <!-- Colonne secondaire -->
             <div>
-              <section class="cv-section avoid-pagebreak">
-                <h2 class="cv-section-title">Compétences techniques</h2>
-                ${hardSkills ? `<div class="chips">${hardSkills}</div>` : `<div class="muted">—</div>`}
-              </section>
-
-              <section class="cv-section avoid-pagebreak">
-                <h2 class="cv-section-title">Soft skills</h2>
-                ${softSkills ? `<div class="chips">${softSkills}</div>` : `<div class="muted">—</div>`}
-              </section>
-
-              <section class="cv-section avoid-pagebreak">
-                <h2 class="cv-section-title">Centres d'intérêt</h2>
-                ${passions ? `<div class="chips">${passions}</div>` : `<div class="muted">—</div>`}
-              </section>
-
-              <section class="cv-section avoid-pagebreak">
-                <h2 class="cv-section-title">Langues</h2>
-                ${langs ? `<div class="chips">${langs}</div>` : `<div class="muted">—</div>`}
-              </section>
+              ${skillSection("Compétences techniques", hardChips, hardText)}
+              ${skillSection("Soft skills", softChips, softText)}
+              ${skillSection("Centres d'intérêt", passionChips, passionText)}
+              ${skillSection("Langues", langsChips, langsText)}
             </div>
           </div>
         </div>
       </div>`;
   };
 
-  /* ========================= ATS ========================= */
+  /* ========================= ATS Scoring ========================= */
   const getATS = () => {
     const a = state.data;
     const id = a.identity;
@@ -435,15 +454,15 @@
     const formCount = (a.formations || []).length;
     const certCount = (a.certifications || []).length;
 
-    if (hasName) score += 8; else recos.push("Ajoutez votre prénom et nom.");
-    if (hasEmail) score += 8; else recos.push("Ajoutez un email valide.");
-    if (hasPhone) score += 5; else recos.push("Ajoutez un téléphone.");
-    if (hasTitle) score += 6; else recos.push("Ajoutez un titre métier clair.");
+    if (hasName) score += 8; else recos.push("Ajoutez votre prénom et nom complet.");
+    if (hasEmail) score += 8; else recos.push("Ajoutez un email valide (format nom@domaine.com).");
+    if (hasPhone) score += 5; else recos.push("Ajoutez un numéro de téléphone avec indicatif.");
+    if (hasTitle) score += 6; else recos.push("Ajoutez un titre métier précis (ex : Développeur Full-Stack).");
 
     if (summaryLen >= 260) score += 10;
     else if (summaryLen >= 120) score += 7;
     else if (summaryLen > 0) score += 4;
-    else recos.push("Ajoutez un profil professionnel de 3–6 lignes.");
+    else recos.push("Ajoutez un profil professionnel de 3–6 lignes résumant votre valeur.");
 
     if (expCount >= 2) score += 10;
     else if (expCount === 1) score += 6;
@@ -452,38 +471,43 @@
     if (missionCount >= 8) score += 10;
     else if (missionCount >= 3) score += 7;
     else if (missionCount > 0) score += 3;
-    else recos.push("Ajoutez des missions (idéal : 3–6 par expérience).");
+    else recos.push("Ajoutez des missions détaillées (idéal : 3–6 par expérience).");
 
     const missionsText = (a.experiences || []).flatMap(e => (e.missions || []).map(m => m.text)).join(" ");
-    if (/\b\d+([.,]\d+)?\b/.test(missionsText)) score += 7;
-    else recos.push("Quantifiez vos résultats (ex : +25%, 30 clients…).");
+    if (/\b\d+([.,]\d+)?\s*(%|clients?|projets?|€|\$|K|M)\b/.test(missionsText)) score += 7;
+    else if (/\b\d+([.,]\d+)?\b/.test(missionsText)) score += 4;
+    else recos.push("Quantifiez vos résultats avec des chiffres (ex : +25%, 30 clients, 2M€…).");
 
     if (hardCount >= 10) score += 8;
     else if (hardCount >= 5) score += 5;
     else if (hardCount > 0) score += 3;
-    else recos.push("Ajoutez des compétences techniques (5–12).");
+    else recos.push("Ajoutez vos compétences techniques (idéal : 8–12).");
 
-    if (langCount >= 2) score += 5; else if (langCount === 1) score += 3;
-    else recos.push("Ajoutez au moins une langue + niveau.");
+    if (langCount >= 2) score += 5;
+    else if (langCount === 1) score += 3;
+    else recos.push("Ajoutez au moins une langue et son niveau (ex : Anglais — Courant).");
 
-    // Bonus formations et certifications
     if (formCount >= 1) score += 5;
-    else recos.push("Ajoutez votre formation principale (diplôme, école).");
+    else recos.push("Ajoutez votre formation principale (diplôme, école, année).");
 
     if (certCount >= 1) score += 4;
+    else recos.push("Des certifications (AWS, TOEIC, PMI…) améliorent votre score ATS.");
 
     if (state.ui.atsMode) score += 10;
-    else recos.push("Activez le Mode ATS pour une mise en page compatible.");
+    else recos.push("Activez le Mode ATS pour une mise en page compatible avec les robots de tri.");
 
     score = Math.max(0, Math.min(100, score));
 
+    // Recommandations métier spécifiques
     const job = (id.titre || "").toLowerCase();
-    if (job.includes("dévelop") || job.includes("dev") || job.includes("software")) {
-      recos.push("Tech : ajoutez des mots-clés stack alignés au poste visé.");
-    } else if (job.includes("marketing")) {
-      recos.push("Marketing : ajoutez des KPI (CPC, ROAS, CTR…).");
-    } else if (job.includes("finance") || job.includes("compta")) {
-      recos.push("Finance : ajoutez outils (Excel, ERP), normes (IFRS).");
+    if (job.includes("développ") || job.includes("dev") || job.includes("software") || job.includes("data")) {
+      if (hardCount < 5) recos.push("Tech : ajoutez les mots-clés de votre stack (React, Python, Docker…).");
+    } else if (job.includes("marketing") || job.includes("growth") || job.includes("digital")) {
+      if (!missionsText.match(/\b(cpc|roas|ctr|cpm|seo|sea|kpi|taux)\b/i))
+        recos.push("Marketing : ajoutez des KPI sectoriels (CPC, ROAS, CTR, taux de conversion…).");
+    } else if (job.includes("finance") || job.includes("compta") || job.includes("audit")) {
+      if (!missionsText.match(/\b(excel|erp|sap|ifrs|budget)\b/i))
+        recos.push("Finance : mentionnez vos outils (Excel avancé, ERP, SAP) et normes (IFRS).");
     }
 
     return { score, recos: recos.slice(0, 10) };
@@ -495,12 +519,26 @@
       atsBadge.hidden = false;
       atsPanel.hidden = false;
       atsScoreEl.textContent = String(score);
+
+      /* FIX : couleur dynamique du badge selon score */
+      atsBadge.classList.remove("score--low", "score--mid", "score--high");
+      if (score < 50) atsBadge.classList.add("score--low");
+      else if (score < 75) atsBadge.classList.add("score--mid");
+      else atsBadge.classList.add("score--high");
+
       atsRecos.innerHTML = "";
-      recos.forEach((r) => {
+      if (recos.length === 0) {
         const li = document.createElement("li");
-        li.textContent = r;
+        li.textContent = "Excellent ! Votre CV est bien optimisé pour les ATS.";
+        li.style.color = "#065f46";
         atsRecos.appendChild(li);
-      });
+      } else {
+        recos.forEach((r) => {
+          const li = document.createElement("li");
+          li.textContent = r;
+          atsRecos.appendChild(li);
+        });
+      }
     } else {
       atsBadge.hidden = true;
       atsPanel.hidden = true;
@@ -518,7 +556,7 @@
       const btn = e.target.closest("button[data-template]");
       if (!btn) return;
       if (state.ui.atsMode && btn.dataset.template === "t3") {
-        system("Le modèle 3 (2 colonnes) est désactivé en Mode ATS.");
+        system("Le modèle 3 (fond coloré) est désactivé en Mode ATS — il gêne la lecture des parsers.");
         rebuildChatDOM(); return;
       }
       templateSwitcher.querySelectorAll("button[data-template]").forEach(b => b.classList.remove("is-active"));
@@ -527,60 +565,66 @@
     });
   };
 
-  /* ========================= PDF Export (FIXED) ========================= */
+  /* ========================= PDF Export ========================= */
   /**
-   * BUG PDF BLANC — Causes identifiées et corrections :
-   * 1. L'élément cloné dans un div à left:-99999px peut être hors viewport réel → html2canvas ne le voit pas
-   * 2. Mauvais timing : html2canvas capture avant le repaint du DOM
-   * 3. Sur mobile : html2pdf ne fonctionne pas bien sur iOS Safari
+   * FIX CRITIQUE ATS :
+   * html2pdf + html2canvas rasterise le CV en JPEG → PDF image.
+   * Un PDF image ne contient AUCUN texte sélectionnable : les robots ATS
+   * ne peuvent pas lire votre CV ! Score ATS = 0 de facto.
    *
    * SOLUTION :
-   * - Desktop : capturer directement l'élément #cv-paper IN-DOM avec requestAnimationFrame
-   * - Mobile : générer un HTML complet self-contained → Blob → window.open (impression native)
+   * → Mode ATS ou mobile : on génère un HTML autonome propre et on ouvre
+   *   la boîte d'impression du navigateur. "Enregistrer en PDF" via
+   *   Chrome/Firefox crée un PDF avec texte sélectionnable et parseable.
+   * → Mode non-ATS (visuel) sur desktop : html2pdf (mise en page fidèle
+   *   mais image — acceptable pour CV envoyé directement à un humain).
    */
   const downloadPDF = async () => {
     const paper = document.getElementById("cv-paper");
     if (!paper || paper.textContent.trim().length < 20) {
-      system("Le CV n'est pas prêt pour l'export."); rebuildChatDOM(); return;
+      system("Le CV n'est pas prêt pour l'export. Renseignez au moins votre nom.");
+      rebuildChatDOM(); return;
     }
 
     const prenom = safeFilePart(state.data.identity.prenom || "Prenom");
     const nom = safeFilePart(state.data.identity.nom || "Nom");
     const filename = `CV_${prenom}_${nom}.pdf`;
 
-    // === MOBILE : fallback HTML → Blob → window.open ===
-    if (isMobile() || !window.html2pdf) {
+    // FIX : en mode ATS ou mobile → impression navigateur (PDF texte)
+    if (state.ui.atsMode || isMobile() || !window.html2pdf) {
+      bot(state.ui.atsMode
+        ? "📄 Mode ATS actif : votre navigateur va ouvrir la fenêtre d'impression. Sélectionnez « Enregistrer en PDF » pour obtenir un PDF avec texte lisible par les ATS."
+        : "📄 Votre navigateur va ouvrir la fenêtre d'impression. Sélectionnez « Enregistrer en PDF ».",
+        { isQuestion: false }
+      );
+      rebuildChatDOM();
       try {
-        await exportPDFMobile(filename);
+        await exportPDFPrint(filename);
       } catch (e) {
-        console.error("Mobile PDF error:", e);
-        system("Export PDF mobile : impossible. Utilisez le bouton Imprimer / Partager de votre navigateur.");
+        console.error("PDF print error:", e);
+        system("Impossible d'ouvrir la fenêtre d'impression. Essayez le bouton 🖨 Imprimer.");
         rebuildChatDOM();
       }
       return;
     }
 
-    // === DESKTOP : html2pdf avec l'élément IN-DOM ===
-    // Attendre que les polices et le layout soient prêts
+    // Mode non-ATS + desktop : html2pdf (visuel, pour envoi direct à un recruteur humain)
     try { await document.fonts?.ready; } catch {}
-    // 2 frames pour s'assurer que le DOM est peint
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-    // Rendre le bouton en loading
     downloadPdfBtn.disabled = true;
     downloadPdfBtn.innerHTML = '<span class="spinner"></span>Génération…';
 
     const opt = {
-      margin: [8, 10, 8, 10],
+      margin: [10, 10, 10, 10],
       filename,
-      image: { type: "jpeg", quality: 0.97 },
+      image: { type: "jpeg", quality: 0.98 },
       html2canvas: {
         scale: 2,
         useCORS: true,
         allowTaint: false,
         backgroundColor: "#ffffff",
         logging: false,
-        // Clé : capturer depuis la position réelle de l'élément
         scrollX: 0,
         scrollY: 0,
         windowWidth: document.documentElement.scrollWidth,
@@ -591,23 +635,23 @@
     };
 
     try {
-      console.log("[PDF] Début export, élément:", paper.id, "taille:", paper.offsetWidth, "x", paper.offsetHeight);
-      // IMPORTANT: passer l'élément directement (pas un clone hors-DOM)
       await html2pdf().set(opt).from(paper).save();
-      console.log("[PDF] Export terminé");
     } catch (e) {
       console.error("[PDF] Erreur:", e);
-      system("Erreur export PDF : " + e.message + ". Essayez le bouton Imprimer.");
+      system("Erreur export PDF : " + e.message + ". Essayez le bouton 🖨 Imprimer.");
+      rebuildChatDOM();
     } finally {
       downloadPdfBtn.disabled = false;
       downloadPdfBtn.innerHTML = "⬇ PDF (A4)";
-      rebuildChatDOM();
     }
   };
 
-  /** Export PDF mobile : génère un HTML autonome et l'ouvre dans un nouvel onglet */
-  const exportPDFMobile = async (filename) => {
-    // Récupérer les styles inlinés
+  /**
+   * FIX : génère un HTML autonome self-contained et ouvre l'impression.
+   * Le PDF produit par "Enregistrer en PDF" du navigateur contient du texte
+   * réel → compatible ATS.
+   */
+  const exportPDFPrint = async (filename) => {
     const styleSheets = Array.from(document.styleSheets);
     let cssText = "";
     for (const sheet of styleSheets) {
@@ -617,34 +661,32 @@
       } catch {}
     }
 
-    // Ajouter styles supplémentaires pour print mobile
-    const extraCSS = `
-      body { margin: 0; background: #fff; font-family: -apple-system, sans-serif; }
-      .cv-paper { width: 100%; min-height: auto; box-shadow: none; border-radius: 0; padding: 20px; }
-      .two-col { grid-template-columns: 1fr !important; gap: 0 !important; }
-      @media print { * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    const printCSS = `
+      @page { size: A4; margin: 12mm 12mm 12mm 12mm; }
+      body { margin: 0; background: #fff; font-family: Arial, sans-serif; }
+      .cv-paper { width: 100%; min-height: auto; box-shadow: none; border-radius: 0; padding: 0; }
+      .two-col { display: block !important; }
+      .chips { display: none !important; }
+      .cv-skills-text { display: block !important; }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     `;
 
     const paperHTML = document.getElementById("cv-paper")?.outerHTML || "<p>CV non généré</p>";
+    const titleSafe = (filename || "CV").replace(/\.pdf$/i, "").replace(/[<>]/g, "");
 
     const html = `<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${filename.replace(".pdf", "")}</title>
-<style>${cssText}\n${extraCSS}</style>
+<title>${escapeHTML(titleSafe)}</title>
+<style>${cssText}\n${printCSS}</style>
 </head>
 <body>
 ${paperHTML}
 <script>
-  // Auto-print sur mobile pour sauvegarder en PDF
   window.addEventListener('load', function() {
-    setTimeout(function() {
-      if (confirm('Appuyez sur OK pour ouvrir la boîte d\\'impression (Enregistrer en PDF)')) {
-        window.print();
-      }
-    }, 800);
+    setTimeout(function() { window.print(); }, 400);
   });
 <\/script>
 </body>
@@ -654,13 +696,15 @@ ${paperHTML}
     const url = URL.createObjectURL(blob);
     const newWin = window.open(url, "_blank");
     if (!newWin) {
-      // Si popup bloqué, fallback anchor
+      // Popup bloqué : fallback anchor
       const a = document.createElement("a");
       a.href = url;
-      a.download = filename.replace(".pdf", ".html");
+      a.download = filename.replace(/\.pdf$/i, ".html");
       a.click();
+      system("Popup bloqué. Le fichier HTML a été téléchargé — ouvrez-le et imprimez → Enregistrer en PDF.");
+      rebuildChatDOM();
     }
-    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    setTimeout(() => URL.revokeObjectURL(url), 12000);
   };
 
   const printCV = () => window.print();
@@ -680,42 +724,48 @@ ${paperHTML}
     const nom = safeFilePart(id.nom || "Nom");
     const filename = `CV_${prenom}_${nom}.docx`;
 
-    const { Document, Packer, Paragraph, TextRun, HeadingLevel } = window.docx;
+    const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = window.docx;
     const children = [];
 
     // Entête
-    children.push(new Paragraph({ text: fullName, heading: HeadingLevel.TITLE }));
-    if (title) children.push(new Paragraph({ children: [new TextRun({ text: title, bold: true })] }));
+    children.push(new Paragraph({
+      children: [new TextRun({ text: fullName, bold: true, size: 48 })],
+      alignment: AlignmentType.LEFT,
+    }));
+    if (title) {
+      children.push(new Paragraph({
+        children: [new TextRun({ text: title, bold: true, size: 28, color: "374151" })],
+      }));
+    }
 
-    const contacts = [
-      id.email ? `Email : ${id.email}` : "",
-      id.telephone ? `Tél : ${id.telephone}` : "",
-      id.ville ? `Ville : ${id.ville}` : "",
-    ].filter(Boolean);
-    if (contacts.length) {
-      children.push(new Paragraph({ children: [new TextRun({ text: contacts.join(" | "), color: "555555" })] }));
+    // Contact — sans labels, séparateur propre
+    const contactParts = [id.email, id.telephone, id.ville].filter(Boolean);
+    if (contactParts.length) {
+      children.push(new Paragraph({
+        children: [new TextRun({ text: contactParts.join("  |  "), color: "555555", size: 22 })],
+      }));
     }
     children.push(new Paragraph({ text: "" }));
 
     // Profil
     if (summary) {
-      children.push(new Paragraph({ text: "Profil professionnel", heading: HeadingLevel.HEADING_2 }));
+      children.push(new Paragraph({ text: "PROFIL PROFESSIONNEL", heading: HeadingLevel.HEADING_2 }));
       children.push(new Paragraph({ text: summary }));
       children.push(new Paragraph({ text: "" }));
     }
 
     // Expériences
-    children.push(new Paragraph({ text: "Expériences", heading: HeadingLevel.HEADING_2 }));
+    children.push(new Paragraph({ text: "EXPÉRIENCES PROFESSIONNELLES", heading: HeadingLevel.HEADING_2 }));
     if (!(a.experiences || []).length) {
       children.push(new Paragraph({ text: "—" }));
     } else {
       for (const exp of a.experiences) {
         const dates = computeExpDisplay(exp);
-        const headline = `${normalizeSpace(exp.poste)} — ${normalizeSpace(exp.entreprise)}`.trim();
+        const headline = [normalizeSpace(exp.poste), normalizeSpace(exp.entreprise)].filter(Boolean).join(" — ");
         children.push(new Paragraph({
           children: [
             new TextRun({ text: headline || "Expérience", bold: true }),
-            dates ? new TextRun({ text: `   (${dates})`, color: "555555" }) : new TextRun({ text: "" }),
+            dates ? new TextRun({ text: `   ${dates}`, color: "666666" }) : new TextRun({ text: "" }),
           ],
         }));
         for (const m of (exp.missions || [])) {
@@ -727,18 +777,18 @@ ${paperHTML}
 
     // Formations
     if ((a.formations || []).length) {
-      children.push(new Paragraph({ text: "Formations", heading: HeadingLevel.HEADING_2 }));
+      children.push(new Paragraph({ text: "FORMATION", heading: HeadingLevel.HEADING_2 }));
       for (const edu of a.formations) {
         const dates = computeEduDisplay(edu);
         const headline = [edu.diplome, edu.etablissement].filter(Boolean).join(" — ");
         children.push(new Paragraph({
           children: [
             new TextRun({ text: headline || "Formation", bold: true }),
-            dates ? new TextRun({ text: `   (${dates})`, color: "555555" }) : new TextRun({ text: "" }),
+            dates ? new TextRun({ text: `   ${dates}`, color: "666666" }) : new TextRun({ text: "" }),
           ],
         }));
         if (edu.ville) {
-          children.push(new Paragraph({ children: [new TextRun({ text: `📍 ${edu.ville}`, color: "888888" })] }));
+          children.push(new Paragraph({ children: [new TextRun({ text: edu.ville, color: "888888" })] }));
         }
         children.push(new Paragraph({ text: "" }));
       }
@@ -746,36 +796,42 @@ ${paperHTML}
 
     // Certifications
     if ((a.certifications || []).length) {
-      children.push(new Paragraph({ text: "Certifications", heading: HeadingLevel.HEADING_2 }));
+      children.push(new Paragraph({ text: "CERTIFICATIONS", heading: HeadingLevel.HEADING_2 }));
       for (const cert of a.certifications) {
         const meta = [cert.organisme, cert.annee].filter(Boolean).join(" — ");
         children.push(new Paragraph({
           children: [
             new TextRun({ text: cert.nom || "", bold: true }),
-            meta ? new TextRun({ text: `   ${meta}`, color: "555555" }) : new TextRun({ text: "" }),
+            meta ? new TextRun({ text: `   ${meta}`, color: "666666" }) : new TextRun({ text: "" }),
           ],
         }));
       }
       children.push(new Paragraph({ text: "" }));
     }
 
-    // Compétences
-    children.push(new Paragraph({ text: "Compétences techniques", heading: HeadingLevel.HEADING_2 }));
+    // Compétences — texte plat, ATS-friendly
+    children.push(new Paragraph({ text: "COMPÉTENCES TECHNIQUES", heading: HeadingLevel.HEADING_2 }));
     children.push(new Paragraph({ text: (a.skills.hard || []).length ? a.skills.hard.join(", ") : "—" }));
     children.push(new Paragraph({ text: "" }));
 
-    children.push(new Paragraph({ text: "Soft skills", heading: HeadingLevel.HEADING_2 }));
+    children.push(new Paragraph({ text: "SOFT SKILLS", heading: HeadingLevel.HEADING_2 }));
     children.push(new Paragraph({ text: (a.skills.soft || []).length ? a.skills.soft.join(", ") : "—" }));
     children.push(new Paragraph({ text: "" }));
 
-    children.push(new Paragraph({ text: "Centres d'intérêt", heading: HeadingLevel.HEADING_2 }));
-    children.push(new Paragraph({ text: (a.skills.passions || []).length ? a.skills.passions.join(", ") : "—" }));
-    children.push(new Paragraph({ text: "" }));
+    if ((a.skills.passions || []).length) {
+      children.push(new Paragraph({ text: "CENTRES D'INTÉRÊT", heading: HeadingLevel.HEADING_2 }));
+      children.push(new Paragraph({ text: a.skills.passions.join(", ") }));
+      children.push(new Paragraph({ text: "" }));
+    }
 
     // Langues
-    children.push(new Paragraph({ text: "Langues", heading: HeadingLevel.HEADING_2 }));
-    for (const l of (a.languages || [])) {
-      children.push(new Paragraph({ text: `${l.langue} — ${l.niveau}`, bullet: { level: 0 } }));
+    children.push(new Paragraph({ text: "LANGUES", heading: HeadingLevel.HEADING_2 }));
+    if ((a.languages || []).length) {
+      for (const l of a.languages) {
+        children.push(new Paragraph({ text: `${l.langue} — ${l.niveau}`, bullet: { level: 0 } }));
+      }
+    } else {
+      children.push(new Paragraph({ text: "—" }));
     }
 
     const doc = new Document({ sections: [{ properties: {}, children }] });
@@ -792,19 +848,32 @@ ${paperHTML}
   /* ========================= Suggestions ========================= */
   const hardSkillSuggestions = (jobTitle) => {
     const t = (jobTitle || "").toLowerCase();
-    const IT = ["JavaScript", "TypeScript", "HTML", "CSS", "React", "Node.js", "SQL", "Docker", "Git", "CI/CD", "REST API", "Python", "PostgreSQL"];
-    const MKT = ["SEO", "SEA", "Google Ads", "Meta Ads", "GA4", "GTM", "CRM", "Emailing", "Content marketing", "Copywriting", "KPI"];
-    const FIN = ["Excel avancé", "Contrôle de gestion", "Reporting", "Budget", "Forecast", "ERP", "Power BI", "IFRS"];
-    if (t.includes("dévelop") || t.includes("dev") || t.includes("software") || t.includes("data")) return IT;
+    const IT = ["JavaScript", "TypeScript", "HTML/CSS", "React", "Node.js", "Python", "SQL", "Docker", "Git", "CI/CD", "REST API", "PostgreSQL", "MongoDB"];
+    const MKT = ["SEO", "SEA", "Google Ads", "Meta Ads", "GA4", "GTM", "CRM", "Emailing", "Content marketing", "Copywriting", "KPI", "Canva"];
+    const FIN = ["Excel avancé", "Contrôle de gestion", "Reporting", "Budget", "Forecast", "ERP", "Power BI", "IFRS", "SAP", "Tableau"];
+    const PM = ["Agile/Scrum", "Jira", "Confluence", "Gestion de projet", "MS Project", "Product backlog", "OKR", "Roadmap"];
+    if (t.includes("développ") || t.includes("dev") || t.includes("software") || t.includes("data")) return IT;
     if (t.includes("marketing") || t.includes("growth") || t.includes("communication")) return MKT;
-    if (t.includes("finance") || t.includes("compta")) return FIN;
-    return [...new Set([...IT.slice(0, 5), ...MKT.slice(0, 5), ...FIN.slice(0, 5)])];
+    if (t.includes("finance") || t.includes("compta") || t.includes("audit")) return FIN;
+    if (t.includes("chef de projet") || t.includes("product") || t.includes("program")) return PM;
+    return [...new Set([...IT.slice(0, 4), ...MKT.slice(0, 4), ...FIN.slice(0, 4), ...PM.slice(0, 3)])];
   };
 
-  const SOFT_SUGGESTIONS = ["Communication", "Leadership", "Esprit d'équipe", "Autonomie", "Rigueur", "Organisation", "Curiosité", "Résolution de problèmes", "Adaptabilité", "Proactivité", "Gestion du temps", "Esprit d'analyse", "Sens du service", "Créativité"];
-  const PASSION_SUGGESTIONS = ["Sport", "Lecture", "Musique", "Voyages", "Photographie", "Bénévolat", "Tech / veille", "Jeux d'échecs", "Cuisine", "Randonnée"];
-  const LANGUAGE_SUGGESTIONS = ["Français", "Anglais", "Espagnol", "Allemand", "Italien", "Portugais", "Arabe", "Chinois", "Japonais", "Russe", "Autre"];
-  const LANGUAGE_LEVELS = ["Maternelle", "Débutant", "Intermédiaire", "Avancé", "Courant", "Bilingue", "Technique"];
+  const SOFT_SUGGESTIONS = [
+    "Communication", "Leadership", "Esprit d'équipe", "Autonomie", "Rigueur",
+    "Organisation", "Curiosité", "Résolution de problèmes", "Adaptabilité",
+    "Proactivité", "Gestion du temps", "Esprit d'analyse", "Sens du service",
+    "Créativité", "Pédagogie", "Négociation",
+  ];
+  const PASSION_SUGGESTIONS = [
+    "Sport", "Lecture", "Musique", "Voyages", "Photographie", "Bénévolat",
+    "Tech / veille", "Jeux d'échecs", "Cuisine", "Randonnée", "Cinéma", "Langues",
+  ];
+  const LANGUAGE_SUGGESTIONS = [
+    "Français", "Anglais", "Espagnol", "Allemand", "Italien", "Portugais",
+    "Arabe", "Chinois (mandarin)", "Japonais", "Russe", "Néerlandais", "Autre",
+  ];
+  const LANGUAGE_LEVELS = ["Maternelle", "Bilingue", "Courant", "Avancé", "Intermédiaire", "Débutant", "Technique"];
 
   /* ========================= Widgets helpers ========================= */
   const widgetTitle = (t) => {
@@ -848,7 +917,7 @@ ${paperHTML}
     wrap.appendChild(widgetTitle(title));
     const ta = document.createElement("textarea");
     ta.className = "textarea";
-    ta.rows = 5;
+    ta.rows = 6;
     ta.placeholder = placeholder || "";
     ta.value = value;
     const actions = document.createElement("div");
@@ -872,7 +941,7 @@ ${paperHTML}
 
     const fDiplome = document.createElement("input");
     fDiplome.className = "input";
-    fDiplome.placeholder = "Ex : Master Informatique, BTS Commerce…";
+    fDiplome.placeholder = "Ex : Master Informatique, BTS Commerce, Licence Droit…";
     fDiplome.value = edu?.diplome || "";
 
     const fEtab = document.createElement("input");
@@ -902,8 +971,10 @@ ${paperHTML}
     durSpan.style.marginTop = "4px";
     const updateDur = () => {
       const md = monthDiff(fStart.value, fEnd.value);
-      durSpan.textContent = md != null ? `Durée calculée : ${formatDurationFR(md + 1)}` : "";
+      durSpan.textContent = md != null ? `Durée : ${formatDurationFR(md + 1)}` : "";
     };
+    fStart.addEventListener("input", updateDur);
+    fEnd.addEventListener("input", updateDur);
     fStart.addEventListener("change", updateDur);
     fEnd.addEventListener("change", updateDur);
 
@@ -914,8 +985,8 @@ ${paperHTML}
 
     const row2 = document.createElement("div");
     row2.className = "row row--3";
-    row2.appendChild(field("Date début (Mois/Année)", fStart));
-    row2.appendChild(field("Date fin (Mois/Année)", fEnd));
+    row2.appendChild(field("Date début", fStart));
+    row2.appendChild(field("Date fin", fEnd));
     row2.appendChild(field("Ville (optionnel)", fVille));
 
     const actions = document.createElement("div");
@@ -970,57 +1041,47 @@ ${paperHTML}
       if (!(state.data.formations || []).length) {
         const p = document.createElement("div");
         p.className = "muted";
-        p.textContent = "Aucune formation. Cliquez sur Ajouter.";
+        p.textContent = "Aucune formation enregistrée.";
         list.appendChild(p);
-        return;
-      }
-      (state.data.formations || []).forEach((edu) => {
-        const box = document.createElement("div");
-        box.style.cssText = "border:1px solid var(--border);border-radius:12px;padding:10px;margin-top:10px;background:#fff;";
-        const t = document.createElement("div");
-        t.style.fontWeight = "950";
-        t.textContent = `${edu.diplome} — ${edu.etablissement}`;
-        const meta = document.createElement("div");
-        meta.className = "muted small";
-        meta.textContent = [computeEduDisplay(edu), edu.ville].filter(Boolean).join(" · ");
-        const btns = document.createElement("div");
-        btns.className = "widget-actions";
-        const edit = document.createElement("button");
-        edit.type = "button"; edit.className = "btn btn--ghost"; edit.textContent = "Modifier";
-        const del = document.createElement("button");
-        del.type = "button"; del.className = "btn btn--danger"; del.textContent = "Supprimer";
-        edit.addEventListener("click", () => {
-          showFormationFormWidget({
-            edu,
-            onSave: (patch) => {
-              Object.assign(edu, patch);
-              saveToStorage(state); renderCV();
-              showFormationManagerWidget({ onClose });
-            },
-            onCancel: () => showFormationManagerWidget({ onClose }),
+      } else {
+        (state.data.formations || []).forEach((edu) => {
+          const box = document.createElement("div");
+          box.style.cssText = "border:1px solid var(--border);border-radius:12px;padding:10px;margin-top:10px;background:#fff;";
+          const t = document.createElement("div"); t.style.fontWeight = "700";
+          t.textContent = `${edu.diplome} — ${edu.etablissement}`;
+          const meta = document.createElement("div"); meta.className = "muted small";
+          meta.textContent = computeEduDisplay(edu) + (edu.ville ? ` • ${edu.ville}` : "");
+          const btns = document.createElement("div"); btns.className = "widget-actions";
+          const edit = document.createElement("button"); edit.type = "button"; edit.className = "btn btn--ghost"; edit.textContent = "Modifier";
+          const del = document.createElement("button"); del.type = "button"; del.className = "btn btn--danger"; del.textContent = "Supprimer";
+          edit.addEventListener("click", () => {
+            showFormationFormWidget({
+              edu,
+              onSave: (patch) => {
+                Object.assign(edu, patch);
+                saveToStorage(state); renderCV();
+                showFormationManagerWidget({ onClose });
+              },
+              onCancel: () => showFormationManagerWidget({ onClose }),
+            });
           });
+          del.addEventListener("click", () => {
+            if (!confirm("Supprimer cette formation ?")) return;
+            state.data.formations = state.data.formations.filter(f => f.id !== edu.id);
+            saveToStorage(state); renderCV(); renderList();
+          });
+          btns.appendChild(edit); btns.appendChild(del);
+          box.appendChild(t); box.appendChild(meta); box.appendChild(btns);
+          list.appendChild(box);
         });
-        del.addEventListener("click", () => {
-          if (!confirm("Supprimer cette formation ?")) return;
-          state.data.formations = state.data.formations.filter(e => e.id !== edu.id);
-          saveToStorage(state); renderCV(); renderList();
-        });
-        btns.appendChild(edit); btns.appendChild(del);
-        box.appendChild(t); box.appendChild(meta); box.appendChild(btns);
-        list.appendChild(box);
-      });
+      }
     };
-
     renderList();
 
     const actions = document.createElement("div");
     actions.className = "widget-actions";
-    const add = document.createElement("button");
-    add.type = "button"; add.className = "btn btn--success"; add.textContent = "+ Ajouter une formation";
-    const next = document.createElement("button");
-    next.type = "button"; next.className = "btn btn--primary"; next.textContent = "Continuer →";
-    const close = document.createElement("button");
-    close.type = "button"; close.className = "btn btn--ghost"; close.textContent = "Fermer";
+    const add = document.createElement("button"); add.type = "button"; add.className = "btn btn--success"; add.textContent = "+ Ajouter une formation";
+    const next = document.createElement("button"); next.type = "button"; next.className = "btn btn--primary"; next.textContent = "Continuer →";
 
     add.addEventListener("click", () => {
       showFormationFormWidget({
@@ -1034,16 +1095,9 @@ ${paperHTML}
         onCancel: () => showFormationManagerWidget({ onClose }),
       });
     });
-
     next.addEventListener("click", () => onClose?.());
-    close.addEventListener("click", () => { setWidget(null); });
-
-    actions.appendChild(add);
-    actions.appendChild(next);
-    actions.appendChild(close);
-    wrap.appendChild(list);
-    wrap.appendChild(actions);
-
+    actions.appendChild(add); actions.appendChild(next);
+    wrap.appendChild(list); wrap.appendChild(actions);
     setWidget(wrap, { lockTextInput: true, lockReason: "Gérez vos formations ci-dessus." });
   };
 
@@ -1052,120 +1106,85 @@ ${paperHTML}
     const wrap = document.createElement("div");
     wrap.appendChild(widgetTitle(cert ? "Modifier une certification" : "Ajouter une certification"));
 
-    const fNom = document.createElement("input");
-    fNom.className = "input";
-    fNom.placeholder = "Ex : AWS Certified, TOEIC, Google Analytics…";
+    const fNom = document.createElement("input"); fNom.className = "input";
+    fNom.placeholder = "Ex : AWS Solutions Architect, TOEIC, PMP, CFA…";
     fNom.value = cert?.nom || "";
 
-    const fOrga = document.createElement("input");
-    fOrga.className = "input";
-    fOrga.placeholder = "Ex : Amazon, ETS, Google, PMI…";
+    const fOrga = document.createElement("input"); fOrga.className = "input";
+    fOrga.placeholder = "Organisme (ex : Amazon, ETS, PMI…)";
     fOrga.value = cert?.organisme || "";
 
-    const fAnnee = document.createElement("input");
-    fAnnee.className = "input";
-    fAnnee.type = "text";
-    fAnnee.placeholder = "Année d'obtention (ex: 2023)";
+    const fAnnee = document.createElement("input"); fAnnee.className = "input";
+    fAnnee.placeholder = "Année (ex : 2023)"; fAnnee.type = "text";
+    fAnnee.inputMode = "numeric"; fAnnee.maxLength = 4;
     fAnnee.value = cert?.annee || "";
-    fAnnee.maxLength = 4;
-    fAnnee.pattern = "\\d{4}";
 
-    const row = document.createElement("div");
-    row.className = "row row--3";
+    const row = document.createElement("div"); row.className = "row row--3";
     row.appendChild(field("Nom de la certification *", fNom));
-    row.appendChild(field("Organisme *", fOrga));
-    row.appendChild(field("Année d'obtention", fAnnee));
+    row.appendChild(field("Organisme", fOrga));
+    row.appendChild(field("Année", fAnnee));
 
-    const actions = document.createElement("div");
-    actions.className = "widget-actions";
-    const saveBtn = document.createElement("button");
-    saveBtn.type = "button"; saveBtn.className = "btn btn--success"; saveBtn.textContent = "Enregistrer";
-    const cancelBtn = document.createElement("button");
-    cancelBtn.type = "button"; cancelBtn.className = "btn btn--ghost"; cancelBtn.textContent = "Annuler";
+    const actions = document.createElement("div"); actions.className = "widget-actions";
+    const saveBtn = document.createElement("button"); saveBtn.type = "button"; saveBtn.className = "btn btn--success"; saveBtn.textContent = "Enregistrer";
+    const cancelBtn = document.createElement("button"); cancelBtn.type = "button"; cancelBtn.className = "btn btn--ghost"; cancelBtn.textContent = "Annuler";
 
     saveBtn.addEventListener("click", () => {
       const nom = normalizeSpace(fNom.value);
-      const organisme = normalizeSpace(fOrga.value);
       if (!nom) return toastSystem("Veuillez saisir le nom de la certification.");
-      if (!organisme) return toastSystem("Veuillez saisir l'organisme.");
       const annee = normalizeSpace(fAnnee.value);
-      if (annee && !/^\d{4}$/.test(annee)) return toastSystem("Année invalide (format AAAA).");
-      onSave?.({ nom, organisme, annee });
+      if (annee && !/^\d{4}$/.test(annee)) return toastSystem("L'année doit être sur 4 chiffres.");
+      onSave?.({ nom, organisme: normalizeSpace(fOrga.value), annee });
     });
-
     cancelBtn.addEventListener("click", () => onCancel?.());
-    actions.appendChild(saveBtn);
-    actions.appendChild(cancelBtn);
-    wrap.appendChild(row);
-    wrap.appendChild(actions);
-
-    setWidget(wrap, { lockTextInput: true, lockReason: "Complétez le formulaire de certification." });
+    actions.appendChild(saveBtn); actions.appendChild(cancelBtn);
+    wrap.appendChild(row); wrap.appendChild(actions);
+    setWidget(wrap, { lockTextInput: true, lockReason: "Complétez le formulaire ci-dessus." });
     setTimeout(() => fNom.focus(), 50);
   };
 
   const showCertificationManagerWidget = ({ onClose }) => {
     const wrap = document.createElement("div");
-    wrap.appendChild(widgetTitle("Certifications"));
-
-    const list = document.createElement("div");
-    list.style.marginTop = "10px";
+    wrap.appendChild(widgetTitle("Certifications professionnelles"));
+    const list = document.createElement("div"); list.style.marginTop = "10px";
 
     const renderList = () => {
       list.innerHTML = "";
       if (!(state.data.certifications || []).length) {
-        const p = document.createElement("div");
-        p.className = "muted";
-        p.textContent = "Aucune certification. Cliquez sur Ajouter.";
-        list.appendChild(p);
-        return;
-      }
-      (state.data.certifications || []).forEach((cert) => {
-        const box = document.createElement("div");
-        box.style.cssText = "border:1px solid var(--border);border-radius:12px;padding:10px;margin-top:10px;background:#fff;";
-        const t = document.createElement("div");
-        t.style.fontWeight = "950";
-        t.textContent = cert.nom;
-        const meta = document.createElement("div");
-        meta.className = "muted small";
-        meta.textContent = [cert.organisme, cert.annee].filter(Boolean).join(" — ");
-        const btns = document.createElement("div");
-        btns.className = "widget-actions";
-        const edit = document.createElement("button");
-        edit.type = "button"; edit.className = "btn btn--ghost"; edit.textContent = "Modifier";
-        const del = document.createElement("button");
-        del.type = "button"; del.className = "btn btn--danger"; del.textContent = "Supprimer";
-        edit.addEventListener("click", () => {
-          showCertificationFormWidget({
-            cert,
-            onSave: (patch) => {
-              Object.assign(cert, patch);
-              saveToStorage(state); renderCV();
-              showCertificationManagerWidget({ onClose });
-            },
-            onCancel: () => showCertificationManagerWidget({ onClose }),
+        const p = document.createElement("div"); p.className = "muted";
+        p.textContent = "Aucune certification."; list.appendChild(p);
+      } else {
+        (state.data.certifications || []).forEach((cert) => {
+          const box = document.createElement("div");
+          box.style.cssText = "border:1px solid var(--border);border-radius:12px;padding:10px;margin-top:10px;background:#fff;";
+          const t = document.createElement("div"); t.style.fontWeight = "700"; t.textContent = cert.nom;
+          const meta = document.createElement("div"); meta.className = "muted small";
+          meta.textContent = [cert.organisme, cert.annee].filter(Boolean).join(" — ");
+          const btns = document.createElement("div"); btns.className = "widget-actions";
+          const edit = document.createElement("button"); edit.type = "button"; edit.className = "btn btn--ghost"; edit.textContent = "Modifier";
+          const del = document.createElement("button"); del.type = "button"; del.className = "btn btn--danger"; del.textContent = "Supprimer";
+          edit.addEventListener("click", () => {
+            showCertificationFormWidget({
+              cert, onSave: (patch) => { Object.assign(cert, patch); saveToStorage(state); renderCV(); showCertificationManagerWidget({ onClose }); },
+              onCancel: () => showCertificationManagerWidget({ onClose }),
+            });
           });
+          del.addEventListener("click", () => {
+            if (!confirm("Supprimer cette certification ?")) return;
+            state.data.certifications = state.data.certifications.filter(c => c.id !== cert.id);
+            saveToStorage(state); renderCV(); renderList();
+          });
+          btns.appendChild(edit); btns.appendChild(del);
+          box.appendChild(t); box.appendChild(meta); box.appendChild(btns);
+          list.appendChild(box);
         });
-        del.addEventListener("click", () => {
-          if (!confirm("Supprimer cette certification ?")) return;
-          state.data.certifications = state.data.certifications.filter(c => c.id !== cert.id);
-          saveToStorage(state); renderCV(); renderList();
-        });
-        btns.appendChild(edit); btns.appendChild(del);
-        box.appendChild(t); box.appendChild(meta); box.appendChild(btns);
-        list.appendChild(box);
-      });
+      }
     };
-
     renderList();
 
-    const actions = document.createElement("div");
-    actions.className = "widget-actions";
-    const add = document.createElement("button");
-    add.type = "button"; add.className = "btn btn--success"; add.textContent = "+ Ajouter une certification";
-    const next = document.createElement("button");
-    next.type = "button"; next.className = "btn btn--primary"; next.textContent = "Continuer →";
-    const close = document.createElement("button");
-    close.type = "button"; close.className = "btn btn--ghost"; close.textContent = "Fermer";
+    const actions = document.createElement("div"); actions.className = "widget-actions";
+    const add = document.createElement("button"); add.type = "button"; add.className = "btn btn--success"; add.textContent = "+ Ajouter une certification";
+    const next = document.createElement("button"); next.type = "button"; next.className = "btn btn--primary"; next.textContent = "Continuer →";
+    const skip = document.createElement("button"); skip.type = "button"; skip.className = "btn btn--ghost"; skip.textContent = "Passer cette étape";
 
     add.addEventListener("click", () => {
       showCertificationFormWidget({
@@ -1173,83 +1192,77 @@ ${paperHTML}
         onSave: (data) => {
           if (!state.data.certifications) state.data.certifications = [];
           state.data.certifications.push({ id: uid(), ...data });
-          saveToStorage(state); renderCV();
-          showCertificationManagerWidget({ onClose });
+          saveToStorage(state); renderCV(); showCertificationManagerWidget({ onClose });
         },
         onCancel: () => showCertificationManagerWidget({ onClose }),
       });
     });
     next.addEventListener("click", () => onClose?.());
-    close.addEventListener("click", () => { setWidget(null); });
-
-    actions.appendChild(add);
-    actions.appendChild(next);
-    actions.appendChild(close);
-    wrap.appendChild(list);
-    wrap.appendChild(actions);
-
+    skip.addEventListener("click", () => onClose?.());
+    actions.appendChild(add); actions.appendChild(next); actions.appendChild(skip);
+    wrap.appendChild(list); wrap.appendChild(actions);
     setWidget(wrap, { lockTextInput: true, lockReason: "Gérez vos certifications ci-dessus." });
   };
 
-  /* ========================= Experience Form Widget ========================= */
+  /* ========================= Experience Widgets ========================= */
   const showExperienceFormWidget = ({ exp, onSave, onCancel }) => {
     const wrap = document.createElement("div");
-    wrap.appendChild(widgetTitle(exp ? "Modifier une expérience" : "Ajouter une expérience"));
+    wrap.appendChild(widgetTitle(exp ? "Modifier l'expérience" : "Ajouter une expérience"));
 
-    const fEntreprise = document.createElement("input");
-    fEntreprise.className = "input";
-    fEntreprise.placeholder = "Nom de l'entreprise";
-    fEntreprise.value = exp?.entreprise || "";
+    const fEntreprise = document.createElement("input"); fEntreprise.className = "input";
+    fEntreprise.placeholder = "Nom de l'entreprise"; fEntreprise.value = exp?.entreprise || "";
 
-    const fPoste = document.createElement("input");
-    fPoste.className = "input";
-    fPoste.placeholder = "Intitulé du poste";
-    fPoste.value = exp?.poste || "";
+    const fPoste = document.createElement("input"); fPoste.className = "input";
+    fPoste.placeholder = "Intitulé du poste"; fPoste.value = exp?.poste || "";
 
-    const start = document.createElement("input");
-    start.className = "input";
+    const start = document.createElement("input"); start.className = "input";
     start.type = monthInputSupported() ? "month" : "text";
-    start.placeholder = monthInputSupported() ? "" : "AAAA-MM (ex: 2020-01)";
+    start.placeholder = monthInputSupported() ? "" : "AAAA-MM (ex: 2022-01)";
     start.value = exp?.startYM || "";
 
-    const end = document.createElement("input");
-    end.className = "input";
+    const end = document.createElement("input"); end.className = "input";
     end.type = monthInputSupported() ? "month" : "text";
-    end.placeholder = monthInputSupported() ? "" : "AAAA-MM (ex: 2023-03)";
+    end.placeholder = monthInputSupported() ? "" : "AAAA-MM (ex: 2024-06)";
     end.value = exp?.endYM || "";
 
-    const currentWrap = document.createElement("label");
-    currentWrap.style.cssText = "display:inline-flex;align-items:center;gap:8px;margin-top:8px;font-weight:900;color:var(--muted);font-size:13px;cursor:pointer;";
-    const current = document.createElement("input");
-    current.type = "checkbox";
+    const currentWrap = document.createElement("div");
+    currentWrap.style.cssText = "display:flex;align-items:center;gap:8px;margin-top:8px;";
+    const current = document.createElement("input"); current.type = "checkbox"; current.id = "exp-current-cb";
     current.checked = !!exp?.isCurrent;
-    const currentTxt = document.createElement("span");
-    currentTxt.textContent = "En cours";
-    currentWrap.appendChild(current);
-    currentWrap.appendChild(currentTxt);
+    const currentTxt = document.createElement("label"); currentTxt.htmlFor = "exp-current-cb";
+    currentTxt.textContent = "Poste actuel (en cours)";
+    currentTxt.style.fontSize = "13px";
+    currentWrap.appendChild(current); currentWrap.appendChild(currentTxt);
 
-    const row1 = document.createElement("div");
-    row1.className = "row row--2";
+    // Durée calculée
+    const durSpan = document.createElement("div"); durSpan.className = "muted small"; durSpan.style.marginTop = "4px";
+    const updateDur = () => {
+      const endYM = current.checked ? nowMonth() : end.value;
+      const md = monthDiff(start.value, endYM);
+      durSpan.textContent = md != null ? `Durée : ${formatDurationFR(md + 1)}` : "";
+    };
+    start.addEventListener("input", updateDur); end.addEventListener("input", updateDur);
+    start.addEventListener("change", updateDur); end.addEventListener("change", updateDur);
+    current.addEventListener("change", updateDur);
+
+    const row1 = document.createElement("div"); row1.className = "row row--2";
     row1.appendChild(field("Entreprise *", fEntreprise));
     row1.appendChild(field("Poste *", fPoste));
 
-    const row2 = document.createElement("div");
-    row2.className = "row row--2";
-    row2.appendChild(field("Date de début (Mois/Année) *", start));
-    row2.appendChild(field("Date de fin (Mois/Année)", end));
+    const row2 = document.createElement("div"); row2.className = "row row--2";
+    row2.appendChild(field("Date de début *", start));
+    row2.appendChild(field("Date de fin", end));
 
     current.addEventListener("change", () => {
       end.disabled = current.checked;
       if (current.checked) end.value = "";
+      updateDur();
     });
     end.disabled = current.checked;
 
-    const actions = document.createElement("div");
-    actions.className = "widget-actions";
-    const saveBtn = document.createElement("button");
-    saveBtn.type = "button"; saveBtn.className = "btn btn--success"; saveBtn.textContent = "Enregistrer";
-    const cancelBtn = document.createElement("button");
-    cancelBtn.type = "button"; cancelBtn.className = "btn btn--ghost"; cancelBtn.textContent = "Annuler";
+    const actions = document.createElement("div"); actions.className = "widget-actions";
+    const saveBtn = document.createElement("button"); saveBtn.type = "button"; saveBtn.className = "btn btn--success"; saveBtn.textContent = "Enregistrer";
+    const cancelBtn = document.createElement("button"); cancelBtn.type = "button"; cancelBtn.className = "btn btn--ghost"; cancelBtn.textContent = "Annuler";
 
     saveBtn.addEventListener("click", () => {
       const entreprise = normalizeSpace(fEntreprise.value);
@@ -1268,12 +1281,9 @@ ${paperHTML}
       onSave?.({ entreprise, poste, startYM, endYM: isCurrent ? "" : endYM, isCurrent });
     });
     cancelBtn.addEventListener("click", () => onCancel?.());
-    actions.appendChild(saveBtn);
-    actions.appendChild(cancelBtn);
-    wrap.appendChild(row1);
-    wrap.appendChild(row2);
-    wrap.appendChild(currentWrap);
-    wrap.appendChild(actions);
+    actions.appendChild(saveBtn); actions.appendChild(cancelBtn);
+    wrap.appendChild(row1); wrap.appendChild(row2); wrap.appendChild(currentWrap);
+    wrap.appendChild(durSpan); wrap.appendChild(actions);
 
     setWidget(wrap, { lockTextInput: true, lockReason: "Complétez le formulaire ci-dessus." });
     setTimeout(() => fEntreprise.focus(), 50);
@@ -1284,29 +1294,37 @@ ${paperHTML}
     if (!exp) return;
 
     const wrap = document.createElement("div");
-    wrap.appendChild(widgetTitle("Missions — " + (exp.poste || "")));
+    wrap.appendChild(widgetTitle(`Missions — ${exp.poste || ""}`));
 
     const info = document.createElement("div");
     info.className = "muted small";
-    info.textContent = "Astuce : verbes d'action + résultats chiffrés (ex : +25%).";
+    info.textContent = "Astuce ATS : verbe d'action + résultat chiffré (ex : « Développé une API REST → +30% de performance »).";
     wrap.appendChild(info);
 
-    const list = document.createElement("div");
-    list.style.marginTop = "10px";
+    const list = document.createElement("div"); list.style.marginTop = "10px";
 
     const renderList = () => {
       list.innerHTML = "";
+      if (!(exp.missions || []).length) {
+        const p = document.createElement("div"); p.className = "muted small";
+        p.textContent = "Aucune mission. Ajoutez en bas.";
+        list.appendChild(p);
+      }
       (exp.missions || []).forEach((m) => {
         const row = document.createElement("div");
         row.style.cssText = "display:flex;gap:8px;align-items:center;margin-top:8px;";
-        const inp = document.createElement("input");
-        inp.className = "input"; inp.value = m.text; inp.style.flex = "1";
-        const save = document.createElement("button");
-        save.type = "button"; save.className = "btn btn--ghost"; save.textContent = "✓";
-        const del = document.createElement("button");
-        del.type = "button"; del.className = "btn btn--danger"; del.textContent = "✕";
-        save.addEventListener("click", () => { const v = normalizeSpace(inp.value); if (!v) return; m.text = v; saveToStorage(state); renderCV(); });
-        del.addEventListener("click", () => { exp.missions = exp.missions.filter(x => x.id !== m.id); saveToStorage(state); renderCV(); renderList(); });
+        const inp = document.createElement("input"); inp.className = "input"; inp.value = m.text; inp.style.flex = "1";
+        const save = document.createElement("button"); save.type = "button"; save.className = "btn btn--ghost"; save.textContent = "✓"; save.title = "Enregistrer";
+        const del = document.createElement("button"); del.type = "button"; del.className = "btn btn--danger"; del.textContent = "✕"; del.title = "Supprimer";
+        save.addEventListener("click", () => {
+          const v = normalizeSpace(inp.value);
+          if (!v) return;
+          m.text = v; saveToStorage(state); renderCV();
+        });
+        del.addEventListener("click", () => {
+          exp.missions = exp.missions.filter(x => x.id !== m.id);
+          saveToStorage(state); renderCV(); renderList();
+        });
         row.appendChild(inp); row.appendChild(save); row.appendChild(del);
         list.appendChild(row);
       });
@@ -1317,10 +1335,10 @@ ${paperHTML}
     addRow.style.cssText = "display:flex;gap:8px;align-items:center;margin-top:12px;";
     const addInput = document.createElement("input");
     addInput.className = "input"; addInput.placeholder = "Ajouter une mission…"; addInput.style.flex = "1";
-    const addBtn = document.createElement("button");
-    addBtn.type = "button"; addBtn.className = "btn btn--primary"; addBtn.textContent = "+ Ajouter";
+    const addBtnEl = document.createElement("button");
+    addBtnEl.type = "button"; addBtnEl.className = "btn btn--primary"; addBtnEl.textContent = "+ Ajouter";
 
-    addBtn.addEventListener("click", () => {
+    addBtnEl.addEventListener("click", () => {
       const v = normalizeSpace(addInput.value);
       if (!v) return;
       exp.missions.push({ id: uid(), text: v });
@@ -1328,45 +1346,37 @@ ${paperHTML}
       saveToStorage(state); renderCV(); renderList();
       addInput.focus();
     });
-    addInput.addEventListener("keydown", (e) => { if (e.key === "Enter") addBtn.click(); });
-    addRow.appendChild(addInput); addRow.appendChild(addBtn);
+    addInput.addEventListener("keydown", (e) => { if (e.key === "Enter") addBtnEl.click(); });
+    addRow.appendChild(addInput); addRow.appendChild(addBtnEl);
 
-    const actions = document.createElement("div");
-    actions.className = "widget-actions";
-    const done = document.createElement("button");
-    done.type = "button"; done.className = "btn btn--success"; done.textContent = "Terminer";
+    const actions = document.createElement("div"); actions.className = "widget-actions";
+    const done = document.createElement("button"); done.type = "button"; done.className = "btn btn--success"; done.textContent = "Terminer";
     done.addEventListener("click", () => onDone?.());
     actions.appendChild(done);
 
-    wrap.appendChild(list);
-    wrap.appendChild(addRow);
-    wrap.appendChild(actions);
-
+    wrap.appendChild(list); wrap.appendChild(addRow); wrap.appendChild(actions);
     setWidget(wrap, { lockTextInput: true, lockReason: "Gérez vos missions ci-dessus." });
     setTimeout(() => addInput.focus(), 50);
   };
 
   const showExperienceManagerWidget = ({ onClose }) => {
     const wrap = document.createElement("div");
-    wrap.appendChild(widgetTitle("Gestion des expériences"));
-    const list = document.createElement("div");
-    list.style.marginTop = "10px";
+    wrap.appendChild(widgetTitle("Expériences professionnelles"));
+    const list = document.createElement("div"); list.style.marginTop = "10px";
 
     const renderList = () => {
       list.innerHTML = "";
       if (!(state.data.experiences || []).length) {
-        const p = document.createElement("div");
-        p.className = "muted";
-        p.textContent = "Aucune expérience.";
+        const p = document.createElement("div"); p.className = "muted"; p.textContent = "Aucune expérience.";
         list.appendChild(p); return;
       }
       (state.data.experiences || []).forEach((exp) => {
         const box = document.createElement("div");
         box.style.cssText = "border:1px solid var(--border);border-radius:12px;padding:10px;margin-top:10px;background:#fff;";
-        const t = document.createElement("div"); t.style.fontWeight = "950";
+        const t = document.createElement("div"); t.style.fontWeight = "700";
         t.textContent = `${exp.poste} — ${exp.entreprise}`;
         const meta = document.createElement("div"); meta.className = "muted small";
-        meta.textContent = computeExpDisplay(exp);
+        meta.textContent = computeExpDisplay(exp) + ` • ${(exp.missions || []).length} mission(s)`;
         const btns = document.createElement("div"); btns.className = "widget-actions";
         const edit = document.createElement("button"); edit.type = "button"; edit.className = "btn btn--ghost"; edit.textContent = "Modifier";
         const mBtn = document.createElement("button"); mBtn.type = "button"; mBtn.className = "btn btn--primary"; mBtn.textContent = "Missions";
@@ -1377,7 +1387,9 @@ ${paperHTML}
             onCancel: () => showExperienceManagerWidget({ onClose }),
           });
         });
-        mBtn.addEventListener("click", () => { showMissionEditorWidget({ expId: exp.id, onDone: () => showExperienceManagerWidget({ onClose }) }); });
+        mBtn.addEventListener("click", () => {
+          showMissionEditorWidget({ expId: exp.id, onDone: () => showExperienceManagerWidget({ onClose }) });
+        });
         del.addEventListener("click", () => {
           if (!confirm("Supprimer cette expérience ?")) return;
           state.data.experiences = state.data.experiences.filter(e => e.id !== exp.id);
@@ -1390,8 +1402,7 @@ ${paperHTML}
     };
     renderList();
 
-    const actions = document.createElement("div");
-    actions.className = "widget-actions";
+    const actions = document.createElement("div"); actions.className = "widget-actions";
     const add = document.createElement("button"); add.type = "button"; add.className = "btn btn--success"; add.textContent = "+ Ajouter une expérience";
     const next = document.createElement("button"); next.type = "button"; next.className = "btn btn--primary"; next.textContent = "Continuer →";
 
@@ -1406,13 +1417,12 @@ ${paperHTML}
       });
     });
     next.addEventListener("click", () => onClose?.());
-
     actions.appendChild(add); actions.appendChild(next);
     wrap.appendChild(list); wrap.appendChild(actions);
     setWidget(wrap, { lockTextInput: true, lockReason: "Gérez vos expériences ci-dessus." });
   };
 
-  /* ========================= Pill / Tag widget ========================= */
+  /* ========================= Pill / Tag Widget ========================= */
   const showPillWidget = ({ title, current, suggestions, onSave, placeholder }) => {
     const wrap = document.createElement("div");
     wrap.appendChild(widgetTitle(title));
@@ -1423,52 +1433,69 @@ ${paperHTML}
     pillRow.className = "pillrow";
     pillRow.style.marginTop = "10px";
 
+    const suggWrap = document.createElement("div");
+    suggWrap.className = "pillrow";
+    suggWrap.style.cssText = "margin-top:8px;";
+
+    /* FIX : les suggestions se mettent à jour après chaque ajout de pill */
+    const renderSuggestions = () => {
+      suggWrap.innerHTML = "";
+      suggestions.filter(s => !items.includes(s)).slice(0, 14).forEach((s) => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "btn btn--ghost"; b.textContent = "+ " + s;
+        b.style.cssText = "font-size:12px;padding:6px 10px;";
+        b.addEventListener("click", () => {
+          if (!items.includes(s)) {
+            items.push(s);
+            renderPills();
+            renderSuggestions(); // FIX : retire la suggestion après ajout
+          }
+        });
+        suggWrap.appendChild(b);
+      });
+    };
+
     const renderPills = () => {
       pillRow.innerHTML = "";
       items.forEach((item, i) => {
         const pill = document.createElement("span");
         pill.className = "pill";
-        pill.textContent = item;
+        const txt = document.createTextNode(item);
+        pill.appendChild(txt);
         const del = document.createElement("button");
         del.type = "button"; del.textContent = "✕";
         del.setAttribute("aria-label", `Supprimer ${item}`);
-        del.addEventListener("click", () => { items.splice(i, 1); renderPills(); });
+        del.addEventListener("click", () => {
+          items.splice(i, 1);
+          renderPills();
+          renderSuggestions(); // FIX : remet la suggestion dans la liste
+        });
         pill.appendChild(del);
         pillRow.appendChild(pill);
       });
     };
     renderPills();
-
-    const suggWrap = document.createElement("div");
-    suggWrap.className = "pillrow";
-    suggWrap.style.cssText = "margin-top:8px;";
-    suggestions.filter(s => !items.includes(s)).slice(0, 12).forEach((s) => {
-      const b = document.createElement("button");
-      b.type = "button"; b.className = "btn btn--ghost"; b.textContent = "+ " + s;
-      b.style.fontSize = "13px"; b.style.padding = "7px 10px";
-      b.addEventListener("click", () => {
-        if (!items.includes(s)) { items.push(s); renderPills(); }
-      });
-      suggWrap.appendChild(b);
-    });
+    if (suggestions.length) renderSuggestions();
 
     const addRow = document.createElement("div");
     addRow.style.cssText = "display:flex;gap:8px;margin-top:10px;";
     const addInp = document.createElement("input");
     addInp.className = "input"; addInp.placeholder = placeholder || "Ajouter…"; addInp.style.flex = "1";
-    const addBtn = document.createElement("button");
-    addBtn.type = "button"; addBtn.className = "btn btn--primary"; addBtn.textContent = "+ Ajouter";
+    const addBtnEl = document.createElement("button");
+    addBtnEl.type = "button"; addBtnEl.className = "btn btn--primary"; addBtnEl.textContent = "+ Ajouter";
 
-    addBtn.addEventListener("click", () => {
-      splitCommaList(addInp.value).forEach(v => { if (!items.includes(v)) items.push(v); });
+    addBtnEl.addEventListener("click", () => {
+      splitCommaList(addInp.value).forEach(v => {
+        if (!items.includes(v)) items.push(v);
+      });
       addInp.value = "";
       renderPills();
+      renderSuggestions();
     });
-    addInp.addEventListener("keydown", (e) => { if (e.key === "Enter") addBtn.click(); });
-    addRow.appendChild(addInp); addRow.appendChild(addBtn);
+    addInp.addEventListener("keydown", (e) => { if (e.key === "Enter") addBtnEl.click(); });
+    addRow.appendChild(addInp); addRow.appendChild(addBtnEl);
 
-    const actions = document.createElement("div");
-    actions.className = "widget-actions";
+    const actions = document.createElement("div"); actions.className = "widget-actions";
     const save = document.createElement("button");
     save.type = "button"; save.className = "btn btn--success"; save.textContent = "Valider";
     save.addEventListener("click", () => onSave?.(items));
@@ -1487,8 +1514,7 @@ ${paperHTML}
     const wrap = document.createElement("div");
     wrap.appendChild(widgetTitle("Langues maîtrisées"));
 
-    const list = document.createElement("div");
-    list.style.marginTop = "10px";
+    const list = document.createElement("div"); list.style.marginTop = "10px";
 
     const renderList = () => {
       list.innerHTML = "";
@@ -1499,26 +1525,21 @@ ${paperHTML}
       (state.data.languages || []).forEach((l, i) => {
         const row = document.createElement("div");
         row.style.cssText = "display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;";
-        const sel = document.createElement("select");
-        sel.className = "select"; sel.style.flex = "1";
+        const sel = document.createElement("select"); sel.className = "select"; sel.style.flex = "1";
         LANGUAGE_SUGGESTIONS.forEach(lg => {
-          const o = document.createElement("option");
-          o.value = lg; o.textContent = lg;
+          const o = document.createElement("option"); o.value = lg; o.textContent = lg;
           if (lg === l.langue) o.selected = true;
           sel.appendChild(o);
         });
-        const lvl = document.createElement("select");
-        lvl.className = "select"; lvl.style.flex = "1";
+        const lvl = document.createElement("select"); lvl.className = "select"; lvl.style.flex = "1";
         LANGUAGE_LEVELS.forEach(lv => {
-          const o = document.createElement("option");
-          o.value = lv; o.textContent = lv;
+          const o = document.createElement("option"); o.value = lv; o.textContent = lv;
           if (lv === l.niveau) o.selected = true;
           lvl.appendChild(o);
         });
         sel.addEventListener("change", () => { l.langue = sel.value; saveToStorage(state); renderCV(); });
         lvl.addEventListener("change", () => { l.niveau = lvl.value; saveToStorage(state); renderCV(); });
-        const del = document.createElement("button");
-        del.type = "button"; del.className = "btn btn--danger"; del.textContent = "✕";
+        const del = document.createElement("button"); del.type = "button"; del.className = "btn btn--danger"; del.textContent = "✕";
         del.addEventListener("click", () => {
           state.data.languages.splice(i, 1);
           saveToStorage(state); renderCV(); renderList();
@@ -1535,37 +1556,29 @@ ${paperHTML}
     LANGUAGE_SUGGESTIONS.forEach(lg => { const o = document.createElement("option"); o.value = lg; o.textContent = lg; selL.appendChild(o); });
     const selLv = document.createElement("select"); selLv.className = "select"; selLv.style.flex = "1";
     LANGUAGE_LEVELS.forEach(lv => { const o = document.createElement("option"); o.value = lv; o.textContent = lv; selLv.appendChild(o); });
-    const addBtn = document.createElement("button");
-    addBtn.type = "button"; addBtn.className = "btn btn--success"; addBtn.textContent = "+ Ajouter";
+    const addBtn = document.createElement("button"); addBtn.type = "button"; addBtn.className = "btn btn--success"; addBtn.textContent = "+ Ajouter";
     addBtn.addEventListener("click", () => {
       const langue = selL.value; const niveau = selLv.value;
       if (!(state.data.languages || []).some(l => l.langue === langue)) {
         if (!state.data.languages) state.data.languages = [];
         state.data.languages.push({ id: uid(), langue, niveau });
         saveToStorage(state); renderCV(); renderList();
+      } else {
+        toastSystem(`La langue "${langue}" est déjà dans la liste.`);
       }
     });
     addRow.appendChild(selL); addRow.appendChild(selLv); addRow.appendChild(addBtn);
 
-    const actions = document.createElement("div");
-    actions.className = "widget-actions";
-    const done = document.createElement("button");
-    done.type = "button"; done.className = "btn btn--primary"; done.textContent = "Terminer →";
+    const actions = document.createElement("div"); actions.className = "widget-actions";
+    const done = document.createElement("button"); done.type = "button"; done.className = "btn btn--primary"; done.textContent = "Terminer →";
     done.addEventListener("click", () => onClose?.());
     actions.appendChild(done);
 
-    wrap.appendChild(list);
-    wrap.appendChild(addRow);
-    wrap.appendChild(actions);
+    wrap.appendChild(list); wrap.appendChild(addRow); wrap.appendChild(actions);
     setWidget(wrap, { lockTextInput: true, lockReason: "Gérez vos langues ci-dessus." });
   };
 
-  /* ========================= Smart Parsing (FIXED) ========================= */
-  /**
-   * PROBLÈME : Tout allait dans le champ "Profil"
-   * SOLUTION : Détection intelligente des sections par mots-clés
-   * Sections détectées : Expériences, Formations, Compétences, Langues, Certifications, Profil
-   */
+  /* ========================= Smart Parsing ========================= */
   const SECTION_PATTERNS = {
     profil: /^(profil|résumé|résumé\s+professionnel|resume|about\s+me|à\s+propos|summary|objectif|présentation)/i,
     experience: /^(expérience|experience|expériences\s+pro|parcours\s+pro|emploi|poste\s+occup|historique\s+profes)/i,
@@ -1583,15 +1596,25 @@ ${paperHTML}
     return null;
   };
 
+  /* FIX : correction de la clé dupliquée "jan" dans l'objet monthNames */
   const parseYearMonth = (str) => {
-    // Cherche AAAA-MM ou AAAA dans une chaîne
     const m = str.match(/\b(20\d{2}|19\d{2})\b/);
     if (!m) return "";
     const year = m[1];
-    const monthNames = { "jan": "01","fév": "02","mars": "03","avr": "04","mai": "05","juin": "06","juil": "07","août": "08","sep": "09","oct": "10","nov": "11","déc": "12", "jan": "01","feb": "02","mar": "03","apr": "04","may": "05","jun": "06","jul": "07","aug": "08","sep": "09","oct": "10","nov": "11","dec": "12" };
+    const monthNames = {
+      // Français
+      "jan": "01", "fév": "02", "mars": "03", "avr": "04",
+      "mai": "05", "juin": "06", "juil": "07", "août": "08",
+      "sep": "09", "oct": "10", "nov": "11", "déc": "12",
+      // Anglais (FIX : "jan" était dupliqué avant)
+      "feb": "02", "mar": "03", "apr": "04", "may": "05",
+      "jun": "06", "jul": "07", "aug": "08",
+      // Même clé de base : jan/sep/oct/nov déjà couverts
+    };
     const mMatch = str.toLowerCase().match(/\b(jan|fév|mars|avr|mai|juin|juil|août|sep|oct|nov|déc|feb|mar|apr|may|jun|jul|aug)\b/i);
     if (mMatch) {
-      const monthNum = monthNames[mMatch[1].toLowerCase().slice(0, 3)] || "01";
+      const key = mMatch[1].toLowerCase();
+      const monthNum = monthNames[key] || monthNames[key.slice(0, 3)] || "01";
       return `${year}-${monthNum}`;
     }
     return `${year}-01`;
@@ -1613,7 +1636,6 @@ ${paperHTML}
       _rawPreview: raw.slice(0, 3000),
     };
 
-    // Email & téléphone
     const emailMatch = raw.match(/[^\s@]+@[^\s@]+\.[^\s@]{2,}/i);
     if (emailMatch) out.identity.email = emailMatch[0];
     const phoneMatch = raw.match(/(\+?\d[\d\s().\-]{7,}\d)/);
@@ -1621,7 +1643,6 @@ ${paperHTML}
 
     const lines = raw.split("\n").map(l => l.trim());
 
-    // Détection du nom (première ligne non-vide courte)
     for (const l of lines.slice(0, 6)) {
       if (l.length >= 3 && l.length <= 50 && !/[@\d]/.test(l) && !detectSection(l)) {
         const parts = l.split(/\s+/);
@@ -1633,17 +1654,15 @@ ${paperHTML}
       }
     }
 
-    // Titre professionnel (ligne ~3-8, courte, contient souvent @ ou |)
     for (const l of lines.slice(1, 8)) {
       if (l.length >= 5 && l.length <= 80 && !detectSection(l) && !/\bbonjour\b/i.test(l)) {
-        if (/développeur|engineer|manager|directeur|consultant|analyst|designer|chef|respon|commercial|comptable/i.test(l)) {
+        if (/développeur|engineer|manager|directeur|consultant|analyst|designer|chef|respon|commercial|comptable|architecte|ingénieur/i.test(l)) {
           out.identity.titre = l;
           break;
         }
       }
     }
 
-    // Parcours en sections
     let currentSection = null;
     const sectionLines = {};
 
@@ -1663,58 +1682,49 @@ ${paperHTML}
 
     out._sections = sectionLines;
 
-    // ── Profil ──
+    // Profil
     if (sectionLines.profil?.length) {
       out.profile.summary = sectionLines.profil.slice(0, 8).join(" ");
     } else {
-      // Cherche le premier paragraphe > 80 chars
       const firstBig = raw.split(/\n{2,}/).find(s => s.trim().length > 80);
       if (firstBig) out.profile.summary = firstBig.trim().slice(0, 800);
     }
 
-    // ── Expériences ──
+    // Expériences
     if (sectionLines.experience?.length) {
       const expLines = sectionLines.experience;
       let i = 0;
       while (i < expLines.length) {
         const L = expLines[i];
         if (!L || L.length < 2) { i++; continue; }
-        // Pattern: ligne titre poste, ligne suivante entreprise, puis dates
         const hasDate = expLines.slice(i, i + 6).some(x => /\b(19|20)\d{2}\b/.test(x));
         if (hasDate) {
           const poste = L;
           const entreprise = expLines[i + 1] && expLines[i + 1].length <= 80 && !/\b(19|20)\d{2}\b/.test(expLines[i + 1]) ? expLines[i + 1] : "";
-          // Cherche dates
           const dateStr = expLines.slice(i, i + 5).find(x => /\b(19|20)\d{2}\b/.test(x)) || "";
           const years = dateStr.match(/\b(19|20)\d{2}\b/g) || [];
           const startYM = years.length ? parseYearMonth(dateStr.split(/[-–—à]/)[0] || "") : "";
           const endYM = years.length > 1 ? parseYearMonth(dateStr.split(/[-–—à]/)[1] || "") : "";
           const isCurrent = /\b(en cours|présent|current|aujourd|aujourd'hui|maintenant)\b/i.test(dateStr);
-
-          // Missions : lignes suivantes jusqu'à prochain "bloc"
           const missions = [];
           let j = entreprise ? i + 2 : i + 1;
           while (j < expLines.length && j < i + 15) {
             const ml = expLines[j];
-            if (ml && ml.length > 10 && !detectSection(ml) && !/\b(19|20)\d{2}\b/.test(ml) && !/^[-•·▪▸→]/.test(ml) === false) {
-              missions.push({ id: uid(), text: ml.replace(/^[-•·▪▸→]\s*/, "") });
-            } else if (ml && /^[-•·▪▸→]/.test(ml)) {
-              missions.push({ id: uid(), text: ml.replace(/^[-•·▪▸→]\s*/, "") });
+            if (ml && /^[-•·▪▸→]/.test(ml)) {
+              missions.push({ id: uid(), text: ml.replace(/^[-•·▪▸→]\s*/, "").trim() });
+            } else if (ml && ml.length > 10 && !detectSection(ml) && !/\b(19|20)\d{2}\b/.test(ml)) {
+              // Ligne longue sans date → possible mission
             }
             j++;
             if (missions.length >= 8) break;
           }
-
           out.experiences.push({ id: uid(), poste: poste.slice(0, 80), entreprise: entreprise.slice(0, 80), startYM, endYM, isCurrent, missions });
           i = entreprise ? i + 2 : i + 1;
           if (out.experiences.length >= 8) break;
-        } else {
-          i++;
-        }
+        } else { i++; }
       }
     }
 
-    // Fallback expériences si section non détectée
     if (!out.experiences.length) {
       const allLines = lines.filter(Boolean);
       for (let i = 0; i < allLines.length; i++) {
@@ -1729,7 +1739,7 @@ ${paperHTML}
       }
     }
 
-    // ── Formations ──
+    // Formations
     if (sectionLines.formation?.length) {
       const fLines = sectionLines.formation;
       let i = 0;
@@ -1747,7 +1757,7 @@ ${paperHTML}
       }
     }
 
-    // ── Certifications ──
+    // Certifications
     if (sectionLines.certifications?.length) {
       sectionLines.certifications.forEach((l, i) => {
         if (!l || l.length < 2) return;
@@ -1759,7 +1769,7 @@ ${paperHTML}
       });
     }
 
-    // ── Compétences ──
+    // Compétences
     if (sectionLines.competences?.length) {
       const skills = sectionLines.competences.flatMap(l =>
         l.split(/[,;|•·▪▸→]/).map(s => s.trim()).filter(s => s.length >= 2 && s.length <= 40)
@@ -1767,7 +1777,7 @@ ${paperHTML}
       out.skills.hard = [...new Set(skills)].slice(0, 20);
     }
 
-    // ── Langues ──
+    // Langues
     if (sectionLines.langues?.length) {
       sectionLines.langues.forEach((l) => {
         const parts = l.split(/[-–—:|·]/);
@@ -1784,26 +1794,23 @@ ${paperHTML}
     return out;
   };
 
-  /* ========================= Apply Import (FIXED) ========================= */
+  /* ========================= Apply Import ========================= */
   const applyImport = () => {
     const draft = state.ui.importDraft;
     if (!draft) return;
 
     const s = deepClone(state);
 
-    // Identité : ne pas écraser si déjà renseigné
     if (draft.identity) {
       Object.keys(draft.identity).forEach(k => {
         if (!s.data.identity[k] && draft.identity[k]) s.data.identity[k] = draft.identity[k];
       });
     }
 
-    // Profil
     if (draft.profile?.summary && !s.data.profile.summary) {
       s.data.profile.summary = draft.profile.summary;
     }
 
-    // Expériences : ajouter seulement les nouvelles (par poste+entreprise)
     if (draft.experiences?.length) {
       const existing = s.data.experiences.map(e => (e.poste + e.entreprise).toLowerCase());
       draft.experiences.forEach(e => {
@@ -1813,7 +1820,6 @@ ${paperHTML}
       });
     }
 
-    // Formations : ajouter nouvelles
     if (draft.formations?.length) {
       if (!s.data.formations) s.data.formations = [];
       const existing = s.data.formations.map(f => (f.diplome + f.etablissement).toLowerCase());
@@ -1824,24 +1830,19 @@ ${paperHTML}
       });
     }
 
-    // Certifications
     if (draft.certifications?.length) {
       if (!s.data.certifications) s.data.certifications = [];
       const existing = s.data.certifications.map(c => c.nom.toLowerCase());
       draft.certifications.forEach(c => {
-        if (!existing.includes(c.nom.toLowerCase())) {
-          s.data.certifications.push(c);
-        }
+        if (!existing.includes(c.nom.toLowerCase())) s.data.certifications.push(c);
       });
     }
 
-    // Compétences
     if (draft.skills?.hard?.length) {
       const merged = [...new Set([...s.data.skills.hard, ...draft.skills.hard])];
       s.data.skills.hard = merged.slice(0, 20);
     }
 
-    // Langues
     if (draft.languages?.length) {
       if (!s.data.languages) s.data.languages = [];
       const existing = s.data.languages.map(l => l.langue.toLowerCase());
@@ -1850,7 +1851,6 @@ ${paperHTML}
       });
     }
 
-    // Activer export si données suffisantes
     const hasData = s.data.identity.prenom || s.data.identity.nom;
     if (hasData) {
       downloadPdfBtn.disabled = false;
@@ -1901,12 +1901,12 @@ ${paperHTML}
 
   /* ========================= Identity questions ========================= */
   const identityQuestions = [
-    { key: "prenom", text: "Quel est votre prénom ?", type: "text", validate: vRequired("Prénom requis.") },
-    { key: "nom", text: "Quel est votre nom de famille ?", type: "text", validate: vRequired("Nom requis.") },
-    { key: "email", text: "Quelle est votre adresse email professionnelle ?", type: "email", validate: vEmail("Email invalide (format nom@domaine.com).") },
-    { key: "telephone", text: "Quel est votre numéro de téléphone ? (avec indicatif, ex : +33 6 12 34 56 78)", type: "tel", validate: vPhone("Téléphone invalide (min. 8 chiffres).") },
-    { key: "ville", text: "Dans quelle ville habitez-vous ?", type: "text", validate: vRequired("Ville requise.") },
-    { key: "titre", text: "Quel est votre titre professionnel actuel ou souhaité ? (ex : Développeur Full-Stack, Chef de projet…)", type: "text", validate: vRequired("Titre requis.") },
+    { key: "prenom",    text: "Quel est votre prénom ?",                                                         type: "text",  validate: vRequired("Prénom requis.") },
+    { key: "nom",       text: "Quel est votre nom de famille ?",                                                 type: "text",  validate: vRequired("Nom requis.") },
+    { key: "email",     text: "Quelle est votre adresse email professionnelle ?",                                type: "email", validate: vEmail("Email invalide (format nom@domaine.com).") },
+    { key: "telephone", text: "Quel est votre numéro de téléphone ? (avec indicatif, ex : +33 6 12 34 56 78)", type: "tel",   validate: vPhone("Téléphone invalide (min. 8 chiffres).") },
+    { key: "ville",     text: "Dans quelle ville habitez-vous / postulez-vous ?",                                type: "text",  validate: vRequired("Ville requise.") },
+    { key: "titre",     text: "Quel est votre titre professionnel actuel ou visé ? (ex : Développeur Full-Stack, Chef de projet…)", type: "text", validate: vRequired("Titre professionnel requis.") },
   ];
 
   /* ========================= Flow / Step Logic ========================= */
@@ -1929,7 +1929,7 @@ ${paperHTML}
     const s = state.flow.step;
 
     if (s === Steps.WELCOME) {
-      const msg = bot("👋 Bonjour ! Je suis Troptop CV, votre assistant de création de CV optimisé ATS.\n\nJe vais vous guider étape par étape pour créer un CV professionnel. Commençons !", { isQuestion: true });
+      bot("👋 Bonjour ! Je suis Troptop CV, votre assistant de création de CV optimisé ATS.\n\nJe vais vous guider étape par étape. À la fin, votre CV sera téléchargeable en PDF (compatible ATS) et en DOCX.", { isQuestion: true });
       rebuildChatDOM();
       showChoices({
         title: "Comment souhaitez-vous commencer ?",
@@ -1966,11 +1966,11 @@ ${paperHTML}
     }
 
     if (s === Steps.PROFILE) {
-      bot("Rédigez votre Profil professionnel (3–6 lignes) : qui vous êtes, votre valeur ajoutée, votre objectif.", { isQuestion: true });
+      bot("Rédigez votre Profil professionnel (3–6 lignes) : qui vous êtes, votre valeur ajoutée, votre objectif.\n\n💡 Tip ATS : intégrez les mots-clés du poste visé.", { isQuestion: true });
       rebuildChatDOM();
       showTextAreaWidget({
         title: "Profil professionnel",
-        placeholder: "Ex : Développeur Full-Stack avec 5 ans d'expérience, spécialisé en React et Node.js…",
+        placeholder: "Ex : Développeur Full-Stack avec 5 ans d'expérience, spécialisé en React et Node.js. Passionné par les architectures scalables, j'ai contribué à des projets à fort impact…",
         value: state.data.profile.summary,
         onSave: (text) => {
           const v = normalizeSpace(text);
@@ -1989,7 +1989,7 @@ ${paperHTML}
       const count = (state.data.experiences || []).length;
       bot(count
         ? `Vous avez ${count} expérience(s). Souhaitez-vous en ajouter d'autres ou continuer ?`
-        : "Maintenant, parlons de vos expériences professionnelles. Avez-vous des expériences à ajouter ?",
+        : "Parlons de vos expériences professionnelles. Ajoutez-en autant que vous souhaitez.",
         { isQuestion: true }
       );
       rebuildChatDOM();
@@ -2007,7 +2007,7 @@ ${paperHTML}
       const count = (state.data.formations || []).length;
       bot(count
         ? `Vous avez ${count} formation(s). Continuez ou ajoutez d'autres.`
-        : "Maintenant, renseignez vos formations et diplômes.",
+        : "Renseignez vos formations et diplômes. La formation est très importante pour les ATS.",
         { isQuestion: true }
       );
       rebuildChatDOM();
@@ -2025,7 +2025,7 @@ ${paperHTML}
       const count = (state.data.certifications || []).length;
       bot(count
         ? `Vous avez ${count} certification(s). Continuez ou ajoutez d'autres.`
-        : "Avez-vous des certifications professionnelles (AWS, TOEIC, PMI…) ?",
+        : "Avez-vous des certifications professionnelles ? (AWS, TOEIC, PMI, Google, Microsoft…)\nElles boostent votre score ATS.",
         { isQuestion: true }
       );
       rebuildChatDOM();
@@ -2041,13 +2041,13 @@ ${paperHTML}
 
     if (s === Steps.SKILLS) {
       const jobTitle = state.data.identity.titre;
-      bot("Quelles sont vos compétences techniques ? (choisissez dans la liste ou saisissez les vôtres)", { isQuestion: true });
+      bot("Quelles sont vos compétences techniques ? Choisissez dans la liste ou saisissez les vôtres.\n\n💡 Tip ATS : utilisez les mots-clés exacts de la fiche de poste.", { isQuestion: true });
       rebuildChatDOM();
       showPillWidget({
         title: "Compétences techniques",
         current: state.data.skills.hard,
         suggestions: hardSkillSuggestions(jobTitle),
-        placeholder: "Ajouter une compétence (séparées par des virgules)…",
+        placeholder: "Ajouter (séparées par des virgules)…",
         onSave: (items) => {
           user(items.slice(0, 5).join(", ") + (items.length > 5 ? "…" : ""));
           const s2 = deepClone(state);
@@ -2072,8 +2072,7 @@ ${paperHTML}
           const s2 = deepClone(state);
           s2.data.skills.soft = items;
 
-          // Centres d'intérêt inline
-          bot("Vos centres d'intérêt / hobbies ? (optionnel)", { isQuestion: true });
+          bot("Vos centres d'intérêt / hobbies ? (optionnel — humanise votre CV)", { isQuestion: true });
           showPillWidget({
             title: "Centres d'intérêt",
             current: s2.data.skills.passions,
@@ -2093,7 +2092,7 @@ ${paperHTML}
     }
 
     if (s === Steps.LANGUAGES) {
-      bot("Quelles langues parlez-vous et à quel niveau ?", { isQuestion: true });
+      bot("Quelles langues parlez-vous et à quel niveau ?\n\nL'anglais est quasi-obligatoire sur un CV aujourd'hui.", { isQuestion: true });
       rebuildChatDOM();
       showLanguageWidget({
         onClose: () => {
@@ -2106,7 +2105,7 @@ ${paperHTML}
     }
 
     if (s === Steps.REVIEW) {
-      bot("🎉 Votre CV est prêt ! Vérifiez l'aperçu à droite.\n\nVous pouvez télécharger en PDF ou DOCX, modifier n'importe quelle section, ou changer de modèle.", { isQuestion: false });
+      bot("🎉 Votre CV est prêt ! Vérifiez l'aperçu à droite.\n\nVous pouvez télécharger en PDF (compatible ATS) ou DOCX, modifier n'importe quelle section, ou changer de modèle.", { isQuestion: false });
       rebuildChatDOM();
 
       downloadPdfBtn.disabled = false;
@@ -2117,7 +2116,7 @@ ${paperHTML}
       showChoices({
         title: "Que souhaitez-vous faire ?",
         choices: [
-          { label: "✏️ Modifier mes expériences", variant: "btn btn--ghost", onClick: () => {
+          { label: "✏️ Modifier les expériences", variant: "btn btn--ghost", onClick: () => {
             const s2 = deepClone(state); s2.flow.step = Steps.EXP_START; setState(s2);
           }},
           { label: "🎓 Modifier formations", variant: "btn btn--ghost", onClick: () => {
@@ -2126,7 +2125,7 @@ ${paperHTML}
           { label: "🏆 Modifier certifications", variant: "btn btn--ghost", onClick: () => {
             const s2 = deepClone(state); s2.flow.step = Steps.CERTIFICATIONS; setState(s2);
           }},
-          { label: "✅ Terminer", variant: "btn btn--primary", onClick: () => {
+          { label: "✅ Finaliser", variant: "btn btn--primary", onClick: () => {
             const s2 = deepClone(state); s2.flow.step = Steps.FINISHED; setState(s2);
           }},
         ],
@@ -2136,7 +2135,7 @@ ${paperHTML}
     }
 
     if (s === Steps.FINISHED) {
-      bot("✅ CV finalisé ! Téléchargez votre CV en PDF ou DOCX via les boutons ci-dessous.", { isQuestion: false });
+      bot("✅ CV finalisé ! Téléchargez votre CV via les boutons ci-dessous.\n\n📄 PDF ATS = impression navigateur → texte sélectionnable\n📝 DOCX = éditable dans Word/LibreOffice", { isQuestion: false });
       rebuildChatDOM();
 
       downloadPdfBtn.disabled = false;
@@ -2146,7 +2145,7 @@ ${paperHTML}
       showChoices({
         title: "Actions",
         choices: [
-          { label: "🔄 Recommencer depuis l'aperçu", variant: "btn btn--ghost", onClick: () => {
+          { label: "🔄 Retourner à l'aperçu", variant: "btn btn--ghost", onClick: () => {
             const s2 = deepClone(state); s2.flow.step = Steps.REVIEW; setState(s2);
           }},
           { label: "📂 Importer un autre CV", variant: "btn btn--ghost", onClick: () => openModal() },
@@ -2167,7 +2166,7 @@ ${paperHTML}
       const qi = state.flow.identityIndex;
       const q = identityQuestions[qi];
       const error = q.validate(val);
-      if (error) { inputHint.textContent = error; return; }
+      if (error) { inputHint.textContent = "⚠ " + error; return; }
       inputHint.textContent = "";
 
       user(val);
@@ -2278,7 +2277,7 @@ ${paperHTML}
   importBtn.addEventListener("click", openModal);
 
   resetBtn.addEventListener("click", () => {
-    if (!confirm("Réinitialiser et effacer toutes vos données ?")) return;
+    if (!confirm("Réinitialiser et effacer toutes vos données ? Cette action est irréversible.")) return;
     clearStorage();
     history = [];
     state = initialState();
@@ -2291,7 +2290,7 @@ ${paperHTML}
     history = [];
     state = saved;
     renderAll();
-    system("✅ Sauvegarde reprise !");
+    system("✅ Session reprise depuis la sauvegarde !");
     rebuildChatDOM();
   });
 
@@ -2311,9 +2310,8 @@ ${paperHTML}
 
     const saved = loadFromStorage();
     if (saved) {
-      // Proposer de reprendre
       state = initialState();
-      const msg = bot("Bienvenue sur Troptop CV !", { isQuestion: true });
+      bot("Bienvenue sur Troptop CV !", { isQuestion: true });
       rebuildChatDOM();
       showChoices({
         title: "Une sauvegarde a été trouvée. Que faire ?",
