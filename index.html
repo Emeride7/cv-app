@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Troptop CV — Créez un CV professionnel optimisé ATS, exportez en PDF et DOCX." />
+  <meta name="theme-color" content="#2563eb" />
   <title>Troptop CV — Assistant conversationnel</title>
 
   <link rel="stylesheet" href="style.css" />
 
-  <!-- PDF export (html2pdf inclut html2canvas + jsPDF) -->
+  <!-- PDF export visuel (html2pdf = html2canvas + jsPDF) — mode non-ATS seulement -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <!-- PDF import (PDF.js) -->
@@ -22,14 +24,14 @@
     <header class="topbar">
       <div class="brand">
         <div class="brand__title">Troptop CV</div>
-        <div class="brand__subtitle">Chatbot + aperçu + export PDF/DOCX + Mode ATS</div>
+        <div class="brand__subtitle">Chatbot · Aperçu A4 · PDF ATS · DOCX · 3 modèles</div>
       </div>
 
       <nav class="top-actions" aria-label="Actions globales">
-        <button id="resume-btn" class="btn btn--ghost" type="button" title="Reprendre depuis la sauvegarde">
+        <button id="resume-btn" class="btn btn--ghost" type="button" title="Reprendre depuis la dernière sauvegarde">
           Reprendre
         </button>
-        <button id="import-btn" class="btn btn--ghost" type="button" title="Importer LinkedIn ou un CV PDF">
+        <button id="import-btn" class="btn btn--ghost" type="button" title="Importer un CV LinkedIn ou un PDF">
           Import
         </button>
         <button id="reset-btn" class="btn btn--ghost" type="button" title="Réinitialiser le projet">
@@ -39,17 +41,17 @@
     </header>
 
     <div class="container">
-      <!-- CHAT -->
-      <section class="chat card" aria-label="Conversation">
+      <!-- ── CHAT ── -->
+      <section class="chat card" aria-label="Conversation avec l'assistant">
         <div class="card__head">
           <h2 class="card__title">Conversation</h2>
           <div class="chat-tools">
-            <button id="back-btn" type="button" class="btn btn--ghost" disabled title="Retour à la question précédente">
-              Retour
+            <button id="back-btn" type="button" class="btn btn--ghost" disabled title="Retour à l'étape précédente">
+              ← Retour
             </button>
-            <label class="switch" title="Activer/Désactiver le mode ATS">
-              <input id="ats-toggle" type="checkbox" checked />
-              <span class="switch__ui"></span>
+            <label class="switch" title="Mode ATS : mise en page optimisée pour les robots de tri de CV">
+              <input id="ats-toggle" type="checkbox" checked aria-label="Mode ATS" />
+              <span class="switch__ui" aria-hidden="true"></span>
               <span class="switch__label">Mode ATS</span>
             </label>
           </div>
@@ -57,108 +59,133 @@
 
         <div class="chat__log" id="chat-log" role="log" aria-live="polite" aria-relevant="additions"></div>
 
-        <!-- Widgets (choix, formulaires, tableaux...) -->
-        <div class="chat__widgets" id="widget-area" hidden></div>
+        <!-- Widgets (choix, formulaires, tableaux…) -->
+        <div class="chat__widgets" id="widget-area" hidden aria-live="polite"></div>
 
         <div class="chat__input" id="input-area">
           <label class="sr-only" for="user-input">Votre réponse</label>
-          <input id="user-input" type="text" placeholder="Votre réponse…" autocomplete="on" />
+          <input
+            id="user-input"
+            type="text"
+            placeholder="Votre réponse…"
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+          />
           <button id="send-btn" type="button" class="btn btn--primary">Envoyer</button>
         </div>
 
-        <div class="hint" id="input-hint" aria-live="polite"></div>
+        <div class="hint" id="input-hint" role="alert" aria-live="assertive"></div>
       </section>
 
-      <!-- CV -->
+      <!-- ── CV APERÇU ── -->
       <section class="cv card" aria-label="Aperçu du CV">
         <div class="cv__header">
           <div class="cv__headerLeft">
             <h2 class="card__title">Aperçu</h2>
-            <div class="ats-badge" id="ats-badge" hidden>
-              <div class="ats-badge__score" id="ats-score">—</div>
-              <div class="ats-badge__label">Score ATS</div>
+            <div class="ats-badge" id="ats-badge" hidden aria-label="Score ATS">
+              <div class="ats-badge__score" id="ats-score" aria-live="polite">—</div>
+              <div class="ats-badge__label">/100 ATS</div>
             </div>
           </div>
 
-          <div class="template-switcher" id="template-switcher" hidden>
+          <div class="template-switcher" id="template-switcher" hidden aria-label="Choix du modèle">
             <span class="template-switcher__label">Modèle :</span>
-            <button type="button" class="btn btn--ghost is-active" data-template="t1">Modèle 1</button>
-            <button type="button" class="btn btn--ghost" data-template="t2">Modèle 2</button>
-            <button type="button" class="btn btn--ghost" data-template="t3">Modèle 3</button>
+            <button type="button" class="btn btn--ghost is-active" data-template="t1">Classique</button>
+            <button type="button" class="btn btn--ghost" data-template="t2">Minimaliste</button>
+            <button type="button" class="btn btn--ghost" data-template="t3">Moderne</button>
           </div>
         </div>
 
-        <div class="cv__preview" id="cv-preview" aria-label="Aperçu rendu du CV"></div>
+        <div class="cv__preview" id="cv-preview" aria-label="Aperçu rendu du CV" tabindex="0"></div>
 
         <div class="cv__actions">
-          <button id="download-pdf" type="button" class="btn btn--success" disabled>
-            ⬇ PDF (A4)
+          <button id="download-pdf" type="button" class="btn btn--success" disabled
+            title="PDF compatible ATS (texte sélectionnable via impression navigateur)">
+            ⬇ PDF ATS
           </button>
-          <button id="download-docx" type="button" class="btn btn--success" disabled>
+          <button id="download-docx" type="button" class="btn btn--success" disabled
+            title="Document Word éditable">
             ⬇ DOCX
           </button>
-          <button id="print-btn" type="button" class="btn btn--ghost" disabled>
+          <button id="print-btn" type="button" class="btn btn--ghost" disabled
+            title="Imprimer ou enregistrer en PDF via le navigateur">
             🖨 Imprimer
           </button>
         </div>
 
         <div class="ats-panel" id="ats-panel" hidden aria-label="Recommandations ATS">
           <h3 class="ats-panel__title">Recommandations ATS</h3>
-          <ul class="ats-panel__list" id="ats-recos"></ul>
+          <ul class="ats-panel__list" id="ats-recos" aria-live="polite"></ul>
         </div>
       </section>
     </div>
 
-    <!-- MODAL IMPORT -->
-    <div class="modal" id="import-modal" hidden role="dialog" aria-modal="true" aria-label="Importer des informations">
-      <div class="modal__backdrop" data-close="true"></div>
+    <!-- ── MODAL IMPORT ── -->
+    <div class="modal" id="import-modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal__backdrop" data-close="true" aria-hidden="true"></div>
       <div class="modal__panel">
         <div class="modal__head">
-          <h2 class="modal__title">Importer</h2>
-          <button class="btn btn--ghost" type="button" data-close="true">Fermer</button>
+          <h2 class="modal__title" id="modal-title">Importer des informations</h2>
+          <button class="btn btn--ghost" type="button" data-close="true" aria-label="Fermer la modal">✕ Fermer</button>
         </div>
 
         <div class="tabs" role="tablist" aria-label="Options d'import">
-          <button class="tab is-active" type="button" data-tab="linkedin" role="tab" aria-selected="true">Texte LinkedIn / CV</button>
-          <button class="tab" type="button" data-tab="pdf" role="tab" aria-selected="false">CV PDF</button>
+          <button class="tab is-active" type="button" data-tab="linkedin"
+            role="tab" aria-selected="true" aria-controls="tab-linkedin">
+            Texte LinkedIn / CV
+          </button>
+          <button class="tab" type="button" data-tab="pdf"
+            role="tab" aria-selected="false" aria-controls="tab-pdf">
+            CV au format PDF
+          </button>
         </div>
 
         <section class="tabpane" id="tab-linkedin" data-tabpane="linkedin">
           <p class="muted">
-            Collez votre texte LinkedIn ou CV (sections "Expérience", "Formation", "Compétences", etc.). Le parsing détecte automatiquement les sections.
+            Collez votre texte LinkedIn ou CV (sections "Expérience", "Formation", "Compétences"…).
+            Le parsing détecte automatiquement les sections.
           </p>
-          <textarea id="linkedin-text" class="textarea" rows="10" placeholder="Collez ici le contenu LinkedIn ou votre CV texte…"></textarea>
+          <textarea
+            id="linkedin-text"
+            class="textarea"
+            rows="10"
+            placeholder="Collez ici le contenu de votre profil LinkedIn ou votre CV en texte brut…"
+            aria-label="Texte LinkedIn ou CV à analyser"
+          ></textarea>
           <div class="modal__actions">
-            <button id="parse-linkedin" class="btn btn--primary" type="button">Parser et analyser</button>
+            <button id="parse-linkedin" class="btn btn--primary" type="button">Analyser le texte</button>
           </div>
         </section>
 
         <section class="tabpane" id="tab-pdf" data-tabpane="pdf" hidden>
           <p class="muted">
-            Import d'un PDF via PDF.js. Les données extraites dépendent de la structure du document.
+            Import d'un PDF via PDF.js. Les données extraites dépendent de la qualité du texte dans le PDF.
           </p>
-          <input id="pdf-file" class="file" type="file" accept="application/pdf" />
+          <input id="pdf-file" class="file" type="file" accept="application/pdf" aria-label="Sélectionner un fichier PDF" />
           <div class="modal__actions">
-            <button id="parse-pdf" class="btn btn--primary" type="button">Parser le PDF</button>
+            <button id="parse-pdf" class="btn btn--primary" type="button">Extraire le texte du PDF</button>
           </div>
-          <div class="muted small" id="pdf-status"></div>
+          <div class="muted small" id="pdf-status" aria-live="polite"></div>
         </section>
 
         <hr class="hr" />
 
         <div class="modal__actions">
-          <button id="apply-import" class="btn btn--success" type="button" disabled>Appliquer à mon CV</button>
+          <button id="apply-import" class="btn btn--success" type="button" disabled>
+            ✅ Appliquer à mon CV
+          </button>
         </div>
 
         <div class="import-preview" id="import-preview" hidden>
-          <h3 class="import-preview__title">Aperçu de l'import</h3>
-          <pre class="import-preview__pre" id="import-preview-pre"></pre>
+          <h3 class="import-preview__title">Aperçu des données détectées</h3>
+          <pre class="import-preview__pre" id="import-preview-pre" tabindex="0"></pre>
         </div>
       </div>
     </div>
 
     <noscript>
-      <p class="noscript">Cette application nécessite JavaScript.</p>
+      <p class="noscript">⚠ Cette application nécessite JavaScript pour fonctionner.</p>
     </noscript>
   </main>
 
