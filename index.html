@@ -136,7 +136,7 @@
                             </div>
                             <div class="input-with-icon" id="pinFieldWrap">
                                 <i class="fas fa-key"></i>
-                                <input type="text" id="pin" autocomplete="off" spellcheck="false" placeholder="Sélectionnez une carte d'abord" required>
+                                <input type="text" id="pin" autocomplete="off" autocomplete="off" spellcheck="false" placeholder="Sélectionnez une carte d'abord" required>
                             </div>
                             <small id="pinHelp" data-i18n="form.pinHelpDefault">Choisissez une carte pour charger le bon format.</small>
                             <div class="error-message" id="pinError" aria-live="polite"></div>
@@ -160,12 +160,14 @@
                                     <i class="fas fa-euro-sign"></i>
                                     <input type="number" id="amount" placeholder="50.00" step="0.01" min="0">
                                 </div>
+                                <div class="error-message" id="amountError" aria-live="polite"></div>
                             </div>
                             <div class="form-group">
                                 <label for="purchaseDate" data-i18n="form.purchaseDate">Date d'achat (optionnel)</label>
                                 <div class="input-with-icon">
                                     <i class="fas fa-calendar-alt"></i>
-                                    <input type="date" id="purchaseDate">
+                                    <input type="date" id="purchaseDate" max="">
+                            <div class="error-message" id="dateError" aria-live="polite"></div>
                                 </div>
                             </div>
                         </div>
@@ -173,7 +175,7 @@
                         <!-- Message -->
                         <div class="form-group">
                             <label for="message" data-i18n="form.message">Message supplémentaire (optionnel)</label>
-                            <textarea id="message" rows="4" placeholder="Informations complémentaires..."></textarea>
+                            <textarea id="message" maxlength="500" rows="4" placeholder="Informations complémentaires..."></textarea>
                         </div>
 
                         <!-- Sécurité -->
@@ -259,5 +261,23 @@
     </div>
 
     <script src="script.js"></script>
+<script>
+    (function(){
+        let formDirty = false;
+        document.addEventListener('DOMContentLoaded', function(){
+            const form = document.getElementById('verificationForm');
+            if(!form) return;
+            form.addEventListener('input', function(){ formDirty = true; });
+            form.addEventListener('change', function(){ formDirty = true; });
+            window.addEventListener('beforeunload', function(e){
+                if(formDirty){
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });
+            form.addEventListener('submit', function(){ formDirty = false; });
+        });
+    })();
+</script>
 </body>
 </html>
