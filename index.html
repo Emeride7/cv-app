@@ -1,194 +1,256 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Troptop CV — Créez un CV professionnel optimisé ATS, exportez en PDF et DOCX." />
-  <meta name="theme-color" content="#2563eb" />
-  <title>Troptop CV — Assistant conversationnel</title>
-
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- PDF export visuel (html2pdf = html2canvas + jsPDF) — mode non-ATS seulement -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-  <!-- PDF import (PDF.js) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-
-  <!-- DOCX export (docx UMD browser) -->
-  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérificateur de Cartes Cadeaux</title>
+    <meta name="description" content="Vérifiez et transmettez une demande concernant une carte PCS, Transcash, Neosurf ou Paysafecard.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body>
-  <main class="app" role="application" aria-label="Troptop CV - Assistant de création de CV">
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand__title">Troptop CV</div>
-        <div class="brand__subtitle">Chatbot · Aperçu A4 · PDF ATS · DOCX · 3 modèles</div>
-      </div>
+    <header class="header">
+        <div class="container">
+            <div class="header-inner">
+                <div class="logo-wrap">
+                    <a href="#top" class="logo" aria-label="GiftCard Verifier">
+                        <span class="logo-icon"><i class="fas fa-gift"></i></span>
+                        <span>
+                            <strong>GiftCard Verifier</strong>
+                        </span>
+                    </a>
+                </div>
 
-      <nav class="top-actions" aria-label="Actions globales">
-        <button id="resume-btn" class="btn btn--ghost" type="button" title="Reprendre depuis la dernière sauvegarde">
-          Reprendre
-        </button>
-        <button id="import-btn" class="btn btn--ghost" type="button" title="Importer un CV LinkedIn ou un PDF">
-          Import
-        </button>
-        <button id="reset-btn" class="btn btn--ghost" type="button" title="Réinitialiser le projet">
-          Réinitialiser
-        </button>
-      </nav>
+                <div class="header-actions">
+                    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activer le mode sombre" title="Mode sombre">
+                        <i class="fas fa-moon"></i>
+                    </button>
+
+                    <div class="language-selector" aria-label="Sélecteur de langue">
+                        <button class="lang-btn active" data-lang="fr" type="button">
+                            <i class="fas fa-flag"></i> FR
+                        </button>
+                        <button class="lang-btn" data-lang="en" type="button">
+                            <i class="fas fa-flag"></i> EN
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </header>
 
-    <div class="container">
-      <!-- ── CHAT ── -->
-      <section class="chat card" aria-label="Conversation avec l'assistant">
-        <div class="card__head">
-          <h2 class="card__title">Conversation</h2>
-          <div class="chat-tools">
-            <button id="back-btn" type="button" class="btn btn--ghost" disabled title="Retour à l'étape précédente">
-              ← Retour
-            </button>
-            <label class="switch" title="Mode ATS : mise en page optimisée pour les robots de tri de CV">
-              <input id="ats-toggle" type="checkbox" checked aria-label="Mode ATS" />
-              <span class="switch__ui" aria-hidden="true"></span>
-              <span class="switch__label">Mode ATS</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="chat__log" id="chat-log" role="log" aria-live="polite" aria-relevant="additions"></div>
-
-        <!-- Widgets (choix, formulaires, tableaux…) -->
-        <div class="chat__widgets" id="widget-area" hidden aria-live="polite"></div>
-
-        <div class="chat__input" id="input-area">
-          <label class="sr-only" for="user-input">Votre réponse</label>
-          <input
-            id="user-input"
-            type="text"
-            placeholder="Votre réponse…"
-            autocomplete="off"
-            autocorrect="off"
-            spellcheck="false"
-          />
-          <button id="send-btn" type="button" class="btn btn--primary">Envoyer</button>
-        </div>
-
-        <div class="hint" id="input-hint" role="alert" aria-live="assertive"></div>
-      </section>
-
-      <!-- ── CV APERÇU ── -->
-      <section class="cv card" aria-label="Aperçu du CV">
-        <div class="cv__header">
-          <div class="cv__headerLeft">
-            <h2 class="card__title">Aperçu</h2>
-            <div class="ats-badge" id="ats-badge" hidden aria-label="Score ATS">
-              <div class="ats-badge__score" id="ats-score" aria-live="polite">—</div>
-              <div class="ats-badge__label">/100 ATS</div>
+    <main id="top">
+        <section class="hero">
+            <canvas id="particles" aria-hidden="true"></canvas>
+            <div class="hero-orb orb-a" aria-hidden="true"></div>
+            <div class="hero-orb orb-b" aria-hidden="true"></div>
+            <div class="container">
+                <div class="hero-content">
+                    <h1 data-i18n="hero.title">Vérificateur de Cartes Cadeaux</h1>
+                    <p data-i18n="hero.subtitle">Vérifiez la validité de vos cartes PCS, Transcash, Neosurf et Paysafecard.</p>
+                </div>
             </div>
-          </div>
-
-          <div class="template-switcher" id="template-switcher" hidden aria-label="Choix du modèle">
-            <span class="template-switcher__label">Modèle :</span>
-            <button type="button" class="btn btn--ghost is-active" data-template="t1">Classique</button>
-            <button type="button" class="btn btn--ghost" data-template="t2">Minimaliste</button>
-            <button type="button" class="btn btn--ghost" data-template="t3">Moderne</button>
-          </div>
-        </div>
-
-        <div class="cv__preview" id="cv-preview" aria-label="Aperçu rendu du CV" tabindex="0"></div>
-
-        <div class="cv__actions">
-          <button id="download-pdf" type="button" class="btn btn--success" disabled
-            title="PDF compatible ATS (texte sélectionnable via impression navigateur)">
-            ⬇ PDF ATS
-          </button>
-          <button id="download-docx" type="button" class="btn btn--success" disabled
-            title="Document Word éditable">
-            ⬇ DOCX
-          </button>
-          <button id="print-btn" type="button" class="btn btn--ghost" disabled
-            title="Imprimer ou enregistrer en PDF via le navigateur">
-            🖨 Imprimer
-          </button>
-        </div>
-
-        <div class="ats-panel" id="ats-panel" hidden aria-label="Recommandations ATS">
-          <h3 class="ats-panel__title">Recommandations ATS</h3>
-          <ul class="ats-panel__list" id="ats-recos" aria-live="polite"></ul>
-        </div>
-      </section>
-    </div>
-
-    <!-- ── MODAL IMPORT ── -->
-    <div class="modal" id="import-modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <div class="modal__backdrop" data-close="true" aria-hidden="true"></div>
-      <div class="modal__panel">
-        <div class="modal__head">
-          <h2 class="modal__title" id="modal-title">Importer des informations</h2>
-          <button class="btn btn--ghost" type="button" data-close="true" aria-label="Fermer la modal">✕ Fermer</button>
-        </div>
-
-        <div class="tabs" role="tablist" aria-label="Options d'import">
-          <button class="tab is-active" type="button" data-tab="linkedin"
-            role="tab" aria-selected="true" aria-controls="tab-linkedin">
-            Texte LinkedIn / CV
-          </button>
-          <button class="tab" type="button" data-tab="pdf"
-            role="tab" aria-selected="false" aria-controls="tab-pdf">
-            CV au format PDF
-          </button>
-        </div>
-
-        <section class="tabpane" id="tab-linkedin" data-tabpane="linkedin">
-          <p class="muted">
-            Collez votre texte LinkedIn ou CV (sections "Expérience", "Formation", "Compétences"…).
-            Le parsing détecte automatiquement les sections.
-          </p>
-          <textarea
-            id="linkedin-text"
-            class="textarea"
-            rows="10"
-            placeholder="Collez ici le contenu de votre profil LinkedIn ou votre CV en texte brut…"
-            aria-label="Texte LinkedIn ou CV à analyser"
-          ></textarea>
-          <div class="modal__actions">
-            <button id="parse-linkedin" class="btn btn--primary" type="button">Analyser le texte</button>
-          </div>
         </section>
 
-        <section class="tabpane" id="tab-pdf" data-tabpane="pdf" hidden>
-          <p class="muted">
-            Import d'un PDF via PDF.js. Les données extraites dépendent de la qualité du texte dans le PDF.
-          </p>
-          <input id="pdf-file" class="file" type="file" accept="application/pdf" aria-label="Sélectionner un fichier PDF" />
-          <div class="modal__actions">
-            <button id="parse-pdf" class="btn btn--primary" type="button">Extraire le texte du PDF</button>
-          </div>
-          <div class="muted small" id="pdf-status" aria-live="polite"></div>
+        <section class="main-form">
+            <div class="container form-layout">
+                <div class="form-card glass-panel">
+                    <div class="form-header">
+                        <h2 data-i18n="form.title">Vérifier une carte</h2>
+                        <p data-i18n="form.subtitle">Sélectionnez une carte, saisissez le code attendu et transmettez la demande à l'équipe de traitement.</p>
+                    </div>
+
+                    <form id="verificationForm" novalidate>
+                        <div class="form-group">
+                            <div class="label-row">
+                                <label for="cardType" data-i18n="form.cardType">Type de carte</label>
+                                <span class="field-note" id="selectedCardHint" data-i18n="form.cardHint">Choisissez une carte pour adapter le format du code</span>
+                            </div>
+
+                            <div class="card-selector-shell">
+                                <button
+                                    type="button"
+                                    class="card-mobile-trigger"
+                                    id="cardMobileTrigger"
+                                    aria-expanded="false"
+                                    aria-controls="cardSelectorSheet"
+                                >
+                                    <span class="mobile-trigger-label" data-i18n="form.mobilePicker">Choisir une carte</span>
+                                    <span class="mobile-trigger-value" id="mobileSelectedCard">Aucune carte sélectionnée</span>
+                                    <i class="fas fa-chevron-up"></i>
+                                </button>
+
+                                <div class="sheet-overlay hidden" id="sheetOverlay"></div>
+
+                                <div class="card-selector-sheet" id="cardSelectorSheet" aria-label="Sélection des cartes">
+                                    <div class="sheet-handle" aria-hidden="true"></div>
+                                    <div class="sheet-header">
+                                        <div>
+                                            <h3 data-i18n="form.sheetTitle">Choisir une carte</h3>
+                                            <p data-i18n="form.sheetSubtitle">Le format du code s'adapte à la marque sélectionnée.</p>
+                                        </div>
+                                        <button type="button" class="sheet-close" id="sheetClose" aria-label="Fermer la sélection des cartes">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+
+                                    <div class="card-selector-grid" id="cardSelectorGrid">
+                                        <button type="button" class="card-option" data-value="PCS" data-card-key="PCS" aria-pressed="false">
+                                            <span class="card-option-shine" aria-hidden="true"></span>
+                                            <span class="card-chip" aria-hidden="true"></span>
+                                            <div class="card-logo pcs-logo">
+                                                <svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                    <rect width="100" height="40" rx="8" fill="#1A237E"/>
+                                                    <text x="10" y="24" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">PCS</text>
+                                                    <text x="46" y="24" font-family="Arial, sans-serif" font-size="10" fill="#90CAF9">Mastercard</text>
+                                                    <circle cx="82" cy="20" r="12" fill="#FF5F00" opacity="0.82"/>
+                                                    <circle cx="90" cy="20" r="12" fill="#F79E1B" opacity="0.82"/>
+                                                </svg>
+                                            </div>
+                                            <span class="card-brand">PCS</span>
+                                            <small class="card-format">10 caractères</small>
+                                        </button>
+
+                                        <button type="button" class="card-option" data-value="Transcash" data-card-key="Transcash" aria-pressed="false">
+                                            <span class="card-option-shine" aria-hidden="true"></span>
+                                            <span class="card-chip" aria-hidden="true"></span>
+                                            <div class="card-logo transcash-logo">
+                                                <svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                    <rect width="100" height="40" rx="8" fill="#E91E63"/>
+                                                    <text x="15" y="20" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#FFFFFF">Transcash</text>
+                                                    <text x="15" y="32" font-family="Arial, sans-serif" font-size="8" fill="#F8BBD0">by Transfond</text>
+                                                </svg>
+                                            </div>
+                                            <span class="card-brand">Transcash</span>
+                                            <small class="card-format">12 chiffres</small>
+                                        </button>
+
+                                        <button type="button" class="card-option" data-value="Neosurf" data-card-key="Neosurf" aria-pressed="false">
+                                            <span class="card-option-shine" aria-hidden="true"></span>
+                                            <span class="card-chip" aria-hidden="true"></span>
+                                            <div class="card-logo neosurf-logo">
+                                                <svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                    <rect width="100" height="40" rx="8" fill="#00BCD4"/>
+                                                    <text x="12" y="22" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">neosurf</text>
+                                                    <text x="70" y="22" font-family="Arial, sans-serif" font-size="8" fill="#B2EBF2">voucher</text>
+                                                </svg>
+                                            </div>
+                                            <span class="card-brand">Neosurf</span>
+                                            <small class="card-format">10 caractères</small>
+                                        </button>
+
+                                        <button type="button" class="card-option" data-value="Paysafecard" data-card-key="Paysafecard" aria-pressed="false">
+                                            <span class="card-option-shine" aria-hidden="true"></span>
+                                            <span class="card-chip" aria-hidden="true"></span>
+                                            <div class="card-logo paysafe-logo">
+                                                <svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                    <rect width="100" height="40" rx="8" fill="#FF6B00"/>
+                                                    <text x="8" y="22" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FFFFFF">paysafe</text>
+                                                    <text x="68" y="22" font-family="Arial, sans-serif" font-size="10" fill="#FFD54F">card</text>
+                                                    <circle cx="88" cy="20" r="8" fill="#FFFFFF" opacity="0.28"/>
+                                                </svg>
+                                            </div>
+                                            <span class="card-brand">Paysafecard</span>
+                                            <small class="card-format">16 chiffres</small>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="hidden" id="cardType" required>
+                            <div class="error-message" id="cardTypeError" aria-live="polite"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="label-row">
+                                <label for="pin" id="pinLabel" data-i18n="form.pin">Code</label>
+                                <span class="field-note" id="pinMetaHint" data-i18n="form.pinMetaDefault">Le format dépend de la carte choisie</span>
+                            </div>
+                            <div class="input-with-icon" id="pinFieldWrap">
+                                <i class="fas fa-key"></i>
+                                <input type="text" id="pin" autocomplete="off" spellcheck="false" placeholder="Sélectionnez une carte d'abord" required>
+                            </div>
+                            <small id="pinHelp" data-i18n="form.pinHelpDefault">Choisissez une carte pour charger le bon format.</small>
+                            <div class="error-message" id="pinError" aria-live="polite"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" data-i18n="form.email">Votre email</label>
+                            <div class="input-with-icon" id="emailFieldWrap">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="email" placeholder="vous@exemple.com" required>
+                            </div>
+                            <div class="error-message" id="emailError" aria-live="polite"></div>
+                        </div>
+
+                        <div class="form-row two-col">
+                            <div class="form-group">
+                                <label for="amount" data-i18n="form.amount">Montant initial (optionnel)</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-euro-sign"></i>
+                                    <input type="number" id="amount" placeholder="50.00" step="0.01" min="0">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="purchaseDate" data-i18n="form.purchaseDate">Date d'achat (optionnel)</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <input type="date" id="purchaseDate">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message" data-i18n="form.message">Message supplémentaire (optionnel)</label>
+                            <textarea id="message" rows="4" placeholder="Informations complémentaires..."></textarea>
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="primary-btn">
+                            <span id="btnText" data-i18n="form.submit">Envoyer la demande</span>
+                            <span id="btnLoader" class="hidden"><i class="fas fa-spinner fa-spin"></i> <span data-i18n="form.sending">Envoi...</span></span>
+                        </button>
+
+                        <div id="result" class="result-fallback hidden" aria-live="polite"></div>
+                    </form>
+                </div>
+            </div>
         </section>
+    </main>
 
-        <hr class="hr" />
-
-        <div class="modal__actions">
-          <button id="apply-import" class="btn btn--success" type="button" disabled>
-            ✅ Appliquer à mon CV
-          </button>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content glass-panel">
+                <div class="footer-brand">
+                    <span class="logo-icon"><i class="fas fa-gift"></i></span>
+                    <div>
+                        <strong>GiftCard Verifier</strong>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <a href="#" data-i18n="footer.privacy">Politique de confidentialité</a>
+                    <a href="#" data-i18n="footer.terms">Conditions d'utilisation</a>
+                </div>
+                <p class="footer-copy" data-i18n="footer.copy">© 2026 GiftCard Verifier. Tous droits réservés.</p>
+            </div>
         </div>
+    </footer>
 
-        <div class="import-preview" id="import-preview" hidden>
-          <h3 class="import-preview__title">Aperçu des données détectées</h3>
-          <pre class="import-preview__pre" id="import-preview-pre" tabindex="0"></pre>
+    <div class="modal hidden" id="successModal" aria-hidden="true">
+        <div class="modal-backdrop" data-close-modal></div>
+        <div class="modal-card glass-panel" role="dialog" aria-modal="true" aria-labelledby="successModalTitle" aria-describedby="successModalDesc" tabindex="-1">
+            <div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
+            <div class="success-icon-wrap" aria-hidden="true">
+                <span class="success-ring"></span>
+                <span class="success-icon"><i class="fas fa-check"></i></span>
+            </div>
+            <h2 id="successModalTitle" data-i18n="modal.title">Demande envoyée</h2>
+            <p id="successModalDesc" data-i18n="modal.description">Votre demande a été transmise à la destination configurée. Si un suivi est effectué, il utilisera l'adresse email renseignée dans le formulaire.</p>
+            <button type="button" class="primary-btn modal-action" id="closeSuccessModal" data-i18n="modal.close">Fermer</button>
         </div>
-      </div>
     </div>
 
-    <noscript>
-      <p class="noscript">⚠ Cette application nécessite JavaScript pour fonctionner.</p>
-    </noscript>
-  </main>
-
-  <script src="script.js" defer></script>
+    <script src="script.js"></script>
 </body>
 </html>
