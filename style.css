@@ -41,25 +41,26 @@ body {
     transition: background var(--transition-smooth), color var(--transition-fast);
 }
 
-body:not(.loaded) .hero,
-body:not(.loaded) .main-form,
-body:not(.loaded) .faq,
-body:not(.loaded) .footer {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-}
-body.loaded .hero,
-body.loaded .main-form,
-body.loaded .faq,
-body.loaded .footer {
+/* Content visible by default - animation is progressive enhancement */
+.hero, .main-form, .faq, .footer {
     opacity: 1;
     transform: translateY(0);
 }
-body.loaded .hero { transition-delay: 0.05s; }
-body.loaded .main-form { transition-delay: 0.15s; }
-body.loaded .faq { transition-delay: 0.25s; }
-body.loaded .footer { transition-delay: 0.35s; }
+/* If JS loaded successfully, add subtle entrance animation */
+body.js-ok .hero,
+body.js-ok .main-form,
+body.js-ok .faq,
+body.js-ok .footer {
+    animation: fadeInUp 0.6s ease forwards;
+}
+body.js-ok .hero { animation-delay: 0.05s; }
+body.js-ok .main-form { animation-delay: 0.15s; }
+body.js-ok .faq { animation-delay: 0.25s; }
+body.js-ok .footer { animation-delay: 0.35s; }
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
 body.sheet-open, body.modal-open { overflow: hidden; }
 
@@ -78,13 +79,13 @@ button { border: none; background: none; }
     box-shadow: var(--shadow-soft), 0 0 0 1px rgba(255, 255, 255, 0.55) inset;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-}
-.glass-panel.visible {
     opacity: 1;
     transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+/* Progressive enhancement: animate in when observed */
+.glass-panel.animate-in {
+    animation: fadeInUp 0.5s ease forwards;
 }
 
 .hidden { display: none !important; }

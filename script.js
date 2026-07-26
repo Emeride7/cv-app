@@ -706,12 +706,12 @@ function initLazyLoading() {
     if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('visible');
+                if (entry.isIntersecting) entry.target.classList.add('animate-in');
             });
         }, { threshold: 0.1, rootMargin: '50px' });
         document.querySelectorAll('.glass-panel:not(.hero-content .glass-panel)').forEach(el => observer.observe(el));
     } else {
-        document.querySelectorAll('.glass-panel').forEach(el => el.classList.add('visible'));
+        document.querySelectorAll('.glass-panel').forEach(el => el.classList.add('animate-in'));
     }
 }
 
@@ -839,19 +839,28 @@ function bindEvents() {
 function init() {
     if (isInitialized) return;
     isInitialized = true;
-    const savedLang = safeStorageGet(STORAGE_KEYS.language, 'fr');
-    const savedTheme = safeStorageGet(STORAGE_KEYS.theme, 'light');
-    setInputState(elements.pinFieldWrap, 'fas fa-key', 'input-neutral');
-    setInputState(elements.emailFieldWrap, 'fas fa-envelope', 'input-neutral');
-    applyTheme(savedTheme);
-    setLanguage(savedLang);
-    bindEvents();
-    initTilt();
-    initParticles();
-    initLazyLoading();
-    document.body.classList.add('loaded');
+    try {
+        const savedLang = safeStorageGet(STORAGE_KEYS.language, 'fr');
+        const savedTheme = safeStorageGet(STORAGE_KEYS.theme, 'light');
+        setInputState(elements.pinFieldWrap, 'fas fa-key', 'input-neutral');
+        setInputState(elements.emailFieldWrap, 'fas fa-envelope', 'input-neutral');
+        applyTheme(savedTheme);
+        setLanguage(savedLang);
+        bindEvents();
+        initTilt();
+        initParticles();
+        initLazyLoading();
+    } catch (err) {
+        console.error('Init error:', err);
+        // Ensure basic functionality even if some features fail
+        try { setLanguage('fr'); } catch(e){}
+    }
+    // Mark JS as ready for CSS animations - content is ALREADY visible by default
+    document.body.classList.add('js-ok');
 }
 
+// Also expose a no-js fallback: if JS is disabled, CSS already shows content
+// If JS fails catastrophically before DOMContentLoaded, content is still visible
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
