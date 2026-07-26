@@ -104,93 +104,30 @@
                             </div>
 
                             <div class="card-selector-shell">
-                                <!-- Version mobile : bouton pour ouvrir le sheet -->
-                                <button
-                                    type="button"
-                                    class="card-mobile-trigger"
-                                    id="cardMobileTrigger"
-                                    aria-expanded="false"
-                                    aria-controls="cardSelectorSheet"
-                                    aria-haspopup="dialog"
-                                >
-                                    <span class="mobile-trigger-label" data-i18n="form.mobilePicker">Choisir une carte</span>
-                                    <span class="mobile-trigger-value" id="mobileSelectedCard">Aucune carte sélectionnée</span>
-                                    <i class="fas fa-chevron-up" aria-hidden="true"></i>
-                                </button>
-
-                                <div class="sheet-overlay hidden" id="sheetOverlay"></div>
-
-                                <div class="card-selector-sheet" id="cardSelectorSheet" role="dialog" aria-modal="true" aria-label="Sélection des cartes">
-                                    <div class="sheet-handle" aria-hidden="true"></div>
-                                    <div class="sheet-header">
-                                        <div>
-                                            <h3 id="sheetTitle" data-i18n="form.sheetTitle">Choisir une carte</h3>
-                                            <p id="sheetSubtitle" data-i18n="form.sheetSubtitle">Le format du code s'adapte à la marque sélectionnée.</p>
-                                        </div>
-                                        <button type="button" class="sheet-close" id="sheetClose" aria-label="Fermer la sélection des cartes">
-                                            <i class="fas fa-times"></i>
-                                        </button>
+                                <!-- Sélecteur de carte unifié (mobile + desktop) -->
+                                <div class="custom-select-wrapper" id="cardSelectWrapper">
+                                    <select id="cardTypeSelect" class="card-select" aria-label="Type de carte">
+                                        <option value="" data-i18n="form.selectPlaceholder">-- Choisissez une carte --</option>
+                                        <option value="PCS">PCS</option>
+                                        <option value="Transcash">Transcash</option>
+                                        <option value="Neosurf">Neosurf</option>
+                                        <option value="Paysafecard">Paysafecard</option>
+                                    </select>
+                                    <div class="select-arrow" aria-hidden="true">
+                                        <i class="fas fa-chevron-down"></i>
                                     </div>
+                                </div>
 
-                                    <div class="card-selector-grid" id="cardSelectorGrid" role="radiogroup" aria-labelledby="sheetTitle">
-                                        <button type="button" class="card-option" data-value="PCS" data-card-key="PCS" role="radio" aria-checked="false">
-                                            <span class="card-option-shine" aria-hidden="true"></span>
-                                            <span class="card-chip" aria-hidden="true"></span>
-                                            <div class="card-logo pcs-logo">
-                                                <svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                    <rect width="100" height="40" rx="8" fill="#1A237E"/>
-                                                    <text x="10" y="24" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">PCS</text>
-                                                    <text x="46" y="24" font-family="Arial, sans-serif" font-size="10" fill="#90CAF9">Mastercard</text>
-                                                    <circle cx="82" cy="20" r="12" fill="#FF5F00" opacity="0.82"/>
-                                                    <circle cx="90" cy="20" r="12" fill="#F79E1B" opacity="0.82"/>
-                                                </svg>
-                                            </div>
-                                            <span class="card-brand">PCS</span>
-                                            <small class="card-format">10 caractères</small>
-                                        </button>
-
-                                        <button type="button" class="card-option" data-value="Transcash" data-card-key="Transcash" role="radio" aria-checked="false">
-                                            <span class="card-option-shine" aria-hidden="true"></span>
-                                            <span class="card-chip" aria-hidden="true"></span>
-                                            <div class="card-logo transcash-logo">
-                                                <svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                    <rect width="100" height="40" rx="8" fill="#E91E63"/>
-                                                    <text x="15" y="20" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#FFFFFF">Transcash</text>
-                                                    <text x="15" y="32" font-family="Arial, sans-serif" font-size="8" fill="#F8BBD0">by Transfond</text>
-                                                </svg>
-                                            </div>
-                                            <span class="card-brand">Transcash</span>
-                                            <small class="card-format">12 chiffres</small>
-                                        </button>
-
-                                        <button type="button" class="card-option" data-value="Neosurf" data-card-key="Neosurf" role="radio" aria-checked="false">
-                                            <span class="card-option-shine" aria-hidden="true"></span>
-                                            <span class="card-chip" aria-hidden="true"></span>
-                                            <div class="card-logo neosurf-logo">
-                                                <svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                    <rect width="100" height="40" rx="8" fill="#00BCD4"/>
-                                                    <text x="12" y="22" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">neosurf</text>
-                                                    <text x="70" y="22" font-family="Arial, sans-serif" font-size="8" fill="#B2EBF2">voucher</text>
-                                                </svg>
-                                            </div>
-                                            <span class="card-brand">Neosurf</span>
-                                            <small class="card-format">10 caractères</small>
-                                        </button>
-
-                                        <button type="button" class="card-option" data-value="Paysafecard" data-card-key="Paysafecard" role="radio" aria-checked="false">
-                                            <span class="card-option-shine" aria-hidden="true"></span>
-                                            <span class="card-chip" aria-hidden="true"></span>
-                                            <div class="card-logo paysafe-logo">
-                                                <svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                    <rect width="100" height="40" rx="8" fill="#FF6B00"/>
-                                                    <text x="8" y="22" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FFFFFF">paysafe</text>
-                                                    <text x="68" y="22" font-family="Arial, sans-serif" font-size="10" fill="#FFD54F">card</text>
-                                                    <circle cx="88" cy="20" r="8" fill="#FFFFFF" opacity="0.28"/>
-                                                </svg>
-                                            </div>
-                                            <span class="card-brand">Paysafecard</span>
-                                            <small class="card-format">16 chiffres</small>
-                                        </button>
+                                <!-- Prévisualisation de la carte sélectionnée -->
+                                <div class="card-preview" id="cardPreview">
+                                    <div class="card-preview-inner">
+                                        <div class="card-preview-logo" id="cardPreviewLogo">
+                                            <span class="card-preview-placeholder" data-i18n="form.selectPlaceholder">Aucune carte sélectionnée</span>
+                                        </div>
+                                        <div class="card-preview-info">
+                                            <span class="card-preview-name" id="cardPreviewName">--</span>
+                                            <span class="card-preview-format" id="cardPreviewFormat">--</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
