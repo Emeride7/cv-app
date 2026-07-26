@@ -40,6 +40,7 @@ function safeStorageRemove(key) {
     }
 }
 
+// ===== CARTES =====
 const CARD_RULES = {
     PCS: {
         key: 'PCS',
@@ -49,19 +50,30 @@ const CARD_RULES = {
         maxLength: 10,
         label: {
             fr: 'Code PCS',
-            en: 'PCS code'
+            en: 'PCS code',
+            de: 'PCS-Code',
+            es: 'Código PCS'
         },
         help: {
             fr: 'PCS : 10 caractères alphanumériques.',
-            en: 'PCS: 10 alphanumeric characters.'
+            en: 'PCS: 10 alphanumeric characters.',
+            de: 'PCS: 10 alphanumerische Zeichen.',
+            es: 'PCS: 10 caracteres alfanuméricos.'
         },
         meta: {
             fr: 'Format détecté : 10 caractères',
-            en: 'Expected format: 10 characters'
+            en: 'Expected format: 10 characters',
+            de: 'Erwartetes Format: 10 Zeichen',
+            es: 'Formato esperado: 10 caracteres'
         },
         placeholder: 'A7218JH12',
         displayName: 'PCS',
-        formatDesc: '10 caractères',
+        formatDesc: {
+            fr: '10 caractères',
+            en: '10 characters',
+            de: '10 Zeichen',
+            es: '10 caracteres'
+        },
         logo: 'pcs'
     },
     Transcash: {
@@ -72,19 +84,30 @@ const CARD_RULES = {
         maxLength: 12,
         label: {
             fr: 'Code Transcash',
-            en: 'Transcash code'
+            en: 'Transcash code',
+            de: 'Transcash-Code',
+            es: 'Código Transcash'
         },
         help: {
             fr: 'Transcash : 12 chiffres.',
-            en: 'Transcash: 12 digits.'
+            en: 'Transcash: 12 digits.',
+            de: 'Transcash: 12 Ziffern.',
+            es: 'Transcash: 12 dígitos.'
         },
         meta: {
             fr: 'Format détecté : 12 chiffres',
-            en: 'Expected format: 12 digits'
+            en: 'Expected format: 12 digits',
+            de: 'Erwartetes Format: 12 Ziffern',
+            es: 'Formato esperado: 12 dígitos'
         },
         placeholder: '123456789012',
         displayName: 'Transcash',
-        formatDesc: '12 chiffres',
+        formatDesc: {
+            fr: '12 chiffres',
+            en: '12 digits',
+            de: '12 Ziffern',
+            es: '12 dígitos'
+        },
         logo: 'transcash'
     },
     Neosurf: {
@@ -95,19 +118,30 @@ const CARD_RULES = {
         maxLength: 10,
         label: {
             fr: 'Code Neosurf',
-            en: 'Neosurf code'
+            en: 'Neosurf code',
+            de: 'Neosurf-Code',
+            es: 'Código Neosurf'
         },
         help: {
             fr: 'Neosurf : 10 caractères.',
-            en: 'Neosurf: 10 characters.'
+            en: 'Neosurf: 10 characters.',
+            de: 'Neosurf: 10 Zeichen.',
+            es: 'Neosurf: 10 caracteres.'
         },
         meta: {
             fr: 'Format détecté : 10 caractères',
-            en: 'Expected format: 10 characters'
+            en: 'Expected format: 10 characters',
+            de: 'Erwartetes Format: 10 Zeichen',
+            es: 'Formato esperado: 10 caracteres'
         },
         placeholder: '12345ABCDE',
         displayName: 'Neosurf',
-        formatDesc: '10 caractères',
+        formatDesc: {
+            fr: '10 caractères',
+            en: '10 characters',
+            de: '10 Zeichen',
+            es: '10 caracteres'
+        },
         logo: 'neosurf'
     },
     Paysafecard: {
@@ -118,50 +152,195 @@ const CARD_RULES = {
         maxLength: 16,
         label: {
             fr: 'Code Paysafecard',
-            en: 'Paysafecard code'
+            en: 'Paysafecard code',
+            de: 'Paysafecard-Code',
+            es: 'Código Paysafecard'
         },
         help: {
             fr: 'Paysafecard : 16 chiffres.',
-            en: 'Paysafecard: 16 digits.'
+            en: 'Paysafecard: 16 digits.',
+            de: 'Paysafecard: 16 Ziffern.',
+            es: 'Paysafecard: 16 dígitos.'
         },
         meta: {
             fr: 'Format détecté : 16 chiffres',
-            en: 'Expected format: 16 digits'
+            en: 'Expected format: 16 digits',
+            de: 'Erwartetes Format: 16 Ziffern',
+            es: 'Formato esperado: 16 dígitos'
         },
         placeholder: '1234567890123456',
         displayName: 'Paysafecard',
-        formatDesc: '16 chiffres',
+        formatDesc: {
+            fr: '16 chiffres',
+            en: '16 digits',
+            de: '16 Ziffern',
+            es: '16 dígitos'
+        },
         logo: 'paysafe'
+    },
+    iTunes: {
+        key: 'iTunes',
+        allowed: /[^a-zA-Z0-9]/g,
+        validate: value => /^[A-Z0-9]{16}$/.test(value),
+        format: value => value.toUpperCase(),
+        maxLength: 16,
+        label: {
+            fr: 'Code iTunes',
+            en: 'iTunes code',
+            de: 'iTunes-Code',
+            es: 'Código iTunes'
+        },
+        help: {
+            fr: 'iTunes : 16 caractères alphanumériques.',
+            en: 'iTunes: 16 alphanumeric characters.',
+            de: 'iTunes: 16 alphanumerische Zeichen.',
+            es: 'iTunes: 16 caracteres alfanuméricos.'
+        },
+        meta: {
+            fr: 'Format détecté : 16 caractères',
+            en: 'Expected format: 16 characters',
+            de: 'Erwartetes Format: 16 Zeichen',
+            es: 'Formato esperado: 16 caracteres'
+        },
+        placeholder: 'ABCDEFGHIJKLMNOP',
+        displayName: 'iTunes',
+        formatDesc: {
+            fr: '16 caractères',
+            en: '16 characters',
+            de: '16 Zeichen',
+            es: '16 caracteres'
+        },
+        logo: 'itunes'
+    },
+    Steam: {
+        key: 'Steam',
+        allowed: /\D/g,
+        validate: value => /^\d{15}$/.test(value),
+        format: value => value,
+        maxLength: 15,
+        label: {
+            fr: 'Code Steam',
+            en: 'Steam code',
+            de: 'Steam-Code',
+            es: 'Código Steam'
+        },
+        help: {
+            fr: 'Steam : 15 chiffres.',
+            en: 'Steam: 15 digits.',
+            de: 'Steam: 15 Ziffern.',
+            es: 'Steam: 15 dígitos.'
+        },
+        meta: {
+            fr: 'Format détecté : 15 chiffres',
+            en: 'Expected format: 15 digits',
+            de: 'Erwartetes Format: 15 Ziffern',
+            es: 'Formato esperado: 15 dígitos'
+        },
+        placeholder: '123456789012345',
+        displayName: 'Steam Card',
+        formatDesc: {
+            fr: '15 chiffres',
+            en: '15 digits',
+            de: '15 Ziffern',
+            es: '15 dígitos'
+        },
+        logo: 'steam'
+    },
+    GooglePlay: {
+        key: 'GooglePlay',
+        allowed: /[^a-zA-Z0-9]/g,
+        validate: value => /^[A-Z0-9]{16}$/.test(value),
+        format: value => value.toUpperCase(),
+        maxLength: 16,
+        label: {
+            fr: 'Code Google Play',
+            en: 'Google Play code',
+            de: 'Google Play-Code',
+            es: 'Código Google Play'
+        },
+        help: {
+            fr: 'Google Play : 16 caractères alphanumériques.',
+            en: 'Google Play: 16 alphanumeric characters.',
+            de: 'Google Play: 16 alphanumerische Zeichen.',
+            es: 'Google Play: 16 caracteres alfanuméricos.'
+        },
+        meta: {
+            fr: 'Format détecté : 16 caractères',
+            en: 'Expected format: 16 characters',
+            de: 'Erwartetes Format: 16 Zeichen',
+            es: 'Formato esperado: 16 caracteres'
+        },
+        placeholder: 'ABCDEFGHIJKLMNOP',
+        displayName: 'Google Play',
+        formatDesc: {
+            fr: '16 caractères',
+            en: '16 characters',
+            de: '16 Zeichen',
+            es: '16 caracteres'
+        },
+        logo: 'googleplay'
+    },
+    Amazon: {
+        key: 'Amazon',
+        allowed: /[^a-zA-Z0-9]/g,
+        validate: value => /^[A-Z0-9]{14}$/.test(value),
+        format: value => value.toUpperCase(),
+        maxLength: 14,
+        label: {
+            fr: 'Code Amazon',
+            en: 'Amazon code',
+            de: 'Amazon-Code',
+            es: 'Código Amazon'
+        },
+        help: {
+            fr: 'Amazon : 14 caractères alphanumériques.',
+            en: 'Amazon: 14 alphanumeric characters.',
+            de: 'Amazon: 14 alphanumerische Zeichen.',
+            es: 'Amazon: 14 caracteres alfanuméricos.'
+        },
+        meta: {
+            fr: 'Format détecté : 14 caractères',
+            en: 'Expected format: 14 characters',
+            de: 'Erwartetes Format: 14 Zeichen',
+            es: 'Formato esperado: 14 caracteres'
+        },
+        placeholder: 'ABCDEFGHIJKLMN',
+        displayName: 'Amazon Card',
+        formatDesc: {
+            fr: '14 caractères',
+            en: '14 characters',
+            de: '14 Zeichen',
+            es: '14 caracteres'
+        },
+        logo: 'amazon'
     }
 };
 
-// Logos SVG pour l'aperçu
+// ===== LOGOS (à remplacer par vos URLs hébergées) =====
 const CARD_LOGOS = {
-    pcs: `<svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;border-radius:8px;">
-            <rect width="100" height="40" rx="8" fill="#1A237E"/>
-            <text x="10" y="24" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">PCS</text>
-            <text x="46" y="24" font-family="Arial, sans-serif" font-size="10" fill="#90CAF9">Mastercard</text>
-            <circle cx="82" cy="20" r="12" fill="#FF5F00" opacity="0.82"/>
-            <circle cx="90" cy="20" r="12" fill="#F79E1B" opacity="0.82"/>
-        </svg>`,
-    transcash: `<svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;border-radius:8px;">
-            <rect width="100" height="40" rx="8" fill="#E91E63"/>
-            <text x="15" y="20" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#FFFFFF">Transcash</text>
-            <text x="15" y="32" font-family="Arial, sans-serif" font-size="8" fill="#F8BBD0">by Transfond</text>
-        </svg>`,
-    neosurf: `<svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;border-radius:8px;">
-            <rect width="100" height="40" rx="8" fill="#00BCD4"/>
-            <text x="12" y="22" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">neosurf</text>
-            <text x="70" y="22" font-family="Arial, sans-serif" font-size="8" fill="#B2EBF2">voucher</text>
-        </svg>`,
-    paysafe: `<svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;border-radius:8px;">
-            <rect width="100" height="40" rx="8" fill="#FF6B00"/>
-            <text x="8" y="22" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FFFFFF">paysafe</text>
-            <text x="68" y="22" font-family="Arial, sans-serif" font-size="10" fill="#FFD54F">card</text>
-            <circle cx="88" cy="20" r="8" fill="#FFFFFF" opacity="0.28"/>
-        </svg>`
+    pcs: `<img src="https://i.pinimg.com/1200x/4b/d4/02/4bd4028aeec8bb467458d3c9db1c7460.jpg" alt="PCS" style="width:100%;height:auto;max-height:40px;border-radius:6px;">`,
+    transcash: `<img src="https://i.pinimg.com/1200x/f5/25/62/f52562ace794f02a992383e6456027a4.jpg" alt="Transcash" style="width:100%;height:auto;max-height:40px;border-radius:6px;">`,
+    neosurf: `<img src="https://www.netentstalker.com/wp-content/uploads/2016/06/neosurf-335x205.jpg" alt="Neosurf" style="width:100%;height:auto;max-height:40px;border-radius:6px;">`,
+    paysafe: `<img src="https://i.pinimg.com/1200x/b4/2c/fa/b42cfaae961c9085cb62a23ce2a1d781.jpg" alt="Paysafecard" style="width:100%;height:auto;max-height:40px;border-radius:6px;">`,
+    itunes: `<img src="https://i.pinimg.com/1200x/8e/43/22/8e432289acad9fb8ca435f8723cc3006.jpg" alt="iTunes" style="width:100%;height:auto;max-height:40px;border-radius:6px;">`,
+    steam: `<img src="https://i.pinimg.com/1200x/2c/31/0a/2c310a42c7ff1a43a55df5293b857693.jpg" alt="Steam" style="width:100%;height:auto;max-height:40px;border-radius:6px;">`,
+    googleplay: `<img src="https://i.pinimg.com/1200x/a5/04/88/a5048821569632f841434651ae44495e.jpg" alt="Google Play" style="width:100%;height:auto;max-height:40px;border-radius:6px;">`,
+    amazon: `<img src="https://i.pinimg.com/1200x/22/b6/7b/22b67b10a768cef2aa80cec378252eb3.jpg" alt="Amazon" style="width:100%;height:auto;max-height:40px;border-radius:6px;">`
 };
 
+// ===== MINI-LOGOS POUR LE SELECT (CORRIGÉS) =====
+const CARD_MINI_LOGOS = {
+    pcs: `<img src="https://i.pinimg.com/1200x/4b/d4/02/4bd4028aeec8bb467458d3c9db1c7460.jpg" alt="PCS" style="width:20px;height:20px;border-radius:4px;vertical-align:middle;margin-right:6px;object-fit:cover;">`,
+    transcash: `<img src="https://i.pinimg.com/1200x/f5/25/62/f52562ace794f02a992383e6456027a4.jpg" alt="Transcash" style="width:20px;height:20px;border-radius:4px;vertical-align:middle;margin-right:6px;object-fit:cover;">`,
+    neosurf: `<img src="https://www.netentstalker.com/wp-content/uploads/2016/06/neosurf-335x205.jpg" alt="Neosurf" style="width:20px;height:20px;border-radius:4px;vertical-align:middle;margin-right:6px;object-fit:cover;">`,
+    paysafe: `<img src="https://i.pinimg.com/1200x/b4/2c/fa/b42cfaae961c9085cb62a23ce2a1d781.jpg" alt="Paysafecard" style="width:20px;height:20px;border-radius:4px;vertical-align:middle;margin-right:6px;object-fit:cover;">`,
+    itunes: `<img src="https://i.pinimg.com/1200x/8e/43/22/8e432289acad9fb8ca435f8723cc3006.jpg" alt="iTunes" style="width:20px;height:20px;border-radius:4px;vertical-align:middle;margin-right:6px;object-fit:cover;">`,
+    steam: `<img src="https://i.pinimg.com/1200x/2c/31/0a/2c310a42c7ff1a43a55df5293b857693.jpg" alt="Steam" style="width:20px;height:20px;border-radius:4px;vertical-align:middle;margin-right:6px;object-fit:cover;">`,
+    googleplay: `<img src="https://i.pinimg.com/1200x/a5/04/88/a5048821569632f841434651ae44495e.jpg" alt="Google Play" style="width:20px;height:20px;border-radius:4px;vertical-align:middle;margin-right:6px;object-fit:cover;">`,
+    amazon: `<img src="https://i.pinimg.com/1200x/22/b6/7b/22b67b10a768cef2aa80cec378252eb3.jpg" alt="Amazon" style="width:20px;height:20px;border-radius:4px;vertical-align:middle;margin-right:6px;object-fit:cover;">`
+};
+
+// ===== TRADUCTIONS (avec contact ajouté) =====
 const translations = {
     fr: {
         header: {
@@ -170,7 +349,7 @@ const translations = {
         hero: {
             badge: 'Expérience premium • validation en temps réel',
             title: 'Vérificateur de Cartes Cadeaux',
-            subtitle: 'Vérifiez le format de vos cartes PCS, Transcash, Neosurf et Paysafecard puis transmettez votre demande avec une interface moderne, claire et responsive.'
+            subtitle: 'Vérifiez la validité de vos cartes PCS, Transcash, Neosurf et Paysafecard.'
         },
         form: {
             title: 'Vérifier une carte',
@@ -192,6 +371,10 @@ const translations = {
             security: 'Les champs sont validés dans le navigateur puis transmis à la destination configurée, sans sauvegarde locale du contenu du formulaire.',
             submit: 'Envoyer la demande',
             sending: 'Envoi...'
+        },
+        contact: {
+            btn: 'Contact',
+            title: '📬 Nous contacter'
         },
         footer: {
             subtitle: 'UI premium, responsive et prête pour l\'évolution du backend',
@@ -235,7 +418,7 @@ const translations = {
         hero: {
             badge: 'Premium experience • real-time validation',
             title: 'Gift Card Verifier',
-            subtitle: 'Check the expected format for PCS, Transcash, Neosurf and Paysafecard codes, then submit your request through a modern, clear and responsive interface.'
+            subtitle: 'Check the validity of your PCS, Transcash, Neosurf and Paysafecard cards.'
         },
         form: {
             title: 'Verify a card',
@@ -257,6 +440,10 @@ const translations = {
             security: 'Fields are validated in the browser, then sent to the configured destination without storing the form content locally.',
             submit: 'Send request',
             sending: 'Sending...'
+        },
+        contact: {
+            btn: 'Contact',
+            title: '📬 Contact us'
         },
         footer: {
             subtitle: 'Premium, responsive UI ready for backend evolution',
@@ -292,6 +479,144 @@ const translations = {
             timeout: 'Request timed out. Please try again.'
         },
         beforeunload: 'You have unsaved changes. Are you sure you want to leave?'
+    },
+    de: {
+        header: {
+            tagline: 'Modernisierte Verifizierungsoberfläche'
+        },
+        hero: {
+            badge: 'Premium-Erfahrung • Echtzeit-Validierung',
+            title: 'Geschenkkarten-Verifizierer',
+            subtitle: 'Überprüfen Sie die Gültigkeit Ihrer PCS-, Transcash-, Neosurf- und Paysafecard-Karten.'
+        },
+        form: {
+            title: 'Eine Karte überprüfen',
+            subtitle: 'Wählen Sie eine Karte aus, geben Sie den erwarteten Code ein und übermitteln Sie die Anfrage an das Verarbeitungsteam.',
+            cardType: 'Kartentyp',
+            cardHint: 'Wählen Sie eine Karte, um das Code-Format anzupassen',
+            selectPlaceholder: '-- Wählen Sie eine Karte --',
+            noCardSelected: 'Keine Karte ausgewählt',
+            selectedCardPrefix: 'Ausgewählte Karte:',
+            pin: 'Code',
+            pinMetaDefault: 'Das Format hängt von der ausgewählten Karte ab',
+            pinHelpDefault: 'Wählen Sie eine Karte, um das richtige Format zu laden.',
+            pinRequired: 'Bitte geben Sie einen Code ein.',
+            email: 'Ihre E-Mail',
+            amount: 'Ursprünglicher Betrag (optional)',
+            purchaseDate: 'Kaufdatum (optional)',
+            message: 'Zusätzliche Nachricht (optional)',
+            securityTitle: 'Formularübermittlung',
+            security: 'Die Felder werden im Browser validiert und dann an das konfigurierte Ziel gesendet, ohne den Formularinhalt lokal zu speichern.',
+            submit: 'Anfrage senden',
+            sending: 'Senden...'
+        },
+        contact: {
+            btn: 'Kontakt',
+            title: '📬 Kontaktieren Sie uns'
+        },
+        footer: {
+            subtitle: 'Premium, responsive UI bereit für Backend-Entwicklung',
+            privacy: 'Datenschutzrichtlinie',
+            terms: 'Nutzungsbedingungen',
+            copy: '© 2026 GiftCard Verifier. Alle Rechte vorbehalten.'
+        },
+        modal: {
+            title: 'Anfrage gesendet',
+            description: 'Ihre Anfrage wurde an das konfigurierte Ziel übermittelt. Wenn eine Nachverfolgung erfolgt, wird die im Formular angegebene E-Mail-Adresse verwendet.',
+            close: 'Schließen'
+        },
+        theme: {
+            toDark: 'Dunkelmodus aktivieren',
+            toLight: 'Hellmodus aktivieren'
+        },
+        noscript: {
+            message: 'Einige interaktive Funktionen erfordern JavaScript. Das Formular bleibt nutzbar, aber die Echtzeit-Validierung ist deaktiviert.'
+        },
+        validation: {
+            selectCard: 'Bitte wählen Sie einen Kartentyp aus.',
+            pinRequired: 'Bitte geben Sie einen Code ein.',
+            pinInvalidFor: card => `Das Format des Codes ${card} ist ungültig.`,
+            pinNeedsCard: 'Wählen Sie eine Karte, um den Code zu validieren.',
+            emailInvalid: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
+            amountNegative: 'Der Betrag darf nicht negativ sein.',
+            amountInvalid: 'Bitte geben Sie einen gültigen Betrag ein (z.B. 50.00).',
+            dateInvalid: 'Bitte geben Sie ein gültiges Datum ein.',
+            dateFuture: 'Das Kaufdatum kann nicht in der Zukunft liegen.'
+        },
+        result: {
+            error: 'Beim Senden ist ein Fehler aufgetreten. Überprüfen Sie die Webhook-Konfiguration und versuchen Sie es erneut.',
+            timeout: 'Die Anfrage wurde zeitüberschritten. Bitte versuchen Sie es erneut.'
+        },
+        beforeunload: 'Sie haben nicht gespeicherte Änderungen. Sind Sie sicher, dass Sie die Seite verlassen möchten?'
+    },
+    es: {
+        header: {
+            tagline: 'Interfaz de verificación modernizada'
+        },
+        hero: {
+            badge: 'Experiencia premium • validación en tiempo real',
+            title: 'Verificador de Tarjetas Regalo',
+            subtitle: 'Verifique la validez de sus tarjetas PCS, Transcash, Neosurf y Paysafecard.'
+        },
+        form: {
+            title: 'Verificar una tarjeta',
+            subtitle: 'Seleccione una tarjeta, ingrese el código esperado y envíe la solicitud al equipo de procesamiento.',
+            cardType: 'Tipo de tarjeta',
+            cardHint: 'Elija una tarjeta para adaptar el formato del código',
+            selectPlaceholder: '-- Elija una tarjeta --',
+            noCardSelected: 'Ninguna tarjeta seleccionada',
+            selectedCardPrefix: 'Tarjeta seleccionada:',
+            pin: 'Código',
+            pinMetaDefault: 'El formato depende de la tarjeta seleccionada',
+            pinHelpDefault: 'Elija una tarjeta para cargar el formato correcto.',
+            pinRequired: 'Por favor, ingrese un código.',
+            email: 'Su correo electrónico',
+            amount: 'Monto inicial (opcional)',
+            purchaseDate: 'Fecha de compra (opcional)',
+            message: 'Mensaje adicional (opcional)',
+            securityTitle: 'Transmisión del formulario',
+            security: 'Los campos se validan en el navegador y luego se envían al destino configurado, sin almacenar el contenido del formulario localmente.',
+            submit: 'Enviar solicitud',
+            sending: 'Enviando...'
+        },
+        contact: {
+            btn: 'Contacto',
+            title: '📬 Contáctenos'
+        },
+        footer: {
+            subtitle: 'UI premium, responsive y lista para la evolución del backend',
+            privacy: 'Política de privacidad',
+            terms: 'Términos de uso',
+            copy: '© 2026 GiftCard Verifier. Todos los derechos reservados.'
+        },
+        modal: {
+            title: 'Solicitud enviada',
+            description: 'Su solicitud ha sido transmitida al destino configurado. Si se realiza un seguimiento, se utilizará la dirección de correo electrónico proporcionada en el formulario.',
+            close: 'Cerrar'
+        },
+        theme: {
+            toDark: 'Activar modo oscuro',
+            toLight: 'Activar modo claro'
+        },
+        noscript: {
+            message: 'Algunas funciones interactivas requieren JavaScript. El formulario sigue siendo utilizable, pero la validación en tiempo real está desactivada.'
+        },
+        validation: {
+            selectCard: 'Por favor, seleccione un tipo de tarjeta.',
+            pinRequired: 'Por favor, ingrese un código.',
+            pinInvalidFor: card => `El formato del código ${card} es inválido.`,
+            pinNeedsCard: 'Elija una tarjeta para validar el código.',
+            emailInvalid: 'Por favor, ingrese un correo electrónico válido.',
+            amountNegative: 'El monto no puede ser negativo.',
+            amountInvalid: 'Por favor, ingrese un monto válido (ej: 50.00).',
+            dateInvalid: 'Por favor, ingrese una fecha válida.',
+            dateFuture: 'La fecha de compra no puede ser en el futuro.'
+        },
+        result: {
+            error: 'Ocurrió un error durante el envío. Verifique la configuración del webhook y vuelva a intentarlo.',
+            timeout: 'La solicitud ha expirado. Por favor, intente de nuevo.'
+        },
+        beforeunload: 'Tiene cambios no guardados. ¿Está seguro de que desea salir?'
     }
 };
 
@@ -310,11 +635,13 @@ if (!Array.from) {
 // ===== ÉLÉMENTS DOM =====
 const elements = {
     body: document.body,
+    header: document.getElementById('mainHeader'),
     form: document.getElementById('verificationForm'),
     cardTypeSelect: document.getElementById('cardTypeSelect'),
     cardTypeInput: document.getElementById('cardType'),
     cardTypeError: document.getElementById('cardTypeError'),
     pinInput: document.getElementById('pin'),
+    pinToggle: document.getElementById('pinToggle'),
     pinLabel: document.getElementById('pinLabel'),
     pinHelp: document.getElementById('pinHelp'),
     pinMetaHint: document.getElementById('pinMetaHint'),
@@ -332,7 +659,7 @@ const elements = {
     btnText: document.getElementById('btnText'),
     btnLoader: document.getElementById('btnLoader'),
     result: document.getElementById('result'),
-    langButtons: Array.from(document.querySelectorAll('.lang-btn')),
+    langSelect: document.getElementById('langSelect'),
     themeToggle: document.getElementById('themeToggle'),
     themeIcon: document.querySelector('#themeToggle i'),
     selectedCardHint: document.getElementById('selectedCardHint'),
@@ -359,6 +686,8 @@ let formSubmitted = false;
 let debounceTimers = {};
 let animationFrameId = null;
 let resizeObserver = null;
+let lastScrollY = 0;
+let headerHidden = false;
 
 // ===== FONCTIONS UTILES =====
 function getCurrentTranslations() {
@@ -402,6 +731,34 @@ function debounce(key, fn, delay = 150) {
     }, delay);
 }
 
+// ===== GESTION DU HEADER (scroll) =====
+function handleScroll() {
+    const currentScrollY = window.scrollY;
+    const header = elements.header;
+    if (!header) return;
+
+    if (currentScrollY < 50) {
+        header.classList.remove('header-hidden');
+        headerHidden = false;
+        lastScrollY = currentScrollY;
+        return;
+    }
+
+    if (currentScrollY > lastScrollY && currentScrollY > 80) {
+        if (!headerHidden) {
+            header.classList.add('header-hidden');
+            headerHidden = true;
+        }
+    } else if (currentScrollY < lastScrollY) {
+        if (headerHidden) {
+            header.classList.remove('header-hidden');
+            headerHidden = false;
+        }
+    }
+
+    lastScrollY = currentScrollY;
+}
+
 // ===== GESTION DU THÈME =====
 function updateThemeButton() {
     const toDark = currentTheme !== 'dark';
@@ -420,7 +777,10 @@ function applyTheme(theme) {
 
 // ===== GESTION DE LA LANGUE =====
 function setLanguage(lang) {
-    currentLang = translations[lang] ? lang : 'fr';
+    if (!translations[lang]) {
+        lang = 'fr';
+    }
+    currentLang = lang;
     const t = getCurrentTranslations();
     document.documentElement.lang = currentLang;
 
@@ -431,15 +791,14 @@ function setLanguage(lang) {
         }
     });
 
-    // Mettre à jour le placeholder du select
+    if (elements.langSelect) {
+        elements.langSelect.value = currentLang;
+    }
+
     const selectPlaceholder = elements.cardTypeSelect.querySelector('option[value=""]');
     if (selectPlaceholder) {
         selectPlaceholder.textContent = t.form.selectPlaceholder;
     }
-
-    elements.langButtons.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === currentLang);
-    });
 
     safeStorageSet(STORAGE_KEYS.language, currentLang);
     updateDynamicText();
@@ -458,7 +817,10 @@ function updateCardPreview() {
         
         elements.cardPreviewLogo.innerHTML = logoHtml || `<span class="card-preview-placeholder">${rule.displayName}</span>`;
         elements.cardPreviewName.textContent = rule.displayName;
-        elements.cardPreviewFormat.textContent = rule.formatDesc;
+        const formatDesc = typeof rule.formatDesc === 'object' 
+            ? (rule.formatDesc[currentLang] || rule.formatDesc.fr) 
+            : rule.formatDesc;
+        elements.cardPreviewFormat.textContent = formatDesc;
         elements.cardPreview.classList.add('has-card');
         elements.selectedCardHint.textContent = `${t.form.selectedCardPrefix} ${rule.displayName}`;
     } else {
@@ -469,7 +831,6 @@ function updateCardPreview() {
         elements.selectedCardHint.textContent = t.form.cardHint;
     }
 
-    // Mettre à jour le champ hidden
     elements.cardTypeInput.value = selectedValue;
     
     updateDynamicText();
@@ -626,7 +987,12 @@ function validateDate(showError = false) {
         return false;
     }
 
-    const selectedDate = new Date(value);
+    const parts = value.split('-');
+    const year = parseInt(parts[0]);
+    const month = parseInt(parts[1]) - 1;
+    const day = parseInt(parts[2]);
+    const selectedDate = new Date(year, month, day);
+    
     if (isNaN(selectedDate.getTime())) {
         if (showError) {
             elements.dateError.textContent = getCurrentTranslations().validation.dateInvalid;
@@ -637,9 +1003,9 @@ function validateDate(showError = false) {
     }
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-    if (selectedDate > today) {
+    if (selectedDate > todayDate) {
         if (showError) {
             elements.dateError.textContent = getCurrentTranslations().validation.dateFuture;
         } else {
@@ -684,22 +1050,42 @@ function clearInlineResult() {
 // ===== GESTION DYNAMIQUE DES TEXTES =====
 function updateDynamicText() {
     const t = getCurrentTranslations();
-    elements.emailInput.placeholder = currentLang === 'fr' ? 'vous@exemple.com' : 'you@example.com';
+    
+    const emailPlaceholders = {
+        fr: 'vous@exemple.com',
+        en: 'you@example.com',
+        de: 'ihre@email.de',
+        es: 'usted@ejemplo.com'
+    };
+    elements.emailInput.placeholder = emailPlaceholders[currentLang] || emailPlaceholders.fr;
     elements.amountInput.placeholder = '50.00';
-    elements.messageInput.placeholder = currentLang === 'fr' ? 'Informations complémentaires...' : 'Additional details...';
+    
+    const messagePlaceholders = {
+        fr: 'Informations complémentaires...',
+        en: 'Additional details...',
+        de: 'Zusätzliche Informationen...',
+        es: 'Información adicional...'
+    };
+    elements.messageInput.placeholder = messagePlaceholders[currentLang] || messagePlaceholders.fr;
 
     const rule = getSelectedCardRule();
     if (rule) {
-        elements.pinLabel.textContent = rule.label[currentLang];
-        elements.pinHelp.textContent = rule.help[currentLang];
-        elements.pinMetaHint.textContent = rule.meta[currentLang];
+        elements.pinLabel.textContent = rule.label[currentLang] || rule.label.fr;
+        elements.pinHelp.textContent = rule.help[currentLang] || rule.help.fr;
+        elements.pinMetaHint.textContent = rule.meta[currentLang] || rule.meta.fr;
         elements.pinInput.placeholder = rule.placeholder;
         elements.pinInput.maxLength = rule.maxLength;
     } else {
         elements.pinLabel.textContent = t.form.pin;
         elements.pinHelp.textContent = t.form.pinHelpDefault;
         elements.pinMetaHint.textContent = t.form.pinMetaDefault;
-        elements.pinInput.placeholder = currentLang === 'fr' ? 'Sélectionnez une carte d\'abord' : 'Select a card first';
+        const pinPlaceholders = {
+            fr: 'Sélectionnez une carte d\'abord',
+            en: 'Select a card first',
+            de: 'Wählen Sie zuerst eine Karte',
+            es: 'Seleccione una tarjeta primero'
+        };
+        elements.pinInput.placeholder = pinPlaceholders[currentLang] || pinPlaceholders.fr;
         elements.pinInput.removeAttribute('maxLength');
     }
 }
@@ -882,7 +1268,7 @@ function initParticles() {
     }, { once: true });
 }
 
-// ===== LAZY LOADING AVEC INTERSECTION OBSERVER =====
+// ===== LAZY LOADING =====
 function initLazyLoading() {
     if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver((entries) => {
@@ -937,14 +1323,29 @@ function init() {
     const todayISO = today.toISOString().split('T')[0];
     elements.purchaseDateInput.setAttribute('max', todayISO);
 
+    enrichSelectOptions();
+
     bindEvents();
     initParticles();
     initLazyLoading();
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     window.addEventListener('pagehide', cleanup);
 
     document.body.classList.add('loaded');
+}
+
+// ===== ENRICHIR LES OPTIONS DU SELECT AVEC DES MINI-LOGOS =====
+function enrichSelectOptions() {
+    const options = elements.cardTypeSelect.querySelectorAll('option[data-logo]');
+    options.forEach(option => {
+        const logoKey = option.getAttribute('data-logo');
+        if (logoKey && CARD_MINI_LOGOS[logoKey]) {
+            option.setAttribute('data-logo-html', CARD_MINI_LOGOS[logoKey]);
+        }
+    });
 }
 
 // ===== NETTOYAGE =====
@@ -956,6 +1357,7 @@ function cleanup() {
         delete debounceTimers[key];
     });
     window.removeEventListener('beforeunload', handleBeforeUnload);
+    window.removeEventListener('scroll', handleScroll);
 }
 
 // ===== GESTION DES ÉVÉNEMENTS =====
@@ -969,15 +1371,30 @@ function handleGlobalKeydown(event) {
 }
 
 function bindEvents() {
-    elements.langButtons.forEach(btn => {
-        btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
-    });
+    // Sélecteur de langue
+    if (elements.langSelect) {
+        elements.langSelect.addEventListener('change', function() {
+            setLanguage(this.value);
+        });
+    }
 
+    // Thème
     elements.themeToggle.addEventListener('click', () => {
         applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
     });
 
-    // Sélection des cartes via le select
+    // ===== TOGGLE PIN (AFFICHER/MASQUER LE CODE) =====
+    if (elements.pinToggle) {
+        elements.pinToggle.addEventListener('click', function() {
+            const input = elements.pinInput;
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            this.innerHTML = isPassword ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+            this.setAttribute('aria-label', isPassword ? 'Masquer le code' : 'Afficher le code');
+        });
+    }
+
+    // Sélection des cartes
     elements.cardTypeSelect.addEventListener('change', () => {
         const value = elements.cardTypeSelect.value;
         if (value && CARD_RULES[value]) {
@@ -988,7 +1405,6 @@ function bindEvents() {
             validateCardSelection(false);
         }
         markFormDirty();
-        // Focus sur le champ PIN après sélection
         setTimeout(() => {
             if (document.activeElement !== elements.pinInput) {
                 elements.pinInput.focus();
@@ -1003,7 +1419,7 @@ function bindEvents() {
         modalBackdrop.addEventListener('click', closeSuccessModal);
     }
 
-    // Validation en temps réel avec debounce
+    // Validations en temps réel
     elements.pinInput.addEventListener('input', () => {
         markFormDirty();
         debounce('pin', () => validatePin(false), 150);
@@ -1050,7 +1466,11 @@ function bindEvents() {
             amount: elements.amountInput.value || 'Non spécifié',
             purchaseDate: elements.purchaseDateInput.value || 'Non spécifié',
             message: elements.messageInput.value.trim() || 'Aucun message',
-            timestamp: new Date().toLocaleString(currentLang === 'fr' ? 'fr-FR' : 'en-US'),
+            timestamp: new Date().toLocaleString(
+                currentLang === 'fr' ? 'fr-FR' : 
+                currentLang === 'de' ? 'de-DE' : 
+                currentLang === 'es' ? 'es-ES' : 'en-US'
+            ),
             lang: currentLang
         };
 

