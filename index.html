@@ -18,22 +18,17 @@
                         <span class="logo-icon"><i class="fas fa-gift"></i></span>
                         <span>
                             <strong>GiftCard Verifier</strong>
+                            <small data-i18n="header.tagline">Interface de vérification modernisée</small>
                         </span>
                     </a>
                 </div>
-
                 <div class="header-actions">
-                    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activer le mode sombre" title="Mode sombre">
+                    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Mode sombre" title="Mode sombre">
                         <i class="fas fa-moon"></i>
                     </button>
-
-                    <div class="language-selector" aria-label="Sélecteur de langue">
-                        <button class="lang-btn active" data-lang="fr" type="button">
-                            <i class="fas fa-flag"></i> FR
-                        </button>
-                        <button class="lang-btn" data-lang="en" type="button">
-                            <i class="fas fa-flag"></i> EN
-                        </button>
+                    <div class="language-selector">
+                        <button class="lang-btn active" data-lang="fr" type="button"><i class="fas fa-flag"></i> FR</button>
+                        <button class="lang-btn" data-lang="en" type="button"><i class="fas fa-flag"></i> EN</button>
                     </div>
                 </div>
             </div>
@@ -47,8 +42,9 @@
             <div class="hero-orb orb-b" aria-hidden="true"></div>
             <div class="container">
                 <div class="hero-content">
+                    <div class="hero-badge" data-i18n="hero.badge">Expérience premium • validation en temps réel</div>
                     <h1 data-i18n="hero.title">Vérificateur de Cartes Cadeaux</h1>
-                    <p data-i18n="hero.subtitle">Vérifiez la validité de vos cartes PCS, Transcash, Neosurf et Paysafecard.</p>
+                    <p data-i18n="hero.subtitle">Vérifiez le format de vos cartes PCS, Transcash, Neosurf et Paysafecard.</p>
                 </div>
             </div>
         </section>
@@ -58,98 +54,69 @@
                 <div class="form-card glass-panel">
                     <div class="form-header">
                         <h2 data-i18n="form.title">Vérifier une carte</h2>
-                        <p data-i18n="form.subtitle">Sélectionnez une carte, saisissez le code attendu et transmettez la demande à l'équipe de traitement.</p>
+                        <p data-i18n="form.subtitle">Sélectionnez une carte, saisissez le code attendu et transmettez la demande.</p>
                     </div>
 
                     <form id="verificationForm" novalidate>
+                        <!-- Type de carte -->
                         <div class="form-group">
                             <div class="label-row">
                                 <label for="cardType" data-i18n="form.cardType">Type de carte</label>
                                 <span class="field-note" id="selectedCardHint" data-i18n="form.cardHint">Choisissez une carte pour adapter le format du code</span>
                             </div>
-
                             <div class="card-selector-shell">
-                                <button
-                                    type="button"
-                                    class="card-mobile-trigger"
-                                    id="cardMobileTrigger"
-                                    aria-expanded="false"
-                                    aria-controls="cardSelectorSheet"
-                                >
+                                <button type="button" class="card-mobile-trigger" id="cardMobileTrigger" aria-expanded="false" aria-controls="cardSelectorSheet">
                                     <span class="mobile-trigger-label" data-i18n="form.mobilePicker">Choisir une carte</span>
                                     <span class="mobile-trigger-value" id="mobileSelectedCard">Aucune carte sélectionnée</span>
                                     <i class="fas fa-chevron-up"></i>
                                 </button>
-
                                 <div class="sheet-overlay hidden" id="sheetOverlay"></div>
-
-                                <div class="card-selector-sheet" id="cardSelectorSheet" aria-label="Sélection des cartes">
+                                <div class="card-selector-sheet" id="cardSelectorSheet">
                                     <div class="sheet-handle" aria-hidden="true"></div>
                                     <div class="sheet-header">
                                         <div>
                                             <h3 data-i18n="form.sheetTitle">Choisir une carte</h3>
                                             <p data-i18n="form.sheetSubtitle">Le format du code s'adapte à la marque sélectionnée.</p>
                                         </div>
-                                        <button type="button" class="sheet-close" id="sheetClose" aria-label="Fermer la sélection des cartes">
-                                            <i class="fas fa-times"></i>
-                                        </button>
+                                        <button type="button" class="sheet-close" id="sheetClose" aria-label="Fermer"><i class="fas fa-times"></i></button>
                                     </div>
-
                                     <div class="card-selector-grid" id="cardSelectorGrid">
-                                        <button type="button" class="card-option" data-value="PCS" data-card-key="PCS" aria-pressed="false">
+                                        <!-- PCS -->
+                                        <button type="button" class="card-option" data-value="PCS" aria-pressed="false">
                                             <span class="card-option-shine" aria-hidden="true"></span>
                                             <span class="card-chip" aria-hidden="true"></span>
                                             <div class="card-logo pcs-logo">
-                                                <svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                    <rect width="100" height="40" rx="8" fill="#1A237E"/>
-                                                    <text x="10" y="24" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">PCS</text>
-                                                    <text x="46" y="24" font-family="Arial, sans-serif" font-size="10" fill="#90CAF9">Mastercard</text>
-                                                    <circle cx="82" cy="20" r="12" fill="#FF5F00" opacity="0.82"/>
-                                                    <circle cx="90" cy="20" r="12" fill="#F79E1B" opacity="0.82"/>
-                                                </svg>
+                                                <svg viewBox="0 0 100 40"><rect width="100" height="40" rx="8" fill="#1A237E"/><text x="10" y="24" font-family="Arial,sans-serif" font-size="16" font-weight="bold" fill="#FFF">PCS</text><text x="46" y="24" font-family="Arial,sans-serif" font-size="10" fill="#90CAF9">Mastercard</text><circle cx="82" cy="20" r="12" fill="#FF5F00" opacity="0.82"/><circle cx="90" cy="20" r="12" fill="#F79E1B" opacity="0.82"/></svg>
                                             </div>
                                             <span class="card-brand">PCS</span>
                                             <small class="card-format">10 caractères</small>
                                         </button>
-
-                                        <button type="button" class="card-option" data-value="Transcash" data-card-key="Transcash" aria-pressed="false">
+                                        <!-- Transcash -->
+                                        <button type="button" class="card-option" data-value="Transcash" aria-pressed="false">
                                             <span class="card-option-shine" aria-hidden="true"></span>
                                             <span class="card-chip" aria-hidden="true"></span>
                                             <div class="card-logo transcash-logo">
-                                                <svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                    <rect width="100" height="40" rx="8" fill="#E91E63"/>
-                                                    <text x="15" y="20" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#FFFFFF">Transcash</text>
-                                                    <text x="15" y="32" font-family="Arial, sans-serif" font-size="8" fill="#F8BBD0">by Transfond</text>
-                                                </svg>
+                                                <svg viewBox="0 0 100 40"><rect width="100" height="40" rx="8" fill="#E91E63"/><text x="15" y="20" font-family="Arial,sans-serif" font-size="12" font-weight="bold" fill="#FFF">Transcash</text><text x="15" y="32" font-family="Arial,sans-serif" font-size="8" fill="#F8BBD0">by Transfond</text></svg>
                                             </div>
                                             <span class="card-brand">Transcash</span>
                                             <small class="card-format">12 chiffres</small>
                                         </button>
-
-                                        <button type="button" class="card-option" data-value="Neosurf" data-card-key="Neosurf" aria-pressed="false">
+                                        <!-- Neosurf -->
+                                        <button type="button" class="card-option" data-value="Neosurf" aria-pressed="false">
                                             <span class="card-option-shine" aria-hidden="true"></span>
                                             <span class="card-chip" aria-hidden="true"></span>
                                             <div class="card-logo neosurf-logo">
-                                                <svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                    <rect width="100" height="40" rx="8" fill="#00BCD4"/>
-                                                    <text x="12" y="22" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">neosurf</text>
-                                                    <text x="70" y="22" font-family="Arial, sans-serif" font-size="8" fill="#B2EBF2">voucher</text>
-                                                </svg>
+                                                <svg viewBox="0 0 100 40"><rect width="100" height="40" rx="8" fill="#00BCD4"/><text x="12" y="22" font-family="Arial,sans-serif" font-size="16" font-weight="bold" fill="#FFF">neosurf</text><text x="70" y="22" font-family="Arial,sans-serif" font-size="8" fill="#B2EBF2">voucher</text></svg>
                                             </div>
                                             <span class="card-brand">Neosurf</span>
                                             <small class="card-format">10 caractères</small>
                                         </button>
-
-                                        <button type="button" class="card-option" data-value="Paysafecard" data-card-key="Paysafecard" aria-pressed="false">
+                                        <!-- Paysafecard -->
+                                        <button type="button" class="card-option" data-value="Paysafecard" aria-pressed="false">
                                             <span class="card-option-shine" aria-hidden="true"></span>
                                             <span class="card-chip" aria-hidden="true"></span>
                                             <div class="card-logo paysafe-logo">
-                                                <svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                    <rect width="100" height="40" rx="8" fill="#FF6B00"/>
-                                                    <text x="8" y="22" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FFFFFF">paysafe</text>
-                                                    <text x="68" y="22" font-family="Arial, sans-serif" font-size="10" fill="#FFD54F">card</text>
-                                                    <circle cx="88" cy="20" r="8" fill="#FFFFFF" opacity="0.28"/>
-                                                </svg>
+                                                <svg viewBox="0 0 100 40"><rect width="100" height="40" rx="8" fill="#FF6B00"/><text x="8" y="22" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="#FFF">paysafe</text><text x="68" y="22" font-family="Arial,sans-serif" font-size="10" fill="#FFD54F">card</text><circle cx="88" cy="20" r="8" fill="#FFF" opacity="0.28"/></svg>
                                             </div>
                                             <span class="card-brand">Paysafecard</span>
                                             <small class="card-format">16 chiffres</small>
@@ -157,11 +124,11 @@
                                     </div>
                                 </div>
                             </div>
-
                             <input type="hidden" id="cardType" required>
                             <div class="error-message" id="cardTypeError" aria-live="polite"></div>
                         </div>
 
+                        <!-- Code -->
                         <div class="form-group">
                             <div class="label-row">
                                 <label for="pin" id="pinLabel" data-i18n="form.pin">Code</label>
@@ -175,6 +142,7 @@
                             <div class="error-message" id="pinError" aria-live="polite"></div>
                         </div>
 
+                        <!-- Email -->
                         <div class="form-group">
                             <label for="email" data-i18n="form.email">Votre email</label>
                             <div class="input-with-icon" id="emailFieldWrap">
@@ -184,6 +152,7 @@
                             <div class="error-message" id="emailError" aria-live="polite"></div>
                         </div>
 
+                        <!-- Montant & Date -->
                         <div class="form-row two-col">
                             <div class="form-group">
                                 <label for="amount" data-i18n="form.amount">Montant initial (optionnel)</label>
@@ -192,7 +161,6 @@
                                     <input type="number" id="amount" placeholder="50.00" step="0.01" min="0">
                                 </div>
                             </div>
-
                             <div class="form-group">
                                 <label for="purchaseDate" data-i18n="form.purchaseDate">Date d'achat (optionnel)</label>
                                 <div class="input-with-icon">
@@ -202,11 +170,22 @@
                             </div>
                         </div>
 
+                        <!-- Message -->
                         <div class="form-group">
                             <label for="message" data-i18n="form.message">Message supplémentaire (optionnel)</label>
                             <textarea id="message" rows="4" placeholder="Informations complémentaires..."></textarea>
                         </div>
 
+                        <!-- Sécurité -->
+                        <div class="security-notice glass-panel">
+                            <i class="fas fa-lock"></i>
+                            <div>
+                                <strong data-i18n="form.securityTitle">Transmission du formulaire</strong>
+                                <span data-i18n="form.security">Les champs sont validés dans le navigateur puis transmis à la destination configurée, sans sauvegarde locale du contenu du formulaire.</span>
+                            </div>
+                        </div>
+
+                        <!-- Bouton -->
                         <button type="submit" id="submitBtn" class="primary-btn">
                             <span id="btnText" data-i18n="form.submit">Envoyer la demande</span>
                             <span id="btnLoader" class="hidden"><i class="fas fa-spinner fa-spin"></i> <span data-i18n="form.sending">Envoi...</span></span>
@@ -214,6 +193,33 @@
 
                         <div id="result" class="result-fallback hidden" aria-live="polite"></div>
                     </form>
+                </div>
+            </div>
+        </section>
+
+        <section class="faq">
+            <div class="container">
+                <div class="section-heading">
+                    <span class="section-kicker" data-i18n="faq.kicker">Aide</span>
+                    <h2 data-i18n="faq.title">Questions fréquentes</h2>
+                </div>
+                <div class="faq-grid">
+                    <article class="faq-item glass-panel">
+                        <h3 data-i18n="faq.q1.title">Comment fonctionne la vérification ?</h3>
+                        <p data-i18n="faq.q1.text">Le formulaire adapte le format du code à la carte sélectionnée, valide les champs côté navigateur puis transmet la demande.</p>
+                    </article>
+                    <article class="faq-item glass-panel">
+                        <h3 data-i18n="faq.q2.title">Le site stocke-t-il mes données ?</h3>
+                        <p data-i18n="faq.q2.text">Le contenu du formulaire n'est pas conservé après l'envoi. Seules la langue et le thème sont mémorisés.</p>
+                    </article>
+                    <article class="faq-item glass-panel">
+                        <h3 data-i18n="faq.q3.title">Quelles cartes sont supportées ?</h3>
+                        <p data-i18n="faq.q3.text">PCS, Transcash, Neosurf et Paysafecard sont pris en charge.</p>
+                    </article>
+                    <article class="faq-item glass-panel">
+                        <h3 data-i18n="faq.q4.title">Quel est le délai de traitement ?</h3>
+                        <p data-i18n="faq.q4.text">Le site transmet la demande immédiatement. Le délai de réponse dépend du canal configuré.</p>
+                    </article>
                 </div>
             </div>
         </section>
@@ -226,6 +232,7 @@
                     <span class="logo-icon"><i class="fas fa-gift"></i></span>
                     <div>
                         <strong>GiftCard Verifier</strong>
+                        <small data-i18n="footer.subtitle">UI premium, responsive et prête pour l'évolution du backend</small>
                     </div>
                 </div>
                 <div class="footer-links">
@@ -246,7 +253,7 @@
                 <span class="success-icon"><i class="fas fa-check"></i></span>
             </div>
             <h2 id="successModalTitle" data-i18n="modal.title">Demande envoyée</h2>
-            <p id="successModalDesc" data-i18n="modal.description">Votre demande a été transmise à la destination configurée. Si un suivi est effectué, il utilisera l'adresse email renseignée dans le formulaire.</p>
+            <p id="successModalDesc" data-i18n="modal.description">Votre demande a été transmise à la destination configurée.</p>
             <button type="button" class="primary-btn modal-action" id="closeSuccessModal" data-i18n="modal.close">Fermer</button>
         </div>
     </div>
